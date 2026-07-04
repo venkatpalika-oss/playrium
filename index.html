@@ -33,7 +33,7 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
   margin:1.2rem 0 0; opacity:.85; animation:fadeUp .9s ease .35s both; }
 @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
 .grid{ position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:1rem 1.5rem 6rem;
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:1.75rem; }
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.75rem; }
 .card{ position:relative; display:block; border-radius:1.4rem; overflow:hidden; text-decoration:none;
   aspect-ratio:4/3; background:#1a1a24; border:1px solid var(--ui-glass-border);
   box-shadow:0 20px 40px rgba(0,0,0,.35);
@@ -41,14 +41,17 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
   transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease; }
 @keyframes cardIn{ to{ opacity:1; transform:translateY(0); } }
 .card:hover{ transform:translateY(-6px) scale(1.015); box-shadow:0 28px 60px rgba(0,0,0,.55); }
+.card.locked{ cursor:default; }
+.card.locked:hover{ transform:none; box-shadow:0 20px 40px rgba(0,0,0,.35); }
 .card-flag{ position:absolute; inset:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center;
   transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease; filter:saturate(1.02) brightness(.94); }
 .card-flag svg{ width:34%; height:auto; border-radius:.5rem; box-shadow:0 10px 30px rgba(0,0,0,.5); }
-.card:hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
+.card:not(.locked):hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
+.card.locked .card-flag{ filter:grayscale(.7) brightness(.55); }
 .card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,10,15,.55) 70%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
 .card::after{ content:''; position:absolute; inset:0; border-radius:1.4rem; z-index:2; pointer-events:none;
   box-shadow:inset 0 0 0 1.5px transparent; transition:box-shadow .35s ease; }
-.card:hover::after{ box-shadow:inset 0 0 0 1.5px var(--accent), 0 0 24px var(--accent); }
+.card:not(.locked):hover::after{ box-shadow:inset 0 0 0 1.5px var(--accent), 0 0 24px var(--accent); }
 .card-content{ position:absolute; left:0; right:0; bottom:0; z-index:3; padding:1.3rem 1.4rem 1.2rem;
   display:flex; flex-direction:column; gap:.35rem; }
 .accent-dot{ width:9px; height:9px; border-radius:50%; background:var(--accent); display:inline-block;
@@ -59,7 +62,9 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 .card-cta{ margin-top:.5rem; align-self:flex-start; padding:.4rem 1rem; border-radius:999px; font-size:.78rem;
   font-weight:600; color:#0a0a0f; background:var(--chalk); opacity:0; transform:translateY(6px);
   transition:all .35s cubic-bezier(.2,.8,.2,1); }
-.card:hover .card-cta{ opacity:1; transform:translateY(0); }
+.card:not(.locked):hover .card-cta{ opacity:1; transform:translateY(0); }
+.card-badge{ margin-top:.5rem; align-self:flex-start; padding:.4rem 1rem; border-radius:999px; font-size:.78rem;
+  font-weight:600; color:var(--chalk-dim); background:rgba(244,240,230,.1); border:1px solid var(--ui-glass-border); }
 footer{ position:relative; z-index:1; text-align:center; padding:2rem 1.5rem 3rem; color:var(--chalk-dim); }
 footer p{ font-size:.82rem; font-family:var(--font-chalk); }
 @media (prefers-reduced-motion:reduce){
@@ -79,27 +84,61 @@ footer p{ font-size:.82rem; font-family:var(--font-chalk); }
 <script>
 const INDIA_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FF9933"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#138808"/><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="5"/><circle cx="450" cy="300" r="6" fill="#000080"/></svg>';
 const JAPAN_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#FFFFFF"/><circle cx="450" cy="300" r="120" fill="#BC002D"/></svg>';
+function monogram(code, accent){
+  return '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" rx="36" fill="#15151f"/><rect x="6" y="6" width="888" height="588" rx="32" fill="none" stroke="' + accent + '" stroke-opacity="0.35" stroke-width="8"/><text x="450" y="335" font-family="Arial, Helvetica, sans-serif" font-size="230" font-weight="700" fill="' + accent + '" text-anchor="middle">' + code + '</text></svg>';
+}
 const COUNTRIES = [
-  { title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG, bg:'linear-gradient(135deg,#3a2a12,#1a1a24)' },
-  { title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:JAPAN_FLAG, bg:'linear-gradient(135deg,#2a1420,#1a1a24)' },
+  { title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG, live:true },
+  { title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:JAPAN_FLAG, live:true },
+  { title:'China', tagline:'Coming soon.', code:'CN', accent:'#DE2910', live:false },
+  { title:'South Korea', tagline:'Coming soon.', code:'KR', accent:'#0047A0', live:false },
+  { title:'Thailand', tagline:'Coming soon.', code:'TH', accent:'#A51931', live:false },
+  { title:'Vietnam', tagline:'Coming soon.', code:'VN', accent:'#DA251D', live:false },
+  { title:'Indonesia', tagline:'Coming soon.', code:'ID', accent:'#CE1126', live:false },
+  { title:'Philippines', tagline:'Coming soon.', code:'PH', accent:'#0038A8', live:false },
+  { title:'Malaysia', tagline:'Coming soon.', code:'MY', accent:'#010066', live:false },
+  { title:'Singapore', tagline:'Coming soon.', code:'SG', accent:'#EF3340', live:false },
+  { title:'Nepal', tagline:'Coming soon.', code:'NP', accent:'#DC143C', live:false },
+  { title:'Bhutan', tagline:'Coming soon.', code:'BT', accent:'#FFA500', live:false },
+  { title:'Mongolia', tagline:'Coming soon.', code:'MN', accent:'#C4272F', live:false },
+  { title:'Australia', tagline:'Coming soon.', code:'AU', accent:'#00247D', live:false },
+  { title:'New Zealand', tagline:'Coming soon.', code:'NZ', accent:'#00247D', live:false },
+  { title:'Ghana', tagline:'Coming soon.', code:'GH', accent:'#FCD116', live:false },
+  { title:'South Africa', tagline:'Coming soon.', code:'ZA', accent:'#007A4D', live:false },
+  { title:'Kenya', tagline:'Coming soon.', code:'KE', accent:'#BB0000', live:false },
+  { title:'Nigeria', tagline:'Coming soon.', code:'NG', accent:'#008751', live:false },
+  { title:'Morocco', tagline:'Coming soon.', code:'MA', accent:'#C1272D', live:false },
+  { title:'Egypt', tagline:'Coming soon.', code:'EG', accent:'#C09300', live:false },
+  { title:'Türkiye', tagline:'Coming soon.', code:'TR', accent:'#E30A17', live:false },
+  { title:'Greece', tagline:'Coming soon.', code:'GR', accent:'#0D5EAF', live:false },
+  { title:'Italy', tagline:'Coming soon.', code:'IT', accent:'#008C45', live:false },
+  { title:'France', tagline:'Coming soon.', code:'FR', accent:'#0055A4', live:false },
+  { title:'Spain', tagline:'Coming soon.', code:'ES', accent:'#AA151B', live:false },
+  { title:'United Kingdom', tagline:'Coming soon.', code:'GB', accent:'#012169', live:false },
+  { title:'Ireland', tagline:'Coming soon.', code:'IE', accent:'#169B62', live:false },
+  { title:'Germany', tagline:'Coming soon.', code:'DE', accent:'#FFCE00', live:false },
+  { title:'Mexico', tagline:'Coming soon.', code:'MX', accent:'#006847', live:false },
+  { title:'Brazil', tagline:'Coming soon.', code:'BR', accent:'#009C3B', live:false },
+  { title:'USA', tagline:'Coming soon.', code:'US', accent:'#3C3B6E', live:false },
+  { title:'Canada', tagline:'Coming soon.', code:'CA', accent:'#FF0000', live:false },
 ];
 const grid = document.getElementById('grid');
 COUNTRIES.forEach((c, i) => {
-  const a = document.createElement('a');
-  a.className = 'card';
-  a.href = c.href;
-  a.style.setProperty('--accent', c.accent);
-  a.style.animationDelay = (i * 0.06) + 's';
-  a.innerHTML = `
-    <div class="card-flag" style="background:${c.bg}">${c.flag}</div>
+  const el = document.createElement(c.live ? 'a' : 'div');
+  el.className = 'card' + (c.live ? '' : ' locked');
+  if (c.live) el.href = c.href;
+  el.style.setProperty('--accent', c.accent);
+  el.style.animationDelay = (i * 0.03) + 's';
+  const icon = c.flag || monogram(c.code, c.accent);
+  el.innerHTML = `
+    <div class="card-flag">${icon}</div>
     <div class="card-content">
       <p class="card-title"><span class="accent-dot"></span>${c.title}</p>
       <p class="card-tagline">${c.tagline}</p>
-      <p class="card-count">${c.count}</p>
-      <span class="card-cta">Explore &rarr;</span>
+      ${c.live ? '<p class="card-count">' + c.count + '</p><span class="card-cta">Explore &rarr;</span>' : '<span class="card-badge">Coming Soon</span>'}
     </div>
   `;
-  grid.appendChild(a);
+  grid.appendChild(el);
 });
 </script>
 </body>
