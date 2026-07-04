@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-  <html lang="en">
+<html lang="en">
   <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Playrium — Japan Collection</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
   <style>
   :root{
@@ -25,7 +25,7 @@ body{ overflow-x:hidden; }
             radial-gradient(circle at 50% 90%, rgba(232,122,60,.05), transparent 50%);
 }
 .back-link{ position:relative; z-index:1; display:inline-block; margin:2rem 0 0 2rem; color:var(--chalk-dim);
-  font-family:var(--font-chalk); font-size:.95rem; text-decoration:none; opacity:.8; transition:opacity .25s ease; }
+  font-family:var(--font-chalk); font-size:.95rem; text-decoration:none; opacity:.7; transition:opacity .25s ease; }
 .back-link:hover{ opacity:1; }
 header{ position:relative; z-index:1; text-align:center; padding:2rem 1.5rem 3rem; }
 .eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.3em; text-transform:uppercase; font-size:.75rem;
@@ -50,6 +50,9 @@ header{ position:relative; z-index:1; text-align:center; padding:2rem 1.5rem 3re
   font-size:5.5rem; transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease; filter:saturate(1.02) brightness(.94); }
 .card:not(.locked):hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
 .card.locked .card-flag{ filter:grayscale(.6) brightness(.5); }
+.card-country-flag{ position:absolute; top:.8rem; right:.8rem; z-index:4; width:32px; height:24px; border-radius:.3rem; overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,.5); border:1px solid rgba(244,240,230,.35); }
+.card-country-flag img{ width:100%; height:100%; object-fit:cover; display:block; }
 .card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,10,15,.55) 70%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
   .card::after{ content:''; position:absolute; inset:0; border-radius:1.4rem; z-index:2; pointer-events:none;
     box-shadow:inset 0 0 0 1.5px transparent; transition:box-shadow .35s ease; }
@@ -76,37 +79,38 @@ footer p{ font-size:.82rem; font-family:var(--font-chalk); }
   <body>
   <div class="bg-glow"></div>
   <a class="back-link" href="index.html">&larr; All Countries</a>
-<header>
-  <p class="eyebrow">Playrium &middot; Japan</p>
+  <header>
+    <p class="eyebrow">Playrium &middot; Japan</p>
     <h1 class="logo">Japan Collection</h1>
     <p class="tagline">Physics toys inspired by Japanese festivals, craft, and quiet moments.</p>
-</header>
-<div class="grid" id="grid"></div>
-<footer><p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p></footer>
+  </header>
+  <div class="grid" id="grid"></div>
+  <footer><p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p></footer>
   <script>
   const GAMES = [
-{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', accent:'#ff6b5e', emoji:'\u{1F3AE}', bg:'linear-gradient(135deg,#3a1a2a,#1a1a24)', live:true },
-  { title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', accent:'#5ab4ff', emoji:'\u{1F41F}', bg:'linear-gradient(135deg,#122a3a,#1a1a24)', live:false },
-  { title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', accent:'#e8a23c', emoji:'\u{1FA71}', bg:'linear-gradient(135deg,#3a2a12,#1a1a24)', live:false },
-  { title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', accent:'#2f8f86', emoji:'\u{1F38F}', bg:'linear-gradient(135deg,#123a30,#1a1a24)', live:false },
+    { title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', accent:'#ff6b5e', emoji:'🎮', bg:'linear-gradient(135deg,#3a1a2a,#1a1a24)', live:true },
+    { title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', accent:'#5ab4ff', emoji:'🐟', bg:'linear-gradient(135deg,#122a3a,#1a1a24)', live:false },
+    { title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', accent:'#e8a23c', emoji:'🩱', bg:'linear-gradient(135deg,#3a2a12,#1a1a24)', live:false },
+    { title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', accent:'#2f8f86', emoji:'🎏', bg:'linear-gradient(135deg,#123a30,#1a1a24)', live:false },
   ];
-const grid = document.getElementById('grid');
-GAMES.forEach((g, i) => {
+  const grid = document.getElementById('grid');
+  GAMES.forEach((g, i) => {
     const el = document.createElement(g.live ? 'a' : 'div');
-  el.className = 'card' + (g.live ? '' : ' locked');
-  if (g.live) el.href = g.href;
-  el.style.setProperty('--accent', g.accent);
-  el.style.animationDelay = (i * 0.06) + 's';
-  el.innerHTML = `
+    el.className = 'card' + (g.live ? '' : ' locked');
+    if (g.live) el.href = g.href;
+    el.style.setProperty('--accent', g.accent);
+    el.style.animationDelay = (i * 0.06) + 's';
+    el.innerHTML = `
         <div class="card-flag" style="background:${g.bg}">${g.emoji}</div>
+        <div class="card-country-flag"><img src="https://flagcdn.com/jp.svg" alt="Japan flag"></div>
         <div class="card-content">
           <p class="card-title"><span class="accent-dot"></span>${g.title}</p>
           <p class="card-tagline">${g.tagline}</p>
           ${g.live ? '<span class="card-cta">Play &rarr;</span>' : '<span class="card-badge">Coming Soon</span>'}
     </div>
-      `;
-  grid.appendChild(el);
-});
-</script>
+        `;
+    grid.appendChild(el);
+  });
+  </script>
   </body>
   </html>
