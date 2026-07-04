@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-  <html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Playrium — Interactive Experiences, Not Games</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-  :root{
-    --bg-deep:#0a0a0f; --bg-mid:#141420;
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Playrium — Interactive Experiences, Not Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#0a0a0f; --bg-mid:#141420;
   --chalk:#f4f0e6; --chalk-dim:#9a97a8;
-      --ui-glass:rgba(244,240,230,.06); --ui-glass-border:rgba(244,240,230,.14);
+  --ui-glass:rgba(244,240,230,.06); --ui-glass-border:rgba(244,240,230,.14);
   --font-display:'Fredoka', system-ui, sans-serif; --font-chalk:'Kalam', cursive;
 }
 *{box-sizing:border-box;}
@@ -20,9 +20,9 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; background:var(--bg
 body{ overflow-x:hidden; }
 .bg-glow{ position:fixed; inset:0; z-index:0; pointer-events:none;
   background:
-      radial-gradient(circle at 20% 20%, rgba(240,193,75,.10), transparent 40%),
-            radial-gradient(circle at 80% 10%, rgba(180,255,240,.06), transparent 45%),
-            radial-gradient(circle at 50% 90%, rgba(232,122,60,.05), transparent 50%);
+    radial-gradient(circle at 20% 20%, rgba(240,193,75,.10), transparent 40%),
+    radial-gradient(circle at 80% 10%, rgba(180,255,240,.06), transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(232,122,60,.05), transparent 50%);
 }
 header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3rem; }
 .eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.3em; text-transform:uppercase; font-size:.75rem;
@@ -42,11 +42,12 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 @keyframes cardIn{ to{ opacity:1; transform:translateY(0); } }
 .card:hover{ transform:translateY(-6px) scale(1.015); box-shadow:0 28px 60px rgba(0,0,0,.55); }
 .card-flag{ position:absolute; inset:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center;
-  font-size:6rem; transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease; filter:saturate(1.02) brightness(.94); }
+  transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease; filter:saturate(1.02) brightness(.94); }
+.card-flag svg{ width:34%; height:auto; border-radius:.5rem; box-shadow:0 10px 30px rgba(0,0,0,.5); }
 .card:hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
 .card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,10,15,.55) 70%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
 .card::after{ content:''; position:absolute; inset:0; border-radius:1.4rem; z-index:2; pointer-events:none;
-    box-shadow:inset 0 0 0 1.5px transparent; transition:box-shadow .35s ease; }
+  box-shadow:inset 0 0 0 1.5px transparent; transition:box-shadow .35s ease; }
 .card:hover::after{ box-shadow:inset 0 0 0 1.5px var(--accent), 0 0 24px var(--accent); }
 .card-content{ position:absolute; left:0; right:0; bottom:0; z-index:3; padding:1.3rem 1.4rem 1.2rem;
   display:flex; flex-direction:column; gap:.35rem; }
@@ -62,42 +63,44 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 footer{ position:relative; z-index:1; text-align:center; padding:2rem 1.5rem 3rem; color:var(--chalk-dim); }
 footer p{ font-size:.82rem; font-family:var(--font-chalk); }
 @media (prefers-reduced-motion:reduce){
-    *{ animation-duration:.001s !important; transition-duration:.001s !important; }
+  *{ animation-duration:.001s !important; transition-duration:.001s !important; }
 }
 </style>
-  </head>
-  <body>
-  <div class="bg-glow"></div>
-  <header>
-    <p class="eyebrow">Playrium</p>
-    <h1 class="logo">Interactive Experiences.<br>Not Games.</h1>
-    <p class="tagline">A growing universe of premium physics-driven toys, organized by country — pick one to begin.</p>
+</head>
+<body>
+<div class="bg-glow"></div>
+<header>
+  <p class="eyebrow">Playrium</p>
+  <h1 class="logo">Interactive Experiences.<br>Not Games.</h1>
+  <p class="tagline">A growing universe of premium physics-driven toys, organized by country — pick one to begin.</p>
 </header>
 <div class="grid" id="grid"></div>
-  <footer><p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p></footer>
-  <script>
-  const COUNTRIES = [
-{ title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:'\u{1F1EE}\u{1F1F3}', bg:'linear-gradient(135deg,#3a2a12,#1a1a24)' },
-  { title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:'\u{1F1EF}\u{1F1F5}', bg:'linear-gradient(135deg,#2a1420,#1a1a24)' },
-  ];
+<footer><p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p></footer>
+<script>
+const INDIA_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FF9933"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#138808"/><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="5"/><circle cx="450" cy="300" r="6" fill="#000080"/></svg>';
+const JAPAN_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#FFFFFF"/><circle cx="450" cy="300" r="120" fill="#BC002D"/></svg>';
+const COUNTRIES = [
+  { title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG, bg:'linear-gradient(135deg,#3a2a12,#1a1a24)' },
+  { title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:JAPAN_FLAG, bg:'linear-gradient(135deg,#2a1420,#1a1a24)' },
+];
 const grid = document.getElementById('grid');
 COUNTRIES.forEach((c, i) => {
-    const a = document.createElement('a');
-    a.className = 'card';
+  const a = document.createElement('a');
+  a.className = 'card';
   a.href = c.href;
   a.style.setProperty('--accent', c.accent);
   a.style.animationDelay = (i * 0.06) + 's';
   a.innerHTML = `
-        <div class="card-flag" style="background:${c.bg}">${c.flag}</div>
-        <div class="card-content">
-          <p class="card-title"><span class="accent-dot"></span>${c.title}</p>
-          <p class="card-tagline">${c.tagline}</p>
-          <p class="card-count">${c.count}</p>
-          <span class="card-cta">Explore &rarr;</span>
-        </div>
-      `;
+    <div class="card-flag" style="background:${c.bg}">${c.flag}</div>
+    <div class="card-content">
+      <p class="card-title"><span class="accent-dot"></span>${c.title}</p>
+      <p class="card-tagline">${c.tagline}</p>
+      <p class="card-count">${c.count}</p>
+      <span class="card-cta">Explore &rarr;</span>
+    </div>
+  `;
   grid.appendChild(a);
-  });
+});
 </script>
-  </body>
-  </html>
+</body>
+</html>
