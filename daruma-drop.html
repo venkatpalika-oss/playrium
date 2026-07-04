@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+  <html lang="en">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daruma Drop - Playrium</title>
+  <style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#1a0f2e; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+#game { display:block; width:100%; height:100%; touch-action:none; cursor:pointer; }
+.panel { position:fixed; background:rgba(255,255,255,0.12); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border:1px solid rgba(255,255,255,0.25); border-radius:18px; color:#fff; box-shadow:0 8px 30px rgba(0,0,0,0.35); }
+#hud { top:16px; left:16px; padding:14px 20px; display:flex; gap:22px; align-items:center; }
+#hud .stat { text-align:center; }
+#hud .stat .num { font-size:22px; font-weight:700; display:block; }
+#hud .stat .label { font-size:10px; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
+#topRight { top:16px; right:16px; padding:10px; display:flex; gap:8px; }
+.iconBtn { width:42px; height:42px; border-radius:12px; border:none; background:rgba(255,255,255,0.15); color:#fff; font-size:18px; cursor:pointer; }
+.iconBtn:hover { background:rgba(255,255,255,0.28); }
+#titleTag { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:0.08em; text-align:center; }
+#overlay { position:fixed; inset:0; background:rgba(10,5,20,0.72); display:flex; align-items:center; justify-content:center; z-index:20; }
+#overlay.hidden { display:none; }
+.card { width:min(440px,88vw); padding:34px 30px; text-align:center; }
+.card h1 { font-size:26px; margin-bottom:6px; }
+.card p.tag { opacity:0.75; font-size:13px; margin-bottom:18px; font-style:italic; }
+.card p.desc { font-size:14px; line-height:1.6; opacity:0.88; margin-bottom:22px; }
+.bigBtn { padding:14px 30px; border:none; border-radius:14px; background:linear-gradient(135deg,#ff8fab,#ff6f91); color:#fff; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(255,111,145,0.4); }
+  .bigBtn:hover { filter:brightness(1.08); }
+.toast { position:fixed; top:90px; left:50%; transform:translateX(-50%) translateY(0); padding:10px 22px; border-radius:12px; background:rgba(255,255,255,0.16); backdrop-filter:blur(10px); color:#fff; font-size:14px; font-weight:600; opacity:0; transition:opacity .3s, transform .3s; pointer-events:none; z-index:15; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(10px); }
+</style>
+  </head>
+
+  <body>
+  <canvas id="game"></canvas>
+
+  <div class="panel" id="hud">
+    <div class="stat"><span class="num" id="statCombo">0</span><span class="label">Combo</span></div>
+    <div class="stat"><span class="num" id="statBest">0</span><span class="label">Best Streak</span></div>
+    <div class="stat"><span class="num" id="statCleared">0</span><span class="label">Towers Cleared</span></div>
+  </div>
+
+  <div class="panel" id="topRight">
+    <button class="iconBtn" id="muteBtn" title="Mute">&#128266;</button>
+    <button class="iconBtn" id="restartBtn" title="New Tower">&#8635;</button>
+  </div>
+
+  <div id="titleTag">PLAYRIUM - JAPAN COLLECTION<br>DARUMA DROP</div>
+
+  <div class="panel card" id="overlay">
+    <h1>Daruma Drop</h1>
+    <p class="tag">"One perfect hit changes everything."</p>
+    <p class="desc" id="overlayText">Click and drag a block outward to knock it free from the stack. Keep the Daruma balanced. If it tips too far, the tower falls. Clear every block without a single topple for a Perfect Clear.</p>
+    <button class="bigBtn" id="startBtn">Begin</button>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+  <script>
+  (function(){
+  var Engine = Matter.Engine, World = Matter.World, Bodies = Matter.Bodies, Body = Matter.Body, Vertices = Matter.Vertices;
+
+var canvas = document.getElementById("game");
+var ctx = canvas.getContext("2d");
+var W, H;
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener("resize", resize);
+
+
+/* ---------- Audio ---------- */
+var audioCtx = null;
+var muted = false;
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function tone(freq, dur, type, vol){
+    if(muted || !audioCtx) return;
+  var o = audioCtx.createOscillator();
+  var g = audioCtx.createGain();
+  o.type = type || "sine";
+  o.frequency.value = freq;
+  g.gain.value = (vol!==undefined?vol:0.18);
+  o.connect(g); g.connect(audioCtx.destination);
+  var now = audioCtx.currentTime;
+  g.gain.setValueAtTime(g.gain.value, now);
+  g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+  o.start(now);
+  o.stop(now+dur+0.02);
+}
+function playChime(){
+    var seq=[880,1108,1318,1760];
+  seq.forEach(function(f,i){ setTimeout(function(){ tone(f,0.28,"sine",0.15); }, i*130); });
+                           }
+
+/* ---------- Toast ---------- */
+function toast(msg){
+    var el=document.createElement("div");
+  el.className="toast";
+  el.textContent=msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add("show"); });
+  setTimeout(function(){ el.classList.remove("show"); setTimeout(function(){ el.remove(); },300); }, 1100);
+}
+
+/* ---------- Materials ---------- */
+var MATERIALS = {
+  wood:   { color:"#c68a53", dark:"#9c6a3a", friction:0.7,  restitution:0.05, density:0.0028, hitFreq:180, hitType:"triangle" },
+    stone:  { color:"#9a9a9a", dark:"#707070", friction:0.9,  restitution:0.02, density:0.0055, hitFreq:90,  hitType:"square" },
+    glass:  { color:"rgba(190,225,255,0.55)", dark:"rgba(140,190,230,0.8)", friction:0.35, restitution:0.35, density:0.0022, hitFreq:900, hitType:"sine", fragile:true },
+    ice:    { color:"#cdeeff", dark:"#9fd6ee", friction:0.04, restitution:0.2,  density:0.0022, hitFreq:520, hitType:"sine" },
+    bamboo: { color:"#a6d16b", dark:"#7fae49", friction:0.55, restitution:0.4,  density:0.0018, hitFreq:340, hitType:"triangle" }
+            };
+var MATERIAL_KEYS = Object.keys(MATERIALS);
+
+/* ---------- World setup ---------- */
+var engine = Engine.create();
+engine.gravity.y = 1;
+var world = engine.world;
+var ground;
+
+var blockW=104, blockH=34, blockCount=7;
+var centerX, groundY;
+var blocks = [];
+var daruma = null;
+var TOPPLE_ANGLE = 0.55;
+
+var state = "intro";
+var combo = 0;
+var bestStreak = parseInt(localStorage.getItem("daruma_best")||"0",10);
+var towersCleared = parseInt(localStorage.getItem("daruma_cleared")||"0",10);
+var goldenUnlocked = localStorage.getItem("daruma_golden")==="1";
+var settleTimer = 0;
+var hadWarningThisRound = false;
+
+function updateHUD(){
+    document.getElementById("statCombo").textContent = combo;
+  document.getElementById("statBest").textContent = bestStreak;
+  document.getElementById("statCleared").textContent = towersCleared;
+}
+
+function buildTower(){
+    blocks.forEach(function(b){ if(b.body) World.remove(world, b.body); });
+  blocks = [];
+  if(ground) World.remove(world, ground);
+  if(daruma) World.remove(world, daruma.body);
+
+  centerX = W/2;
+  groundY = H - 90;
+  ground = Bodies.rectangle(centerX, groundY+60, W*2, 120, { isStatic:true, friction:1 });
+  World.add(world, ground);
+
+  var goldenIndex = Math.floor(Math.random()*blockCount);
+  for(var i=0;i<blockCount;i++){
+    var key = MATERIAL_KEYS[Math.floor(Math.random()*MATERIAL_KEYS.length)];
+    var mat = MATERIALS[key];
+    var cy = groundY - blockH/2 - blockH*i;
+    var body = Bodies.rectangle(centerX, cy, blockW, blockH, {
+      friction: mat.friction, restitution: mat.restitution, density: mat.density, frictionAir: 0.001, chamfer:{radius:5}
+  });
+    blocks.push({ body:body, key:key, isGolden:(i===goldenIndex), removed:false, shattered:false, hit:false });
+    World.add(world, body);
+            }
+
+  var darumaRadius = 46;
+  var topBlockTopY = groundY - blockH*blockCount;
+  var darumaCenterY = topBlockTopY - darumaRadius + 4;
+  var dBody = Bodies.circle(centerX, darumaCenterY, darumaRadius, { friction:0.9, restitution:0.05, density:0.003, frictionAir:0.002 });
+  daruma = { body:dBody, radius:darumaRadius };
+  World.add(world, dBody);
+
+  combo = 0;
+  hadWarningThisRound = false;
+  updateHUD();
+            }
+/* ---------- Particles ---------- */
+var petals = [];
+for(var pI=0; pI<26; pI++){
+  petals.push({ x:Math.random()*2000, y:Math.random()*1200, vx:0.3+Math.random()*0.5, vy:0.6+Math.random()*0.8, rot:Math.random()*6.28, vr:(Math.random()-0.5)*0.04, size:5+Math.random()*6 });
+}
+var burstParticles = [];
+function spawnPetalBurst(x,y){
+    for(var i=0;i<18;i++){
+    var ang = Math.random()*Math.PI*2;
+    var spd = 1.5+Math.random()*3;
+    burstParticles.push({ type:"petal", x:x, y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd-1, life:1, rot:Math.random()*6.28, vr:(Math.random()-0.5)*0.1, size:5+Math.random()*5 });
+    }
+}
+function spawnCoinBurst(x,y){
+    for(var i=0;i<16;i++){
+    var ang = -Math.PI/2 + (Math.random()-0.5)*1.6;
+    var spd = 2+Math.random()*4;
+    burstParticles.push({ type:"coin", x:x, y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd-2, life:1, rot:0, vr:0.2, size:5+Math.random()*3, gravity:0.15 });
+    }
+}
+function spawnShatterParticles(x,y){
+    for(var i=0;i<20;i++){
+    var ang = Math.random()*Math.PI*2;
+    var spd = 1+Math.random()*5;
+    burstParticles.push({ type:"shard", x:x, y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, life:1, rot:Math.random()*6.28, vr:(Math.random()-0.5)*0.3, size:3+Math.random()*5, gravity:0.2 });
+    }
+}
+function spawnFireworks(){
+    var colors=["#ff8fab","#ffd166","#8fd3ff","#c3f584","#ffffff"];
+  for(var b=0;b<4;b++){
+    setTimeout(function(){
+      var cx = W*0.25+Math.random()*W*0.5, cy = H*0.25+Math.random()*H*0.2;
+      for(var i=0;i<28;i++){
+        var ang = Math.random()*Math.PI*2;
+        var spd = 2+Math.random()*4.5;
+        burstParticles.push({ type:"spark", x:cx, y:cy, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, life:1, rot:0, vr:0, size:3+Math.random()*2, gravity:0.05, color:colors[Math.floor(Math.random()*colors.length)] });
+      }
+    }, b*260);
+  }
+}
+function updateParticles(dt){
+    var f = dt/16.6;
+  petals.forEach(function(p){
+        p.x += p.vx*f; p.y += p.vy*f; p.rot += p.vr*f;
+    if(p.y>H+20){ p.y=-20; p.x=Math.random()*W; }
+    if(p.x>W+20) p.x=-20;
+  });
+  for(var i=burstParticles.length-1;i>=0;i--){
+    var b = burstParticles[i];
+    b.x += b.vx*f; b.y += b.vy*f; b.rot += b.vr*f;
+    b.vy += (b.gravity||0)*f;
+    b.life -= 0.016*f;
+    if(b.life<=0) burstParticles.splice(i,1);
+  }
+}
+
+/* ---------- Rendering ---------- */
+var shakeMag = 0, zoomPunch = 0;
+function triggerShake(m){ shakeMag = Math.max(shakeMag, m); }
+function triggerZoom(z){ zoomPunch = Math.max(zoomPunch, z); }
+
+function drawBackground(){
+    var g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,"#2c1250");
+  g.addColorStop(0.45,"#5b2a6b");
+  g.addColorStop(0.75,"#c96f95");
+  g.addColorStop(1,"#ffcf9e");
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.fillStyle = "#fff6e0";
+  ctx.beginPath();
+  ctx.arc(W*0.78, H*0.18, 46, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+
+  ctx.fillStyle = "rgba(30,15,40,0.55)";
+  ctx.beginPath();
+  ctx.moveTo(0,H*0.62);
+  ctx.lineTo(W*0.15,H*0.5);
+  ctx.lineTo(W*0.32,H*0.6);
+  ctx.lineTo(W*0.5,H*0.46);
+  ctx.lineTo(W*0.68,H*0.58);
+  ctx.lineTo(W*0.85,H*0.48);
+  ctx.lineTo(W,H*0.6);
+  ctx.lineTo(W,H*0.75);
+  ctx.lineTo(0,H*0.75);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function drawLanterns(){
+    drawLantern(60,40);
+  drawLantern(W-60,70);
+}
+function drawLantern(x,y){
+    ctx.save();
+  ctx.strokeStyle="rgba(255,255,255,0.3)";
+  ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,y); ctx.stroke();
+  var grad = ctx.createRadialGradient(x,y+18,2,x,y+18,26);
+  grad.addColorStop(0,"rgba(255,210,140,0.95)");
+  grad.addColorStop(1,"rgba(255,140,90,0.05)");
+  ctx.fillStyle = grad;
+  ctx.beginPath(); ctx.ellipse(x,y+18,18,22,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawPetal(x,y,rot,size,alpha){
+    ctx.save();
+  ctx.translate(x,y); ctx.rotate(rot);
+  ctx.globalAlpha = alpha!==undefined?alpha:0.85;
+  ctx.fillStyle = "#ffc9dd";
+  ctx.beginPath();
+  ctx.ellipse(0,0,size,size*0.55,0,0,Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+function drawPetals(){
+    petals.forEach(function(p){ drawPetal(p.x,p.y,p.rot,p.size,0.7); });
+}
+
+function drawGround(){
+    ctx.fillStyle = "#4a3b63";
+  ctx.fillRect(0, groundY+30, W, H-(groundY+30));
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  for(var x=0;x<W;x+=40){
+    ctx.beginPath(); ctx.moveTo(x, groundY+30); ctx.lineTo(x+20, H); ctx.stroke();
+  }
+}
+
+function drawBlock(b){
+    var body = b.body;
+  var mat = MATERIALS[b.key];
+  var v = body.vertices;
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(v[0].x, v[0].y);
+  for(var i=1;i<v.length;i++) ctx.lineTo(v[i].x, v[i].y);
+  ctx.closePath();
+  if(b.isGolden){
+    ctx.shadowColor = "#ffd700"; ctx.shadowBlur = 18;
+    ctx.fillStyle = "#ffd700";
+  } else {
+    ctx.fillStyle = mat.color;
+  }
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = b.isGolden ? "#a87b00" : mat.dark;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function getExpression(){
+    if(state==="won") return "celebrating";
+  if(state==="lost") return "dizzy";
+  if(daruma && Math.abs(daruma.body.angle) > 0.28) return "worried";
+  return "calm";
+}
+
+function drawDaruma(){
+    var body = daruma.body;
+  var r = daruma.radius;
+  ctx.save();
+  ctx.translate(body.position.x, body.position.y);
+  ctx.rotate(body.angle);
+
+  var bodyColor = goldenUnlocked ? "#ffcf3f" : "#e6432b";
+  var darkColor = goldenUnlocked ? "#c99a00" : "#a92a1a";
+  var grad = ctx.createRadialGradient(-r*0.3,-r*0.3,r*0.2,0,0,r*1.1);
+  grad.addColorStop(0, bodyColor);
+  grad.addColorStop(1, darkColor);
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(0,0,r,0,Math.PI*2);
+  ctx.fill();
+
+  ctx.fillStyle = "#fff6e6";
+  ctx.beginPath();
+  ctx.ellipse(0, r*0.18, r*0.62, r*0.55, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#2a1a12";
+  ctx.lineWidth = r*0.06;
+  var expr = getExpression();
+  drawFace(expr, r);
+
+  ctx.restore();
+}
+
+function drawFace(expr, r){
+    ctx.fillStyle = "#2a1a12";
+  var ex = r*0.28;
+  if(expr==="calm"){
+    ctx.beginPath(); ctx.arc(-ex,-r*0.05,r*0.07,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex,-r*0.05,r*0.07,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0,r*0.22,r*0.14,0.15*Math.PI,0.85*Math.PI); ctx.stroke();
+  } else if(expr==="worried"){
+    ctx.beginPath(); ctx.arc(-ex,-r*0.05,r*0.09,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(ex,-r*0.05,r*0.09,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-ex-r*0.1,-r*0.22); ctx.lineTo(-ex+r*0.1,-r*0.12); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ex+r*0.1,-r*0.22); ctx.lineTo(ex-r*0.1,-r*0.12); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,r*0.3,r*0.1,0,Math.PI*2); ctx.stroke();
+  } else if(expr==="celebrating"){
+    ctx.save(); ctx.translate(-ex,-r*0.05); ctx.rotate(Math.PI/4);
+    ctx.beginPath(); ctx.moveTo(-r*0.09,0); ctx.lineTo(r*0.09,0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-r*0.09); ctx.lineTo(0,r*0.09); ctx.stroke();
+    ctx.restore();
+    ctx.save(); ctx.translate(ex,-r*0.05); ctx.rotate(Math.PI/4);
+    ctx.beginPath(); ctx.moveTo(-r*0.09,0); ctx.lineTo(r*0.09,0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-r*0.09); ctx.lineTo(0,r*0.09); ctx.stroke();
+    ctx.restore();
+    ctx.beginPath(); ctx.arc(0,r*0.2,r*0.18,0,Math.PI,false); ctx.stroke();
+  } else if(expr==="dizzy"){
+    drawSpiral(-ex,-r*0.05,r*0.09);
+    drawSpiral(ex,-r*0.05,r*0.09);
+    ctx.beginPath(); ctx.arc(0,r*0.28,r*0.08,0,Math.PI*2); ctx.stroke();
+  }
+}
+function drawSpiral(x,y,size){
+    ctx.save();
+  ctx.translate(x,y);
+  ctx.beginPath();
+  for(var a=0;a<Math.PI*4;a+=0.3){
+    var rr = (a/(Math.PI*4))*size;
+    var px = Math.cos(a)*rr, py = Math.sin(a)*rr;
+    if(a===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawBurstParticles(){
+    burstParticles.forEach(function(b){
+    ctx.save();
+    ctx.globalAlpha = Math.max(b.life,0);
+    if(b.type==="petal"){
+      drawPetal(b.x,b.y,b.rot,b.size,ctx.globalAlpha);
+    } else if(b.type==="coin"){
+      ctx.fillStyle = "#ffd700";
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.size,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = "#a87b00"; ctx.lineWidth=1; ctx.stroke();
+    } else if(b.type==="shard"){
+      ctx.translate(b.x,b.y); ctx.rotate(b.rot);
+      ctx.fillStyle = "rgba(200,230,255,0.75)";
+      ctx.fillRect(-b.size/2,-b.size/2,b.size,b.size);
+    } else if(b.type==="spark"){
+      ctx.fillStyle = b.color || "#ffffff";
+      ctx.beginPath(); ctx.arc(b.x,b.y,b.size,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+});
+          }
+
+var dragging = null;
+function getPoint(e){
+    var rect = canvas.getBoundingClientRect();
+  var cx = (e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0].clientX));
+  var cy = (e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0].clientY));
+  var scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+  return { x:(cx-rect.left)*scaleX, y:(cy-rect.top)*scaleY };
+}
+function hitTestBlock(x,y){
+    for(var i=blocks.length-1;i>=0;i--){
+    var b = blocks[i];
+    if(b.removed||b.shattered) continue;
+    if(Vertices.contains(b.body.vertices, {x:x,y:y})) return i;
+    }
+  return -1;
+}
+
+function drawAimArrow(){
+    if(!dragging || dragging.cx===undefined) return;
+  ctx.save();
+  ctx.strokeStyle = "rgba(255,255,255,0.8)";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(dragging.sx, dragging.sy);
+  ctx.lineTo(dragging.cx, dragging.cy);
+  ctx.stroke();
+  ctx.restore();
+}
+
+canvas.addEventListener("pointerdown", function(e){
+    if(state!=="playing") return;
+  var pt = getPoint(e);
+  var idx = hitTestBlock(pt.x, pt.y);
+  if(idx!==-1){ dragging = { idx:idx, sx:pt.x, sy:pt.y, cx:pt.x, cy:pt.y }; }
+});
+canvas.addEventListener("pointermove", function(e){
+    if(dragging){ var pt=getPoint(e); dragging.cx=pt.x; dragging.cy=pt.y; }
+});
+canvas.addEventListener("pointerup", function(e){
+    if(!dragging) return;
+  var pt = getPoint(e);
+  var dx = pt.x-dragging.sx, dy = pt.y-dragging.sy;
+  var idxLocal = dragging.idx;
+  dragging = null;
+  var dist = Math.sqrt(dx*dx+dy*dy);
+  if(dist<6) return;
+  applyHit(idxLocal, dx, dy, dist);
+});
+
+function playMaterialSound(key, dist){
+    ensureAudio();
+  var mat = MATERIALS[key];
+  var vol = Math.min(0.12+dist*0.0006, 0.3);
+  tone(mat.hitFreq, 0.12, mat.hitType, vol);
+  if(key==="stone") tone(mat.hitFreq*0.5, 0.18, "sine", vol*0.6);
+}
+
+function applyHit(idx, dx, dy, dist){
+    var b = blocks[idx];
+  if(!b || b.removed || b.shattered) return;
+  b.hit = true;
+  var power = Math.min(dist,260) * 0.0026;
+  var fx = dx*power, fy = dy*power*0.55;
+  Body.applyForce(b.body, b.body.position, {x:fx, y:fy});
+  playMaterialSound(b.key, dist);
+  triggerShake(Math.min(dist*0.025,6));
+  triggerZoom(Math.min(dist/220,1));
+  state = "settling";
+  settleTimer = 0;
+  hadWarningThisRound = false;
+}
+
+function onBlockRemoved(b){
+    combo++;
+  if(b.isGolden){ spawnCoinBurst(b.body.position.x, b.body.position.y); tone(1200,0.25,"sine",0.22); }
+  if(combo>bestStreak){ bestStreak=combo; localStorage.setItem("daruma_best", bestStreak); }
+  if(combo>0 && combo%5===0){ spawnPetalBurst(daruma.body.position.x, daruma.body.position.y); }
+  updateHUD();
+}
+
+function triggerLoss(){
+    state = "lost";
+  tone(80,0.5,"sawtooth",0.25);
+  triggerShake(10);
+  combo = 0;
+  updateHUD();
+  showOverlay("lost");
+}
+
+function triggerWin(){
+    state = "won";
+  towersCleared++;
+  localStorage.setItem("daruma_cleared", towersCleared);
+  if(!goldenUnlocked){ goldenUnlocked = true; localStorage.setItem("daruma_golden","1"); }
+  spawnFireworks();
+  playChime();
+  updateHUD();
+  showOverlay("won");
+}
+
+var overlay, overlayText, startBtn, restartBtn, muteBtn;
+function showOverlay(kind){
+    if(kind==="won"){
+    overlayText.textContent = goldenUnlocked ? "Perfect clear! The Daruma bows in gratitude. Golden Daruma unlocked for all future towers." : "Perfect clear! Every block removed without a single topple.";
+    startBtn.textContent = "Next Tower";
+    } else if(kind==="lost"){
+    overlayText.textContent = "The tower tumbled! Your streak resets, but your best stays saved. Try again with a gentler touch.";
+    startBtn.textContent = "Try Again";
+    }
+  overlay.classList.remove("hidden");
+}
+
+function isEverythingSlow(){
+    var dv = daruma.body.velocity;
+  var dSpeed = Math.sqrt(dv.x*dv.x+dv.y*dv.y);
+  if(dSpeed>0.6 || Math.abs(daruma.body.angularVelocity)>0.05) return false;
+  for(var i=0;i<blocks.length;i++){
+    var b = blocks[i];
+    if(b.removed||b.shattered) continue;
+    var v = b.body.velocity;
+    var s = Math.sqrt(v.x*v.x+v.y*v.y);
+    if(s>0.6) return false;
+  }
+  return true;
+}
+
+function updatePhysics(delta){
+    Engine.update(engine, delta);
+
+  blocks.forEach(function(b){
+        if(b.removed||b.shattered) return;
+    var pos = b.body.position;
+    var v = b.body.velocity;
+    var speed = Math.sqrt(v.x*v.x+v.y*v.y);
+    if(b.key==="glass" && b.hit && speed>9){
+      b.shattered = true;
+      spawnShatterParticles(pos.x,pos.y);
+      World.remove(world,b.body);
+      tone(1400,0.15,"square",0.15);
+      onBlockRemoved(b);
+      return;
+    }
+    if(pos.y > H+80 || pos.x < -150 || pos.x > W+150){
+      b.removed = true;
+      World.remove(world,b.body);
+      onBlockRemoved(b);
+    }
+  });
+
+  if(state==="settling"){
+    settleTimer += delta;
+    var darumaAngle = Math.abs(daruma.body.angle);
+    if(darumaAngle>0.32) hadWarningThisRound = true;
+    if(darumaAngle>TOPPLE_ANGLE || daruma.body.position.y>groundY+40){
+      triggerLoss();
+      return;
+    }
+    var settled = isEverythingSlow();
+    if((settled && settleTimer>500) || settleTimer>2600){
+      var remaining = blocks.filter(function(b){ return !b.removed && !b.shattered; }).length;
+      if(remaining===0){
+        triggerWin();
+      } else {
+        state = "playing";
+        if(hadWarningThisRound){ toast("Phew! Steady hands."); }
+      }
+    }
+  }
+}
+
+function updateCameraEffects(){
+    shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
+  zoomPunch *= 0.9; if(zoomPunch<0.005) zoomPunch=0;
+}
+
+function render(){
+    ctx.clearRect(0,0,W,H);
+  ctx.save();
+  var breathe = Math.sin(Date.now()/1800)*0.008;
+  var scale = 1+breathe+zoomPunch*0.04;
+  var ox = (Math.random()-0.5)*shakeMag*2, oy = (Math.random()-0.5)*shakeMag*2;
+  ctx.translate(W/2+ox, H/2+oy);
+  ctx.scale(scale,scale);
+  ctx.translate(-W/2,-H/2);
+
+  drawBackground();
+  drawLanterns();
+  drawPetals();
+  drawGround();
+  blocks.forEach(function(b){ if(!b.removed && !b.shattered) drawBlock(b); });
+  if(daruma) drawDaruma();
+  drawBurstParticles();
+  drawAimArrow();
+
+  ctx.restore();
+}
+
+var lastTime = null;
+function loop(ts){
+    if(lastTime===null) lastTime = ts;
+  var delta = ts-lastTime; lastTime = ts;
+  if(delta>50) delta=50;
+  updateParticles(delta);
+  if(state==="playing"||state==="settling"){ updatePhysics(delta); }
+  updateCameraEffects();
+  render();
+  requestAnimationFrame(loop);
+}
+
+overlay = document.getElementById("overlay");
+overlayText = document.getElementById("overlayText");
+startBtn = document.getElementById("startBtn");
+restartBtn = document.getElementById("restartBtn");
+muteBtn = document.getElementById("muteBtn");
+
+startBtn.addEventListener("click", function(){
+    ensureAudio();
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+  overlay.classList.add("hidden");
+  buildTower();
+  state = "playing";
+});
+restartBtn.addEventListener("click", function(){
+    ensureAudio();
+  if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+  buildTower();
+  state = "playing";
+  overlay.classList.add("hidden");
+});
+muteBtn.addEventListener("click", function(){
+    muted = !muted;
+  muteBtn.innerHTML = muted ? "&#128263;" : "&#128266;";
+});
+
+buildTower();
+updateHUD();
+requestAnimationFrame(loop);
+
+})();
+</script>
+  </body>
+  </html>
+  
