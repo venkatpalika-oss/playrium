@@ -45,7 +45,7 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 .card.locked:hover{ transform:none; box-shadow:0 20px 40px rgba(0,0,0,.35); }
 .card-flag{ position:absolute; inset:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center;
   transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease; filter:saturate(1.02) brightness(.94); }
-.card-flag svg{ width:34%; height:auto; border-radius:.5rem; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+.card-flag svg, .card-flag img{ width:34%; height:auto; border-radius:.5rem; box-shadow:0 10px 30px rgba(0,0,0,.5); object-fit:cover; }
 .card:not(.locked):hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
 .card.locked .card-flag{ filter:grayscale(.7) brightness(.55); }
 .card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,10,15,.55) 70%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
@@ -65,8 +65,7 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 .card:not(.locked):hover .card-cta{ opacity:1; transform:translateY(0); }
 .card-badge{ margin-top:.5rem; align-self:flex-start; padding:.4rem 1rem; border-radius:999px; font-size:.78rem;
   font-weight:600; color:var(--chalk-dim); background:rgba(244,240,230,.1); border:1px solid var(--ui-glass-border); }
-footer{ position:relative; z-index:1; text-align:center; padding:2rem 1.5rem 3rem; color:var(--chalk-dim); }
-footer p{ font-size:.82rem; font-family:var(--font-chalk); }
+footer{ position:relative; z-index:1; text-align:center; padding:3rem 1.5rem 3rem; color:var(--chalk-dim); }
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.001s !important; transition-duration:.001s !important; }
 }
@@ -76,15 +75,16 @@ footer p{ font-size:.82rem; font-family:var(--font-chalk); }
 <div class="bg-glow"></div>
 <header>
   <p class="eyebrow">Playrium</p>
-  <h1 class="logo">Interactive Experiences 🚀.<br>Not Games.</h1>
+  <h1 class="logo">Interactive Experiences.<br>Not Games.</h1>
   <p class="tagline">A growing universe of premium physics-driven toys, organized by country — pick one to begin.</p>
 </header>
 <div class="grid" id="grid"></div>
+<footer><p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p></footer>
 <script>
 const INDIA_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FF9933"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#138808"/><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="5"/><circle cx="450" cy="300" r="6" fill="#000080"/></svg>';
 const JAPAN_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#FFFFFF"/><circle cx="450" cy="300" r="120" fill="#BC002D"/></svg>';
-function monogram(code, accent){
-  return '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" rx="36" fill="#15151f"/><rect x="6" y="6" width="888" height="588" rx="32" fill="none" stroke="' + accent + '" stroke-opacity="0.35" stroke-width="8"/><text x="450" y="335" font-family="Arial, Helvetica, sans-serif" font-size="230" font-weight="700" fill="' + accent + '" text-anchor="middle">' + code + '</text></svg>';
+function flagImg(code){
+  return '<img src="https://flagcdn.com/' + code.toLowerCase() + '.svg" alt="' + code + ' flag" loading="lazy">';
 }
 const COUNTRIES = [
   { title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG, live:true },
@@ -128,7 +128,7 @@ COUNTRIES.forEach((c, i) => {
   if (c.live) el.href = c.href;
   el.style.setProperty('--accent', c.accent);
   el.style.animationDelay = (i * 0.03) + 's';
-  const icon = c.flag || monogram(c.code, c.accent);
+  const icon = c.flag || flagImg(c.code);
   el.innerHTML = `
     <div class="card-flag">${icon}</div>
     <div class="card-content">
