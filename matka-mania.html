@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Matka Mania™ — Balance. Race. Survive.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky-top:#3a2a52;
+  --sky-mid:#c96b5a;
+  --sky-horizon:#ffcf8a;
+  --sky-glow:#ffe3ad;
+  --wall-clay:#c1703f;
+  --wall-clay-dark:#8f4f2c;
+  --wall-cream:#e9d9bd;
+  --ground:#a9825c;
+  --ground-dark:#7c5c3e;
+  --teal:#2f8f86;
+  --teal-dark:#20635d;
+  --brass:#d8a53d;
+  --vermillion:#c14a3a;
+  --chalk:#f7f1e2;
+  --chalk-dim:#d8cdb4;
+  --ui-charcoal:#17110d;
+  --ui-glass: rgba(247,241,226,0.10);
+  --ui-glass-border: rgba(247,241,226,0.20);
+  --font-display:'Fredoka', system-ui, sans-serif;
+  --font-chalk:'Kalam', cursive;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--ui-charcoal);
+  font-family:var(--font-display); -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none; }
+#app{ position:relative; width:100vw; height:100vh; height:100dvh; overflow:hidden; }
+
+#scene{ position:absolute; inset:0; transform-origin:50% 65%; will-change:transform; }
+.layer{ position:absolute; inset:0; pointer-events:none; }
+.layer > *{ pointer-events:auto; }
+
+#sky{ background:
+    radial-gradient(75% 55% at 50% 4%, var(--sky-glow) 0%, transparent 55%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 50%, var(--sky-horizon) 100%); }
+.sun{ position:absolute; left:50%; top:9%; width:10vmin; height:10vmin; transform:translate(-50%,-50%);
+  background: radial-gradient(circle, #fff3d6 0%, var(--brass) 55%, transparent 72%); border-radius:50%; opacity:.9; }
+
+#far{ }
+.spire{ position:absolute; bottom:38%; left:80%; width:6%; height:26%;
+  background:linear-gradient(180deg,var(--wall-cream),var(--wall-clay-dark)); clip-path:polygon(50% 0%,100% 100%,0% 100%); }
+.roofline{ position:absolute; bottom:30%; left:0; right:0; height:14%;
+  background:linear-gradient(180deg, var(--wall-clay), var(--wall-clay-dark)); opacity:.55; }
+.marigold-string{ position:absolute; top:20%; left:10%; right:10%; height:5%; }
+.marigold-string::before{ content:''; position:absolute; left:0; right:0; top:0; height:2px; background:rgba(20,15,12,.4); }
+.marigold-string span{ position:absolute; top:0; width:1.6%; height:70%; border-radius:50%; background:var(--brass);
+  transform-origin:top center; animation: sway 3.4s ease-in-out infinite; }
+
+#mid{ }
+.building{ position:absolute; bottom:24%; height:32%; border-radius:5px 5px 0 0; }
+.bd1{ left:2%; width:22%; background:linear-gradient(180deg,var(--wall-cream),var(--wall-clay)); }
+.bd2{ left:66%; width:26%; height:26%; background:linear-gradient(180deg,var(--wall-clay),var(--wall-clay-dark)); }
+.cat-window{ position:absolute; bottom:38%; left:8%; width:9%; height:12%; background:var(--wall-clay-dark);
+  border-radius:3px; box-shadow:0 0 0 3px rgba(247,241,226,.25) inset; }
+.cat{ position:absolute; bottom:6%; left:50%; width:70%; height:60%; transform:translateX(-50%); cursor:pointer; transition: transform .4s ease, opacity .4s ease; }
+.cat svg{ width:100%; height:100%; }
+.cat.yelp{ animation: catYelp .55s ease-out forwards; }
+@keyframes catYelp{
+  0%{ transform:translateX(-50%) translateY(0) scale(1); }
+  30%{ transform:translateX(-50%) translateY(-14px) scale(1.15) rotate(-6deg); }
+  100%{ transform:translateX(-60%) translateY(4px) scale(.9) rotate(-2deg); opacity:0; }
+}
+
+#groundLayer{ }
+.ground{ position:absolute; left:0; right:0; bottom:0; height:24%;
+  background:linear-gradient(180deg, var(--ground) 0%, var(--ground-dark) 100%); }
+.ground::before{ content:''; position:absolute; inset:0; opacity:.45;
+  background-image: repeating-linear-gradient(95deg, rgba(0,0,0,.06) 0 2px, transparent 2px 46px); }
+
+.obstacle{ position:absolute; will-change:left, transform; }
+.gust{ bottom:28%; width:7vmin; height:7vmin; opacity:.85; transition: transform .3s ease; }
+.gust svg{ width:100%; height:100%; }
+.gust.telegraph{ animation: gustGrow 1s ease-in-out infinite; }
+@keyframes gustGrow{ 0%,100%{ transform:scale(1) rotate(0deg);} 50%{ transform:scale(1.18) rotate(6deg);} }
+
+.bump{ bottom:22.5%; width:4.4vmin; height:2.6vmin; border-radius:50% 50% 0 0;
+  background:linear-gradient(180deg, var(--ground), var(--ground-dark)); }
+
+.gift{ bottom:32%; width:4vmin; height:4.6vmin; border-radius:50% 50% 45% 45%;
+  background:radial-gradient(circle at 35% 30%, #aef0e6, var(--teal) 65%, var(--teal-dark)); animation: bob 1.4s ease-in-out infinite; }
+@keyframes bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-6px);} }
+.gift.pop{ animation:none; transform:scale(1.6); opacity:0; transition: all .3s ease; }
+
+.well{ position:absolute; bottom:20%; width:13vmin; height:14vmin; }
+.well svg{ width:100%; height:100%; }
+.well .basin-fill{ transition: height .4s linear; }
+
+/* character */
+.character{ position:absolute; bottom:20%; left:22%; width:11vmin; height:20vmin; transform-origin:bottom center; }
+.character.walking{ animation: walkBob .55s ease-in-out infinite; }
+@keyframes walkBob{ 0%,100%{ transform:translateY(0) rotate(0deg);} 50%{ transform:translateY(-2.6%) rotate(1.2deg);} }
+.character.stumble{ animation: stumbleAnim .5s ease-out; }
+@keyframes stumbleAnim{
+  0%{ transform:translateY(0) rotate(0);} 25%{ transform:translateY(3%) rotate(-8deg);}
+  55%{ transform:translateY(-1%) rotate(5deg);} 100%{ transform:translateY(0) rotate(0);} }
+.character svg{ width:100%; height:100%; overflow:visible; }
+
+.pot-wrap{ position:absolute; top:-6%; left:50%; width:8.6vmin; height:7.6vmin; transform:translateX(-50%); }
+#potCanvas{ width:100%; height:100%; display:block; }
+
+#fxCanvas{ position:fixed; inset:0; z-index:30; pointer-events:none; }
+
+/* HUD */
+#titleScreen{ position:absolute; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:.5em; transition: opacity .6s ease, visibility .6s; }
+#titleScreen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.eyebrow{ color:var(--chalk); opacity:.75; letter-spacing:.14em; text-transform:uppercase; font-size:.78rem; font-weight:500; animation: fadeUp .7s ease both; }
+.logo{ font-weight:700; color:var(--chalk); font-size:clamp(2rem,7.6vw,4.2rem); margin:0;
+  text-shadow:0 6px 24px rgba(0,0,0,.35); animation: logoIn .7s cubic-bezier(.2,.9,.3,1) both .15s; }
+.logo span{ font-size:.4em; vertical-align:super; opacity:.7; }
+@keyframes logoIn{ from{ filter:blur(8px); transform:scale(1.2); opacity:0;} to{ filter:blur(0); transform:scale(1); opacity:1;} }
+.chalk-underline{ width:min(260px,50vw); height:6px; }
+.chalk-underline svg{ width:100%; height:100%; }
+.chalk-underline path{ stroke-dasharray:300; stroke-dashoffset:300; animation: draw 1s ease .55s forwards; }
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+.tagline{ font-family:var(--font-chalk); color:var(--chalk); font-size:clamp(1rem,2.3vw,1.35rem); opacity:0; animation: fadeUp .7s ease both .9s; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+.play-btn{ margin-top:1.3rem; padding:.9em 2.3em; font-family:var(--font-display); font-weight:600; font-size:1.02rem;
+  color:var(--ui-charcoal); background:linear-gradient(180deg,#fff7e6,var(--chalk)); border:none; border-radius:999px; cursor:pointer;
+  box-shadow:0 10px 26px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.4) inset;
+  opacity:0; animation: fadeUp .7s ease both 1.15s, pulse 2.4s ease-in-out infinite 1.9s;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+.play-btn:active{ transform:scale(.94); }
+@keyframes pulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.035);} }
+.play-btn.small{ margin-top:1rem; padding:.7em 1.7em; font-size:.9rem; }
+
+.hud{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; justify-content:space-between; align-items:flex-start;
+  padding:max(16px, env(safe-area-inset-top)) 18px 0; opacity:0; transition:opacity .5s ease; }
+.hud.show{ opacity:1; }
+.water-card{ background:var(--ui-glass); backdrop-filter:blur(10px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:.5em 1em; display:flex; align-items:baseline; gap:.5em; box-shadow:0 8px 22px rgba(0,0,0,.25); }
+.water-label{ font-size:.6rem; letter-spacing:.14em; color:var(--chalk-dim); text-transform:uppercase; }
+.water-value{ font-family:var(--font-chalk); font-size:1.65rem; color:var(--chalk); font-weight:700; }
+.progress-card{ background:var(--ui-glass); backdrop-filter:blur(10px); border:1px solid var(--ui-glass-border); border-radius:999px;
+  padding:.55em 1em; width:34vw; max-width:220px; box-shadow:0 8px 22px rgba(0,0,0,.25); }
+.progress-track{ height:6px; border-radius:99px; background:rgba(247,241,226,.2); overflow:hidden; }
+.progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--brass),var(--teal)); border-radius:99px; transition:width .2s linear; }
+
+.prompt{ position:absolute; left:50%; bottom:10%; transform:translateX(-50%); font-family:var(--font-chalk); font-size:1.15rem;
+  color:var(--chalk); background:rgba(23,17,13,.35); backdrop-filter:blur(6px); padding:.35em 1.1em; border-radius:999px;
+  z-index:35; opacity:0; transition:opacity .3s; }
+.prompt.show{ opacity:.9; animation:promptPulse 1.6s ease-in-out infinite; }
+@keyframes promptPulse{ 0%,100%{ opacity:.6;} 50%{ opacity:1;} }
+
+.outcome-text{ position:absolute; left:50%; top:36%; transform:translate(-50%,-50%) scale(.5); font-weight:700;
+  font-size:clamp(1.6rem,6vw,3.4rem); color:var(--chalk); opacity:0; z-index:55; text-shadow:0 8px 30px rgba(0,0,0,.4);
+  pointer-events:none; text-align:center; }
+.outcome-text.show{ animation: outcomePop .9s cubic-bezier(.2,1.4,.3,1) forwards; }
+@keyframes outcomePop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.4);}
+  20%{ opacity:1; transform:translate(-50%,-50%) scale(1.1);}
+  32%{ transform:translate(-50%,-50%) scale(1);}
+  76%{ opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{ opacity:0; transform:translate(-50%,-60%) scale(.94);} }
+.outcome-text.warn{ color:var(--vermillion); }
+.outcome-text.good{ color:var(--teal); }
+
+#app.shake{ animation: screenShake .4s cubic-bezier(.36,.07,.19,.97); }
+@keyframes screenShake{
+  10%,90%{ transform:translate3d(-1px,0,0);} 20%,80%{ transform:translate3d(2px,0,0);}
+  30%,50%,70%{ transform:translate3d(-3px,1px,0);} 40%,60%{ transform:translate3d(3px,-1px,0);} }
+
+#resultCard{ position:absolute; inset:0; z-index:70; display:flex; align-items:center; justify-content:center;
+  background:rgba(15,10,8,.55); backdrop-filter:blur(6px); transition:opacity .4s ease, visibility .4s; }
+#resultCard.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.polaroid{ background:var(--chalk); border-radius:14px; padding:1.1em 1.1em 1.4em; width:min(320px,78vw);
+  box-shadow:0 30px 60px rgba(0,0,0,.5); transform:rotate(-1.5deg) translateY(30px) scale(.9); opacity:0; text-align:center; }
+#resultCard:not(.hidden) .polaroid{ animation: polaroidIn .55s cubic-bezier(.2,1.3,.3,1) forwards .1s; }
+@keyframes polaroidIn{ to{ transform:rotate(-1.5deg) translateY(0) scale(1); opacity:1; } }
+.polaroid-photo{ background:linear-gradient(160deg,#8fd8cf,var(--teal) 55%,#2a5a53); border-radius:6px; height:150px;
+  display:flex; align-items:center; justify-content:center; font-size:3.2rem; margin-bottom:.8em; }
+.polaroid-sub{ font-family:var(--font-display); font-size:.76rem; color:#8a7a68; margin:0 0 .3em; }
+.polaroid-score{ font-family:var(--font-display); font-weight:700; font-size:1.55rem; color:var(--ui-charcoal); margin:.2em 0 .1em; }
+.polaroid-caption{ font-family:var(--font-chalk); font-size:1.05rem; color:#4a3c2c; margin:.2em 0; }
+
+#muteBtn{ position:absolute; top:max(16px, env(safe-area-inset-top)); right:18px; z-index:41; width:38px; height:38px;
+  border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--ui-glass); backdrop-filter:blur(10px);
+  color:var(--chalk); font-size:1rem; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+#muteBtn:active{ transform:scale(.88); }
+
+.petal{ position:absolute; top:-2%; width:1vmin; height:1.2vmin; border-radius:50% 0 50% 0; pointer-events:none; z-index:20; }
+@keyframes petalFall{ 0%{ transform:translateY(0) rotate(0deg); opacity:1;} 100%{ transform:translateY(70vh) rotate(360deg); opacity:0;} }
+
+@keyframes sway{ 0%,100%{ transform:rotate(-4deg);} 50%{ transform:rotate(4deg);} }
+
+@media (max-width:640px){ .character{ left:18%; } .progress-card{ width:26vw; } }
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="scene">
+    <div class="layer" id="sky"><div class="sun"></div></div>
+
+    <div class="layer" id="far">
+      <div class="roofline"></div>
+      <div class="spire"></div>
+      <div class="marigold-string">
+        <span style="left:8%"></span><span style="left:22%; animation-delay:.3s"></span>
+        <span style="left:38%; animation-delay:.6s"></span><span style="left:55%; animation-delay:.2s"></span>
+        <span style="left:72%; animation-delay:.5s"></span><span style="left:88%; animation-delay:.1s"></span>
+      </div>
+    </div>
+
+    <div class="layer" id="mid">
+      <div class="building bd1"></div>
+      <div class="building bd2"></div>
+      <div class="cat-window">
+        <div class="cat" id="cat">
+          <svg viewBox="0 0 40 32">
+            <ellipse cx="20" cy="24" rx="16" ry="8" fill="#3a2e28"/>
+            <circle cx="30" cy="14" r="8" fill="#3a2e28"/>
+            <path d="M25 8 L23 2 L28 7Z" fill="#3a2e28"/>
+            <path d="M35 8 L38 2 L33 7Z" fill="#3a2e28"/>
+            <circle cx="33" cy="14" r="1" fill="#ffcf8a"/>
+            <path d="M4 22 Q -4 16 2 8" stroke="#3a2e28" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="layer" id="groundLayer">
+      <div class="ground"></div>
+      <div id="obstacleField"></div>
+
+      <div class="character" id="character">
+        <svg viewBox="0 0 60 100">
+          <ellipse cx="30" cy="96" rx="16" ry="4" fill="rgba(0,0,0,.25)"/>
+          <rect x="18" y="38" width="24" height="40" rx="10" fill="var(--vermillion)"/>
+          <circle cx="30" cy="24" r="12" fill="#c1703f"/>
+          <rect x="10" y="72" width="12" height="26" rx="5" fill="#3a2e28"/>
+          <rect x="38" y="72" width="12" height="26" rx="5" fill="#3a2e28"/>
+          <path d="M14 46 Q4 52 8 64" stroke="var(--vermillion)" stroke-width="8" fill="none" stroke-linecap="round"/>
+          <path d="M46 46 Q56 52 52 64" stroke="var(--vermillion)" stroke-width="8" fill="none" stroke-linecap="round"/>
+        </svg>
+        <div class="pot-wrap">
+          <canvas id="potCanvas" width="120" height="110"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="fxCanvas"></canvas>
+
+  <button id="muteBtn" title="Mute sound">🔊</button>
+
+  <div id="titleScreen">
+    <p class="eyebrow">Playrium presents</p>
+    <h1 class="logo">MATKA MANIA<span>™</span></h1>
+    <div class="chalk-underline">
+      <svg viewBox="0 0 260 6" preserveAspectRatio="none"><path d="M2 3 Q65 0 130 3 T258 3" stroke="#f7f1e2" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
+    </div>
+    <p class="tagline">Balance. Race. Survive.</p>
+    <button id="playBtn" class="play-btn">Play</button>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="water-card"><span class="water-label">Water</span><span class="water-value" id="waterValue">100%</span></div>
+    <div class="progress-card"><div class="progress-track"><div class="progress-fill" id="progressFill"></div></div></div>
+  </div>
+
+  <div class="prompt" id="prompt">Move your cursor — or tilt your phone — to find your balance</div>
+  <div class="outcome-text" id="outcomeText"></div>
+
+  <div id="resultCard" class="hidden">
+    <div class="polaroid">
+      <div class="polaroid-photo" id="resultEmoji">🏺</div>
+      <p class="polaroid-sub">JOURNEY COMPLETE</p>
+      <p class="polaroid-score" id="resultScore">100% water</p>
+      <p class="polaroid-caption" id="resultCaption">Not a Drop Lost</p>
+      <button id="replayBtn" class="play-btn small">Carry Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const app = document.getElementById('app');
+const scene = document.getElementById('scene');
+const titleScreen = document.getElementById('titleScreen');
+const playBtn = document.getElementById('playBtn');
+const hud = document.getElementById('hud');
+const waterValue = document.getElementById('waterValue');
+const progressFill = document.getElementById('progressFill');
+const prompt = document.getElementById('prompt');
+const outcomeText = document.getElementById('outcomeText');
+const resultCard = document.getElementById('resultCard');
+const resultScore = document.getElementById('resultScore');
+const resultCaption = document.getElementById('resultCaption');
+const resultEmoji = document.getElementById('resultEmoji');
+const replayBtn = document.getElementById('replayBtn');
+const muteBtn = document.getElementById('muteBtn');
+const character = document.getElementById('character');
+const potCanvas = document.getElementById('potCanvas');
+const potCtx = potCanvas.getContext('2d');
+const fxCanvas = document.getElementById('fxCanvas');
+const fxCtx = fxCanvas.getContext('2d');
+const obstacleField = document.getElementById('obstacleField');
+const cat = document.getElementById('cat');
+
+function resizeFx(){
+  fxCanvas.width = window.innerWidth;
+  fxCanvas.height = window.innerHeight;
+}
+resizeFx();
+window.addEventListener('resize', resizeFx);
+
+/* ============================================================
+   AUDIO — synthesized
+   ============================================================ */
+let actx = null, muted = false;
+function ac(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function envGain(ctx,dur,peak){ const g=ctx.createGain(); g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(peak,ctx.currentTime+0.01); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur); return g; }
+function tone(freq,dur,type,peak){ if(muted)return; const ctx=ac(); const o=ctx.createOscillator(); o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,ctx.currentTime); const g=envGain(ctx,dur,peak||0.2); o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+dur+0.05); }
+function noiseBurst(dur,freq,type,peak){ if(muted)return; const ctx=ac(); const n=Math.floor(ctx.sampleRate*dur);
+  const buf=ctx.createBuffer(1,n,ctx.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i]=(Math.random()*2-1)*(1-i/n); }
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const f=ctx.createBiquadFilter(); f.type=type||'bandpass'; f.frequency.value=freq||1200;
+  const g=envGain(ctx,dur,peak||0.25); src.connect(f).connect(g).connect(ctx.destination); src.start(); }
+
+const Sound = {
+  click(){ tone(650,0.06,'sine',0.12); },
+  plip(){ tone(760+Math.random()*260,0.09,'sine',0.12); },
+  splash(){ noiseBurst(0.35,1400,'bandpass',0.24); },
+  stumble(){ noiseBurst(0.3,900,'bandpass',0.22); setTimeout(()=>tone(180,0.18,'sine',0.14),40); },
+  gust(){ noiseBurst(0.5,2200,'lowpass',0.14); },
+  bump(){ tone(140,0.09,'square',0.1); },
+  gift(){ tone(920,0.12,'sine',0.16); setTimeout(()=>tone(1300,0.1,'sine',0.12),60); },
+  pour(){ noiseBurst(1.2,1100,'bandpass',0.22); },
+  bell(){ tone(1500,0.6,'sine',0.14); setTimeout(()=>tone(2200,0.5,'sine',0.08),80); },
+  jingle(){ [1046,1318,1568].forEach((f,i)=>setTimeout(()=>tone(f,0.4,'sine',0.13),i*140)); },
+  catYelp(){ const ctx=ac(); if(muted)return; const o=ctx.createOscillator(); o.type='sawtooth';
+    o.frequency.setValueAtTime(700,ctx.currentTime); o.frequency.exponentialRampToValueAtTime(1400,ctx.currentTime+0.08);
+    o.frequency.exponentialRampToValueAtTime(300,ctx.currentTime+0.22);
+    const g=envGain(ctx,0.28,0.16); o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.3); },
+};
+muteBtn.addEventListener('click', ()=>{ muted=!muted; muteBtn.textContent = muted?'🔇':'🔊'; Sound.click(); });
+
+/* continuous water-slosh ambience */
+let sloshNoise=null, sloshFilter=null, sloshGain=null;
+function startSlosh(){
+  if(muted) return;
+  const ctx = ac();
+  const bufSize = ctx.sampleRate*2;
+  const buf = ctx.createBuffer(1,bufSize,ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  let last=0;
+  for(let i=0;i<bufSize;i++){ const white=Math.random()*2-1; last = (last+0.02*white)/1.02; d[i]=last*3.2; }
+  sloshNoise = ctx.createBufferSource(); sloshNoise.buffer=buf; sloshNoise.loop=true;
+  sloshFilter = ctx.createBiquadFilter(); sloshFilter.type='bandpass'; sloshFilter.frequency.value=500; sloshFilter.Q.value=0.7;
+  sloshGain = ctx.createGain(); sloshGain.gain.value=0.02;
+  sloshNoise.connect(sloshFilter).connect(sloshGain).connect(ctx.destination);
+  sloshNoise.start();
+}
+function updateSlosh(intensity){
+  if(!sloshGain) return;
+  sloshGain.gain.value = 0.02 + Math.min(intensity,1)*0.09;
+  sloshFilter.frequency.value = 420 + Math.min(intensity,1)*900;
+}
+function stopSlosh(){ if(sloshNoise){ try{sloshNoise.stop();}catch(e){} sloshNoise=null; } }
+
+/* ============================================================
+   INPUT
+   ============================================================ */
+let inputTilt = 0; // -1..1
+function updateInputFromClientX(x){
+  const nx = (x/window.innerWidth - 0.5)*2;
+  inputTilt = Math.max(-1, Math.min(1, nx));
+}
+window.addEventListener('mousemove', e=> updateInputFromClientX(e.clientX));
+window.addEventListener('touchmove', e=>{ if(e.touches[0]) updateInputFromClientX(e.touches[0].clientX); }, {passive:true});
+window.addEventListener('keydown', e=>{
+  if(e.code==='ArrowLeft') inputTilt = -0.8;
+  if(e.code==='ArrowRight') inputTilt = 0.8;
+});
+window.addEventListener('keyup', e=>{ if(e.code==='ArrowLeft'||e.code==='ArrowRight') inputTilt = 0; });
+
+/* gyroscope enhancement (best-effort, silently ignored if unavailable) */
+let gyroActive=false, gyroZero=null;
+function tryEnableGyro(){
+  if(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function'){
+    DeviceOrientationEvent.requestPermission().then(res=>{ if(res==='granted') attachGyro(); }).catch(()=>{});
+  } else if(window.DeviceOrientationEvent){
+    attachGyro();
+  }
+}
+function attachGyro(){
+  gyroActive = true;
+  window.addEventListener('deviceorientation', e=>{
+    if(e.gamma===null) return;
+    if(gyroZero===null) gyroZero = e.gamma;
+    const rel = (e.gamma - gyroZero) / 22;
+    inputTilt = Math.max(-1, Math.min(1, rel));
+  });
+}
+
+/* ============================================================
+   POT WATER PHYSICS
+   ============================================================ */
+const PHYS = {
+  k: 14, c: 5, maxInputAngle: 0.5, bobFreq: 1.6*Math.PI*2,
+  outerThreshold: 0.34, criticalThreshold: 0.6, dripRate: 26,
+};
+let waterAngle = 0, waterVel = 0, walkPhase = 0;
+let water = 100;
+let stumbling = false;
+let inputDamp = 1;
+
+function physicsStep(dt, running){
+  walkPhase += dt * PHYS.bobFreq * (running?1:0.4);
+  const bob = Math.sin(walkPhase) * (running?0.035:0.05);
+  const target = inputTilt * inputDamp * PHYS.maxInputAngle + bob;
+  const accel = PHYS.k*(target-waterAngle) - PHYS.c*waterVel;
+  waterVel += accel*dt;
+  waterAngle += waterVel*dt;
+  if(waterAngle>1.1) waterAngle=1.1; if(waterAngle<-1.1) waterAngle=-1.1;
+
+  const abs = Math.abs(waterAngle);
+  if(abs > PHYS.outerThreshold && water>0){
+    const excess = abs - PHYS.outerThreshold;
+    water -= excess*PHYS.dripRate*dt;
+    if(water<0) water=0;
+    if(Math.random() < excess*dt*10){ spawnDroplet(); }
+  }
+  if(abs > PHYS.criticalThreshold && !stumbling){
+    triggerStumble();
+  }
+  updateSlosh(Math.abs(waterVel)*0.5 + abs);
+  return bob;
+}
+
+function triggerStumble(){
+  stumbling = true;
+  water = Math.max(0, water - 10);
+  waterVel *= -0.35;
+  waterAngle *= 0.5;
+  inputDamp = 0.3;
+  character.classList.remove('stumble'); void character.offsetWidth; character.classList.add('stumble');
+  app.classList.remove('shake'); void app.offsetWidth; app.classList.add('shake');
+  Sound.stumble();
+  popText('Careful!', 'warn');
+  spawnDroplet(); spawnDroplet(); spawnDroplet();
+  setTimeout(()=>{ stumbling=false; inputDamp=1; }, 550);
+}
+
+/* ============================================================
+   POT RENDER (canvas)
+   ============================================================ */
+function drawPot(){
+  const w = potCanvas.width, h = potCanvas.height;
+  potCtx.clearRect(0,0,w,h);
+
+  // pot silhouette (matka shape)
+  potCtx.save();
+  const potPath = new Path2D();
+  potPath.moveTo(w*0.30, h*0.10);
+  potPath.quadraticCurveTo(w*0.02, h*0.42, w*0.14, h*0.72);
+  potPath.quadraticCurveTo(w*0.22, h*0.98, w*0.5, h*0.98);
+  potPath.quadraticCurveTo(w*0.78, h*0.98, w*0.86, h*0.72);
+  potPath.quadraticCurveTo(w*0.98, h*0.42, w*0.70, h*0.10);
+  potPath.closePath();
+
+  const potGrad = potCtx.createLinearGradient(0,0,0,h);
+  potGrad.addColorStop(0,'#d99a5e'); potGrad.addColorStop(1,'#a4622f');
+  potCtx.fillStyle = potGrad;
+  potCtx.fill(potPath);
+
+  // water clipped to interior
+  potCtx.save();
+  potCtx.clip(potPath);
+  const waterLevelY = h*0.16 + (1 - water/100) * (h*0.74);
+  const tilt = Math.tan(waterAngle) * (w*0.42);
+  const wob = Math.sin(performance.now()/160) * Math.min(3, Math.abs(waterVel)*2);
+  potCtx.beginPath();
+  potCtx.moveTo(-10, waterLevelY - tilt + wob);
+  potCtx.lineTo(w+10, waterLevelY + tilt + wob);
+  potCtx.lineTo(w+10, h+10);
+  potCtx.lineTo(-10, h+10);
+  potCtx.closePath();
+  const waterGrad = potCtx.createLinearGradient(0,waterLevelY-20,0,h);
+  waterGrad.addColorStop(0,'#8fe4da'); waterGrad.addColorStop(1,'#1f7168');
+  potCtx.fillStyle = waterGrad;
+  potCtx.globalAlpha = 0.92;
+  potCtx.fill();
+  potCtx.restore();
+
+  // rim highlight
+  potCtx.strokeStyle = 'rgba(255,255,255,.35)';
+  potCtx.lineWidth = 2;
+  potCtx.stroke(potPath);
+  potCtx.restore();
+}
+
+/* ============================================================
+   FX PARTICLES (droplets / petals)
+   ============================================================ */
+let particles = [];
+function potScreenPos(){
+  const r = potCanvas.getBoundingClientRect();
+  return { x: r.left + r.width*0.5, y: r.top + r.height*0.55 };
+}
+function spawnDroplet(){
+  const p = potScreenPos();
+  const dir = waterAngle >= 0 ? 1 : -1;
+  particles.push({
+    x: p.x + dir*10, y: p.y,
+    vx: dir*(60+Math.random()*60), vy: -40-Math.random()*60,
+    life: 1, type:'drop'
+  });
+  Sound.plip();
+}
+function spawnBurstToward(targetX, targetY){
+  const p = potScreenPos();
+  for(let i=0;i<6;i++){
+    particles.push({
+      x:p.x, y:p.y,
+      vx:(targetX-p.x)/0.5 + (Math.random()*40-20),
+      vy:(targetY-p.y)/0.5 - 80 - Math.random()*40,
+      life:1, type:'drop', gravity:520
+    });
+  }
+  Sound.splash();
+}
+function spawnPetals(n){
+  for(let i=0;i<n;i++){
+    const el = document.createElement('div');
+    el.className='petal';
+    el.style.left = (30+Math.random()*40)+'%';
+    el.style.top = (5+Math.random()*10)+'%';
+    el.style.background = i%2? '#ffb238':'#e8637a';
+    el.style.animation = `petalFall ${1.4+Math.random()*1}s ease-in forwards`;
+    el.style.animationDelay = (Math.random()*0.4)+'s';
+    scene.appendChild(el);
+    setTimeout(()=>el.remove(), 3000);
+  }
+}
+
+function fxTick(dt){
+  fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+  particles.forEach(p=>{
+    const g = p.gravity || 700;
+    p.vy += g*dt;
+    p.x += p.vx*dt;
+    p.y += p.vy*dt;
+    p.life -= dt*0.9;
+  });
+  particles = particles.filter(p=> p.life>0 && p.y < fxCanvas.height+30);
+  fxCtx.fillStyle = 'rgba(143,228,218,0.95)';
+  particles.forEach(p=>{
+    fxCtx.beginPath();
+    fxCtx.arc(p.x,p.y, 3.2*Math.max(p.life,0.2), 0, Math.PI*2);
+    fxCtx.fill();
+  });
+}
+
+/* ============================================================
+   DELIGHT: cat splash surprise
+   ============================================================ */
+let catSplashed = false;
+function checkCatSplash(){
+  if(catSplashed) return;
+  if(Math.abs(waterAngle) > 0.5){
+    catSplashed = true;
+    const r = cat.getBoundingClientRect();
+    spawnBurstToward(r.left + r.width*0.5, r.top + r.height*0.4);
+    setTimeout(()=>{
+      cat.classList.add('yelp');
+      Sound.catYelp();
+    }, 260);
+  }
+}
+
+/* ============================================================
+   OBSTACLES
+   ============================================================ */
+let obstacles = [];
+let nextSpawnAt = 0;
+const SPAWN_MIN = 1900, SPAWN_MAX = 3000;
+
+function spawnObstacle(distanceNow){
+  const sceneW = window.innerWidth;
+  const roll = Math.random();
+  let type = roll < 0.15 ? 'gift' : (roll < 0.55 ? 'gust' : 'bump');
+  const worldX = distanceNow + sceneW*0.95;
+  const el = document.createElement('div');
+  el.className = 'obstacle ' + type;
+  if(type==='gust'){
+    el.innerHTML = '<svg viewBox="0 0 60 60"><path d="M6 20 Q30 4 54 20" stroke="#f7f1e2" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.8"/><path d="M6 34 Q30 20 54 34" stroke="#f7f1e2" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/><path d="M6 48 Q30 36 54 48" stroke="#f7f1e2" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.4"/></svg>';
+  }
+  obstacleField.appendChild(el);
+  obstacles.push({ type, worldX, el, telegraphed:false, resolved:false });
+}
+
+function updateObstacles(distanceNow, characterXpx){
+  obstacles.forEach(ob=>{
+    const dx = ob.worldX - distanceNow;
+    const screenX = characterXpx + dx;
+    ob.el.style.left = screenX + 'px';
+
+    if(ob.type==='gust' && !ob.telegraphed && dx < 300 && dx > 0){
+      ob.telegraphed = true;
+      ob.el.classList.add('telegraph');
+      Sound.gust();
+    }
+    if(!ob.resolved && dx <= 40 && dx > -40){
+      ob.resolved = true;
+      resolveObstacle(ob);
+    }
+  });
+  obstacles = obstacles.filter(ob=>{
+    const dx = ob.worldX - distanceNow;
+    if(dx < -140){ ob.el.remove(); return false; }
+    return true;
+  });
+}
+
+function resolveObstacle(ob){
+  if(ob.type==='gust'){
+    const dir = Math.random()<0.5?-1:1;
+    waterVel += dir*2.6;
+    Sound.gust();
+  } else if(ob.type==='bump'){
+    waterVel += (Math.random()<0.5?-1:1)*0.9;
+    Sound.bump();
+  } else if(ob.type==='gift'){
+    water = Math.min(100, water+8);
+    ob.el.classList.add('pop');
+    Sound.gift();
+    popText('Splash gift! +8%', 'good');
+    const r = ob.el.getBoundingClientRect();
+    spawnBurstToward(r.left, r.top);
+  }
+}
+
+/* ============================================================
+   WELL / FINISH
+   ============================================================ */
+let wellEl = null, wellSpawned = false;
+function spawnWell(distanceNow){
+  wellSpawned = true;
+  const sceneW = window.innerWidth;
+  wellEl = document.createElement('div');
+  wellEl.className = 'obstacle well';
+  wellEl.innerHTML = `<svg viewBox="0 0 100 100">
+      <ellipse cx="50" cy="86" rx="42" ry="8" fill="rgba(0,0,0,.2)"/>
+      <rect x="14" y="42" width="72" height="40" rx="6" fill="#8a6a4f"/>
+      <rect class="basin-fill" x="20" y="76" width="60" height="0" fill="#2f8f86"/>
+      <rect x="10" y="34" width="80" height="10" rx="4" fill="#c1703f"/>
+      <rect x="44" y="6" width="6" height="30" fill="#5c4326"/>
+      <rect x="14" y="6" width="72" height="6" rx="3" fill="#5c4326"/>
+    </svg>`;
+  wellEl.dataset.worldX = distanceNow + sceneW*0.95;
+  obstacleField.appendChild(wellEl);
+}
+function updateWell(distanceNow, characterXpx){
+  if(!wellEl) return;
+  const worldX = parseFloat(wellEl.dataset.worldX);
+  const dx = worldX - distanceNow;
+  wellEl.style.left = (characterXpx + dx) + 'px';
+  return dx;
+}
+
+/* ============================================================
+   GAME STATE MACHINE
+   ============================================================ */
+const STATE = { TITLE:'title', CALIBRATE:'calibrate', RUNNING:'running', POUR:'pour', CELEBRATE:'celebrate', RESULT:'result' };
+let state = STATE.TITLE;
+let distance = 0;
+const BASE_SPEED = 200;
+const TARGET_DISTANCE = 8600;
+let calibrateEnd = 0;
+let lastTime = 0;
+let finalScore = 100;
+let pourStart = 0;
+
+function popText(msg, cls){
+  outcomeText.textContent = msg;
+  outcomeText.className = 'outcome-text ' + (cls||'');
+  void outcomeText.offsetWidth;
+  outcomeText.classList.add('show');
+}
+
+function startGame(){
+  water = 100; distance = 0; waterAngle=0; waterVel=0; stumbling=false; inputDamp=1;
+  catSplashed = false; cat.classList.remove('yelp');
+  obstacles.forEach(o=>o.el.remove()); obstacles=[];
+  if(wellEl){ wellEl.remove(); wellEl=null; } wellSpawned=false;
+  waterValue.textContent = '100%';
+  progressFill.style.width = '0%';
+  titleScreen.classList.add('hidden');
+  hud.classList.add('show');
+  resultCard.classList.add('hidden');
+  character.classList.remove('walking');
+  prompt.textContent = 'Find your balance…';
+  prompt.classList.add('show');
+  startSlosh();
+  state = STATE.CALIBRATE;
+  calibrateEnd = performance.now() + 2600;
+  nextSpawnAt = performance.now() + 800;
+  lastTime = performance.now();
+  requestAnimationFrame(loop);
+}
+
+function loop(now){
+  const dt = Math.min(0.033, (now-lastTime)/1000);
+  lastTime = now;
+  const sceneW = window.innerWidth;
+  const characterXpx = sceneW * (window.innerWidth<=640?0.18:0.22);
+
+  if(state===STATE.CALIBRATE){
+    physicsStep(dt, false);
+    checkCatSplash();
+    if(now > calibrateEnd){
+      state = STATE.RUNNING;
+      prompt.classList.remove('show');
+      character.classList.add('walking');
+    }
+  }
+  else if(state===STATE.RUNNING){
+    const bob=physicsStep(dt, true);
+    character.style.setProperty('--bob', bob);
+    distance += BASE_SPEED*dt*(stumbling?0.3:1);
+    progressFill.style.width = Math.min(100,(distance/TARGET_DISTANCE)*100) + '%';
+    waterValue.textContent = Math.round(water) + '%';
+
+    if(now > nextSpawnAt && !wellSpawned){
+      spawnObstacle(distance);
+      nextSpawnAt = now + SPAWN_MIN + Math.random()*(SPAWN_MAX-SPAWN_MIN);
+    }
+    updateObstacles(distance, characterXpx);
+
+    if(!wellSpawned && distance > TARGET_DISTANCE - sceneW*0.9){
+      spawnWell(distance);
+    }
+    if(wellSpawned){
+      const dx = updateWell(distance, characterXpx);
+      if(dx !== undefined && dx <= 30){
+        beginPour();
+      }
+    }
+  }
+  else if(state===STATE.POUR){
+    const t = Math.min(1, (now-pourStart)/1500);
+    water = finalScore * (1-t);
+    waterValue.textContent = Math.round(water) + '%';
+    if(wellEl){
+      const fill = wellEl.querySelector('.basin-fill');
+      if(fill) fill.setAttribute('height', String(34*t));
+    }
+    if(Math.random() < 0.5) spawnPourDrop();
+    if(t>=1){ beginCelebrate(); }
+  }
+
+  drawPot();
+  fxTick(dt);
+
+  if(state!==STATE.TITLE && state!==STATE.RESULT){
+    requestAnimationFrame(loop);
+  }
+}
+
+function spawnPourDrop(){
+  if(!wellEl) return;
+  const p = potScreenPos();
+  const w = wellEl.getBoundingClientRect();
+  particles.push({ x:p.x, y:p.y, vx:(w.left+w.width*0.5-p.x)*0.6, vy:-20, life:1, type:'drop', gravity:900 });
+}
+
+function beginPour(){
+  state = STATE.POUR;
+  finalScore = water;
+  pourStart = performance.now();
+  character.classList.remove('walking');
+  Sound.pour();
+  setTimeout(Sound.bell, 400);
+}
+
+function beginCelebrate(){
+  state = STATE.CELEBRATE;
+  spawnPetals(14);
+  Sound.jingle();
+  setTimeout(showResult, 1200);
+}
+
+function showResult(){
+  state = STATE.RESULT;
+  stopSlosh();
+  hud.classList.remove('show');
+  let caption, emoji;
+  const s = Math.round(finalScore);
+  if(s>=95){ caption='Not a Drop Lost'; emoji='💧'; }
+  else if(s>=70){ caption='Steady Hands'; emoji='🏺'; }
+  else if(s>=35){ caption='Made It Home'; emoji='🙂'; }
+  else { caption='Bone Dry… but you tried'; emoji='😅'; }
+  resultScore.textContent = s + '% water';
+  resultCaption.textContent = caption;
+  resultEmoji.textContent = emoji;
+  resultCard.classList.remove('hidden');
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+playBtn.addEventListener('click', ()=>{ ac(); Sound.click(); tryEnableGyro(); startGame(); });
+replayBtn.addEventListener('click', ()=>{ Sound.click(); startGame(); });
+cat.addEventListener('click', (e)=>{ e.stopPropagation(); if(!catSplashed) return; });
+
+drawPot();
+})();
+</script>
+</body>
+</html>

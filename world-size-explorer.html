@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>World Size Explorer™ — The World Isn't What It Looks Like</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --space-deep:#050a16; --space-mid:#0d1a33; --ocean:#0f2540;
+  --atmosphere:#5ab4ff; --gold:#f0c14b;
+  --chalk:#eef3fb; --chalk-dim:#9fb0c9;
+  --ui-glass:rgba(238,243,251,.07); --ui-glass-border:rgba(238,243,251,.16);
+  --font-display:'Fredoka', system-ui, sans-serif; --font-data:'JetBrains Mono', monospace;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--space-deep);
+  font-family:var(--font-display); -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none; }
+#app{ position:relative; width:100vw; height:100vh; height:100dvh; overflow:hidden; }
+#globeCanvas, #mainCanvas{ position:absolute; inset:0; width:100%; height:100%; }
+
+/* ============================================================
+   TITLE
+   ============================================================ */
+#titleScreen{ position:absolute; inset:0; z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+  text-align:center; gap:.5em; padding-bottom:8vh; transition: opacity .8s ease, visibility .8s; }
+#titleScreen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.eyebrow{ color:var(--chalk); opacity:.65; letter-spacing:.16em; text-transform:uppercase; font-size:.74rem; font-weight:500; animation: fadeUp .7s ease both; }
+.headline{ font-weight:700; color:var(--chalk); font-size:clamp(1.7rem,6.4vw,3.2rem); margin:0;
+  text-shadow:0 8px 30px rgba(0,0,0,.5); animation: fadeUp .8s cubic-bezier(.2,.9,.3,1) both .15s; letter-spacing:.01em; }
+.tagline{ font-family:var(--font-data); color:var(--atmosphere); font-size:clamp(.85rem,2vw,1.05rem); opacity:0;
+  animation: fadeUp .7s ease both .8s; letter-spacing:.02em; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(16px);} to{ opacity:1; transform:translateY(0);} }
+#startBtn{ margin-top:1.2rem; padding:.9em 2.3em; font-family:var(--font-display); font-weight:600; font-size:1.02rem;
+  color:var(--space-deep); background:linear-gradient(180deg,#e8f4ff,var(--atmosphere)); border:none; border-radius:999px; cursor:pointer;
+  box-shadow:0 14px 32px rgba(90,180,255,.25), 0 0 0 1px rgba(255,255,255,.3) inset;
+  opacity:0; animation: fadeUp .7s ease both 1.25s, pulse 2.6s ease-in-out infinite 2s;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+#startBtn:active{ transform:scale(.94); }
+@keyframes pulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.035);} }
+
+/* ============================================================
+   HUD
+   ============================================================ */
+.hud{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; justify-content:space-between; align-items:flex-start;
+  padding:max(14px, env(safe-area-inset-top)) 16px 0; opacity:0; transition:opacity .5s ease; }
+.hud.show{ opacity:1; }
+.hud-card{ background:var(--ui-glass); backdrop-filter:blur(14px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:.5em .9em; display:flex; align-items:center; gap:.5em; box-shadow:0 8px 22px rgba(0,0,0,.3); cursor:pointer;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); color:var(--chalk); font-size:.85rem; font-weight:600; }
+.hud-card:active{ transform:scale(.95); }
+.hud-right{ display:flex; gap:.5em; }
+.icon-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--ui-glass);
+  backdrop-filter:blur(10px); color:var(--chalk); font-size:1rem; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+.icon-btn:active{ transform:scale(.88); }
+
+#logPanel{ position:absolute; top:64px; left:18px; z-index:45; width:min(240px,78vw); max-height:60vh; overflow-y:auto;
+  background:var(--ui-glass); backdrop-filter:blur(16px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:1em; box-shadow:0 20px 40px rgba(0,0,0,.4); opacity:0; visibility:hidden; transform:translateY(-10px) scale(.96);
+  transition: all .3s cubic-bezier(.2,1,.3,1); }
+#logPanel.show{ opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.log-title{ font-family:var(--font-data); color:var(--chalk); font-size:.95rem; margin:0 0 .5em; letter-spacing:.03em; }
+.log-row{ display:flex; align-items:center; gap:.5em; padding:.3em 0; color:var(--chalk-dim); font-size:.8rem; }
+.log-row.found{ color:var(--chalk); }
+.log-flag{ width:20px; text-align:center; opacity:.35; filter:grayscale(1); }
+.log-row.found .log-flag{ opacity:1; filter:none; }
+
+/* ============================================================
+   SHELF
+   ============================================================ */
+.shelf-wrap{ position:absolute; bottom:0; left:0; right:0; z-index:30; padding:0 12px max(10px, env(safe-area-inset-bottom));
+  display:flex; justify-content:center; }
+.shelf{ display:flex; gap:.5em; background:var(--ui-glass); backdrop-filter:blur(16px); border:1px solid var(--ui-glass-border);
+  border-radius:20px; padding:.6em; max-width:96vw; overflow-x:auto; }
+.shelf-item{ display:flex; flex-direction:column; align-items:center; gap:.15em; width:60px; flex-shrink:0; cursor:grab;
+  padding:.4em .2em; border-radius:12px; transition: transform .15s cubic-bezier(.3,1.6,.5,1), background .15s; }
+.shelf-item:hover{ background:rgba(238,243,251,.06); transform:translateY(-3px); }
+.shelf-item .flag{ font-size:1.6rem; animation: shelfIdle 3.2s ease-in-out infinite; }
+@keyframes shelfIdle{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-2px);} }
+.shelf-item .label{ font-size:.56rem; color:var(--chalk-dim); text-align:center; line-height:1.15; }
+.shelf-item .area{ font-family:var(--font-data); font-size:.5rem; color:var(--atmosphere); }
+
+.drag-ghost{ position:fixed; z-index:90; pointer-events:none; }
+
+/* ============================================================
+   COMPARE READOUT
+   ============================================================ */
+.compare-readout{ position:absolute; left:50%; top:12%; transform:translate(-50%,-50%) scale(.7); z-index:55;
+  background:rgba(13,26,51,.7); backdrop-filter:blur(12px); border:1px solid rgba(90,180,255,.35); border-radius:16px;
+  padding:.6em 1.3em; font-family:var(--font-data); color:var(--chalk); font-size:clamp(.85rem,2.4vw,1.05rem);
+  text-align:center; opacity:0; pointer-events:none; box-shadow:0 16px 34px rgba(0,0,0,.4); }
+.compare-readout.show{ animation: readoutPop 2.4s cubic-bezier(.2,1.2,.3,1) forwards; }
+@keyframes readoutPop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.7);}
+  14%{ opacity:1; transform:translate(-50%,-50%) scale(1.04);}
+  24%{ transform:translate(-50%,-50%) scale(1);}
+  86%{ opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{ opacity:0; transform:translate(-50%,-58%) scale(.96);} }
+.compare-readout .ratio{ color:var(--gold); font-weight:600; }
+
+.toast{ position:absolute; left:50%; top:26%; transform:translate(-50%,-50%) scale(.6); font-family:var(--font-display);
+  font-size:clamp(1rem,3vw,1.3rem); color:var(--chalk); opacity:0; z-index:60; text-shadow:0 6px 20px rgba(0,0,0,.5);
+  pointer-events:none; text-align:center; background:rgba(13,26,51,.55); backdrop-filter:blur(8px); padding:.4em 1.2em; border-radius:999px;
+  border:1px solid rgba(240,193,75,.3); }
+.toast.show{ animation: toastPop 1.8s cubic-bezier(.2,1.2,.3,1) forwards; }
+@keyframes toastPop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.6);}
+  14%{ opacity:1; transform:translate(-50%,-50%) scale(1.06);}
+  24%{ transform:translate(-50%,-50%) scale(1);}
+  80%{ opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{ opacity:0; transform:translate(-50%,-60%) scale(.96);} }
+
+.board-hint{ position:absolute; left:50%; bottom:14%; transform:translateX(-50%); z-index:25;
+  font-family:var(--font-data); color:var(--chalk-dim); font-size:.78rem; background:rgba(13,26,51,.4);
+  backdrop-filter:blur(6px); padding:.35em 1em; border-radius:999px; opacity:.85; transition:opacity .4s; }
+.board-hint.hidden{ opacity:0; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="globeCanvas"></canvas>
+  <canvas id="mainCanvas" style="opacity:0;"></canvas>
+
+  <div id="titleScreen">
+    <p class="eyebrow">Playrium presents</p>
+    <h1 class="headline">WORLD SIZE EXPLORER™</h1>
+    <p class="tagline">"The world isn't what it looks like."</p>
+    <button id="startBtn">Start Exploring</button>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="hud-card" id="logBtn">🗺️ Discovery Log <span id="logCount">0/20</span></div>
+    <div class="hud-right">
+      <div class="icon-btn" id="resetBtn" title="Reset board">🔄</div>
+      <div class="icon-btn" id="muteBtn" title="Mute">🔊</div>
+    </div>
+  </div>
+
+  <div id="logPanel">
+    <p class="log-title">DISCOVERY LOG</p>
+    <div id="logList"></div>
+  </div>
+
+  <div class="board-hint" id="boardHint">Drag two shapes onto each other to compare their real size</div>
+  <div class="compare-readout" id="compareReadout"></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="shelf-wrap">
+    <div class="shelf" id="shelf"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const app = document.getElementById('app');
+const globeCanvas = document.getElementById('globeCanvas');
+const gctx = globeCanvas.getContext('2d');
+const mainCanvas = document.getElementById('mainCanvas');
+const mctx = mainCanvas.getContext('2d');
+const titleScreen = document.getElementById('titleScreen');
+const startBtn = document.getElementById('startBtn');
+const hud = document.getElementById('hud');
+const logBtn = document.getElementById('logBtn');
+const logCount = document.getElementById('logCount');
+const logPanel = document.getElementById('logPanel');
+const logList = document.getElementById('logList');
+const shelf = document.getElementById('shelf');
+const compareReadout = document.getElementById('compareReadout');
+const toast = document.getElementById('toast');
+const boardHint = document.getElementById('boardHint');
+const muteBtn = document.getElementById('muteBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+function resizeCanvases(){
+  [globeCanvas, mainCanvas].forEach(c=>{
+    c.width = window.innerWidth*devicePixelRatio;
+    c.height = window.innerHeight*devicePixelRatio;
+    c.style.width = window.innerWidth+'px';
+    c.style.height = window.innerHeight+'px';
+    c.getContext('2d').setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  });
+}
+resizeCanvases();
+window.addEventListener('resize', resizeCanvases);
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+let actx=null, muted=false;
+function ac(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function envGain(ctx,dur,peak){ const g=ctx.createGain(); g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(peak,ctx.currentTime+0.008); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur); return g; }
+function tone(freq,dur,type,peak){ if(muted)return; const ctx=ac(); const o=ctx.createOscillator(); o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,ctx.currentTime); const g=envGain(ctx,dur,peak||0.15); o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+dur+0.05); }
+function noiseBurst(dur,freq,type,peak){ if(muted)return; const ctx=ac(); const n=Math.floor(ctx.sampleRate*dur);
+  const buf=ctx.createBuffer(1,n,ctx.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i]=(Math.random()*2-1)*(1-i/n); }
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const f=ctx.createBiquadFilter(); f.type=type||'bandpass'; f.frequency.value=freq||1500;
+  const g=envGain(ctx,dur,peak||0.18); src.connect(f).connect(g).connect(ctx.destination); src.start(); }
+const Sound = {
+  click(){ tone(1300,0.05,'sine',0.09); },
+  lift(){ noiseBurst(0.14,2600,'highpass',0.1); },
+  drop(){ tone(300,0.1,'sine',0.12); },
+  reveal(){ tone(880,0.18,'sine',0.14); setTimeout(()=>tone(1318,0.22,'sine',0.11),90); },
+  chime(){ [1046,1318,1568].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sine',0.12),i*130)); },
+};
+muteBtn.addEventListener('click', ()=>{ muted=!muted; muteBtn.textContent=muted?'🔇':'🔊'; Sound.click(); });
+
+resetBtn.addEventListener('click', ()=>{
+  Sound.click();
+  if(board.length===0){ showToast('Board is already empty'); return; }
+  board = [];
+  particles = [];
+  revealedPairs.clear();
+  compareReadout.classList.remove('show');
+  boardHint.classList.remove('hidden');
+  showToast('Board cleared — try a new comparison!');
+});
+
+/* ============================================================
+   COUNTRY / CONTINENT DATA
+   real approximate surface areas (km²) — used only to calibrate
+   each silhouette's relative SIZE. Shapes themselves are stylized
+   organic blobs, not survey-grade coastlines — a deliberate v1
+   simplification (see hand-off notes).
+   ============================================================ */
+const ENTRIES = [
+  // — existing set, recolored to each nation's actual flag palette —
+  { id:'russia',   name:'Russia',        flag:'🇷🇺', area:17098242, color:'#4a5a8f', color2:'#c1443a', aspect:1.6 },
+  { id:'canada',   name:'Canada',        flag:'🇨🇦', area:9984670,  color:'#e2564f', color2:'#f2f2f2', aspect:1.3 },
+  { id:'usa',      name:'USA',           flag:'🇺🇸', area:9833517,  color:'#4a7fe8', color2:'#e2564f', aspect:1.5 },
+  { id:'china',    name:'China',         flag:'🇨🇳', area:9596961,  color:'#e2564f', color2:'#f0c14b', aspect:1.2 },
+  { id:'brazil',   name:'Brazil',        flag:'🇧🇷', area:8515767,  color:'#3fae5c', color2:'#f0c14b', aspect:1.1 },
+  { id:'australia',name:'Australia',     flag:'🇦🇺', area:7692024,  color:'#2a3a6e', color2:'#c1443a', aspect:1.25, delight:'🦘' },
+  { id:'africa',   name:'Africa',        flag:'🌍', area:30370000, color:'#2f7a4a', color2:'#f0c14b', aspect:1.05, isContinent:true },
+  { id:'europe',   name:'Europe',        flag:'🌍', area:10180000, color:'#2a4a9f', color2:'#f0c14b', aspect:1.15, isContinent:true },
+  { id:'india',    name:'India',         flag:'🇮🇳', area:3287263,  color:'#e8a23c', color2:'#2f7a4a', aspect:1.2 },
+  { id:'pakistan', name:'Pakistan',      flag:'🇵🇰', area:881913,   color:'#2f7a4a', color2:'#eef3fb', aspect:1.15 },
+  { id:'bangladesh',name:'Bangladesh',   flag:'🇧🇩', area:148460,   color:'#2f8f5c', color2:'#c1443a', aspect:1.05 },
+  { id:'nepal',    name:'Nepal',         flag:'🇳🇵', area:147516,   color:'#c1443a', color2:'#1a3a6e', aspect:1.4 },
+  { id:'greenland',name:'Greenland',     flag:'🇬🇱', area:2166086,  color:'#e2564f', color2:'#eef3fb', aspect:1.9 },
+  { id:'algeria',  name:'Algeria',       flag:'🇩🇿', area:2381741,  color:'#2f7a4a', color2:'#c1443a', aspect:1.1 },
+  { id:'egypt',    name:'Egypt',         flag:'🇪🇬', area:1002450,  color:'#c1443a', color2:'#f0c14b', aspect:1.1, delight:'🔺' },
+  { id:'japan',    name:'Japan',         flag:'🇯🇵', area:377975,   color:'#e8637a', color2:'#eef3fb', aspect:1.7, delight:'🌸' },
+  { id:'italy',    name:'Italy',         flag:'🇮🇹', area:301340,   color:'#3fae5c', color2:'#c1443a', aspect:1.8, delight:'🍕' },
+  { id:'uk',       name:'United Kingdom',flag:'🇬🇧', area:243610,   color:'#2a3a6e', color2:'#c1443a', aspect:1.3 },
+  { id:'singapore',name:'Singapore',     flag:'🇸🇬', area:728.6,    color:'#e2564f', color2:'#eef3fb', aspect:1.1 },
+  { id:'vatican',  name:'Vatican City',  flag:'🇻🇦', area:0.49,     color:'#f0c14b', color2:'#eef3fb', aspect:1.0, delight:'😄' },
+
+  // — new additions —
+  { id:'mexico',   name:'Mexico',        flag:'🇲🇽', area:1964375,  color:'#2f7a4a', color2:'#c1443a', aspect:1.3, delight:'🌮' },
+  { id:'france',   name:'France',        flag:'🇫🇷', area:551695,   color:'#2a4a9f', color2:'#c1443a', aspect:1.15, delight:'🥐' },
+  { id:'germany',  name:'Germany',       flag:'🇩🇪', area:357022,   color:'#c1443a', color2:'#f0c14b', aspect:1.2 },
+  { id:'spain',    name:'Spain',         flag:'🇪🇸', area:505990,   color:'#c1443a', color2:'#f0c14b', aspect:1.3 },
+  { id:'indonesia',name:'Indonesia',     flag:'🇮🇩', area:1904569,  color:'#c1443a', color2:'#eef3fb', aspect:2.2 },
+  { id:'saudi',    name:'Saudi Arabia',  flag:'🇸🇦', area:2149690,  color:'#2f7a4a', color2:'#eef3fb', aspect:1.3 },
+  { id:'iran',     name:'Iran',          flag:'🇮🇷', area:1648195,  color:'#2f7a4a', color2:'#c1443a', aspect:1.2 },
+  { id:'mongolia', name:'Mongolia',      flag:'🇲🇳', area:1564110,  color:'#c1443a', color2:'#2a4a9f', aspect:1.6 },
+  { id:'argentina',name:'Argentina',     flag:'🇦🇷', area:2780400,  color:'#5a9fd4', color2:'#f0c14b', aspect:1.7 },
+  { id:'southafrica',name:'South Africa',flag:'🇿🇦', area:1221037,  color:'#2f7a4a', color2:'#f0c14b', aspect:1.15 },
+  { id:'skorea',   name:'South Korea',   flag:'🇰🇷', area:100210,   color:'#c1443a', color2:'#2a4a9f', aspect:1.3 },
+  { id:'vietnam',  name:'Vietnam',       flag:'🇻🇳', area:331212,   color:'#c1443a', color2:'#f0c14b', aspect:2.0 },
+  { id:'thailand', name:'Thailand',      flag:'🇹🇭', area:513120,   color:'#2a4a9f', color2:'#c1443a', aspect:1.5 },
+  { id:'srilanka', name:'Sri Lanka',     flag:'🇱🇰', area:65610,    color:'#8a3a3a', color2:'#f0c14b', aspect:1.2 },
+  { id:'bhutan',   name:'Bhutan',        flag:'🇧🇹', area:38394,    color:'#e8a23c', color2:'#f0c14b', aspect:1.4, delight:'🐉' },
+  { id:'newzealand',name:'New Zealand',  flag:'🇳🇿', area:268021,   color:'#2a3a6e', color2:'#c1443a', aspect:1.6, delight:'🥝' },
+  { id:'switzerland',name:'Switzerland', flag:'🇨🇭', area:41285,    color:'#c1443a', color2:'#eef3fb', aspect:1.2, delight:'🍫' },
+  { id:'maldives', name:'Maldives',      flag:'🇲🇻', area:298,      color:'#c1443a', color2:'#2f7a4a', aspect:1.1 },
+
+  // — round two: filling in Africa, South America, Scandinavia, the Middle East, Southeast Asia —
+  { id:'nigeria',  name:'Nigeria',       flag:'🇳🇬', area:923768,   color:'#2f7a4a', color2:'#eef3fb', aspect:1.2 },
+  { id:'kenya',    name:'Kenya',         flag:'🇰🇪', area:580367,   color:'#c1443a', color2:'#2f7a4a', aspect:1.15, delight:'🦁' },
+  { id:'ethiopia', name:'Ethiopia',      flag:'🇪🇹', area:1104300,  color:'#2f7a4a', color2:'#f0c14b', aspect:1.25 },
+  { id:'morocco',  name:'Morocco',       flag:'🇲🇦', area:446550,   color:'#c1443a', color2:'#2f7a4a', aspect:1.3 },
+  { id:'sudan',    name:'Sudan',         flag:'🇸🇩', area:1886068,  color:'#c1443a', color2:'#2f7a4a', aspect:1.1 },
+  { id:'colombia', name:'Colombia',      flag:'🇨🇴', area:1141748,  color:'#f0c14b', color2:'#2a4a9f', aspect:1.2 },
+  { id:'peru',     name:'Peru',          flag:'🇵🇪', area:1285216,  color:'#c1443a', color2:'#eef3fb', aspect:1.3, delight:'🦙' },
+  { id:'chile',    name:'Chile',         flag:'🇨🇱', area:756102,   color:'#c1443a', color2:'#2a4a9f', aspect:2.6 },
+  { id:'venezuela',name:'Venezuela',     flag:'🇻🇪', area:916445,   color:'#f0c14b', color2:'#2a4a9f', aspect:1.3 },
+  { id:'poland',   name:'Poland',        flag:'🇵🇱', area:312696,   color:'#eef3fb', color2:'#c1443a', aspect:1.3 },
+  { id:'ukraine',  name:'Ukraine',       flag:'🇺🇦', area:603550,   color:'#2a4a9f', color2:'#f0c14b', aspect:1.4, delight:'🌻' },
+  { id:'sweden',   name:'Sweden',        flag:'🇸🇪', area:450295,   color:'#2a4a9f', color2:'#f0c14b', aspect:1.8 },
+  { id:'norway',   name:'Norway',        flag:'🇳🇴', area:385207,   color:'#c1443a', color2:'#2a4a9f', aspect:2.0 },
+  { id:'finland',  name:'Finland',       flag:'🇫🇮', area:338455,   color:'#2a4a9f', color2:'#eef3fb', aspect:1.5 },
+  { id:'denmark',  name:'Denmark',       flag:'🇩🇰', area:42933,    color:'#c1443a', color2:'#eef3fb', aspect:1.2, delight:'🧱' },
+  { id:'portugal', name:'Portugal',      flag:'🇵🇹', area:92212,    color:'#2f7a4a', color2:'#c1443a', aspect:1.6 },
+  { id:'greece',   name:'Greece',        flag:'🇬🇷', area:131957,   color:'#2a4a9f', color2:'#eef3fb', aspect:1.3, delight:'🏛️' },
+  { id:'turkey',   name:'Turkey',        flag:'🇹🇷', area:783562,   color:'#c1443a', color2:'#eef3fb', aspect:1.6, delight:'🦃' },
+  { id:'israel',   name:'Israel',        flag:'🇮🇱', area:20770,    color:'#2a4a9f', color2:'#eef3fb', aspect:1.8 },
+  { id:'philippines',name:'Philippines', flag:'🇵🇭', area:300000,   color:'#2a4a9f', color2:'#f0c14b', aspect:1.4 },
+  { id:'malaysia', name:'Malaysia',      flag:'🇲🇾', area:330803,   color:'#c1443a', color2:'#f0c14b', aspect:1.6 },
+  { id:'iceland',  name:'Iceland',       flag:'🇮🇸', area:103000,   color:'#2a4a9f', color2:'#c1443a', aspect:1.3, delight:'❄️' },
+  { id:'cuba',     name:'Cuba',          flag:'🇨🇺', area:109884,   color:'#c1443a', color2:'#2a4a9f', aspect:2.2 },
+  { id:'monaco',   name:'Monaco',        flag:'🇲🇨', area:2.02,     color:'#c1443a', color2:'#eef3fb', aspect:1.4, delight:'🏎️' },
+
+  // — round three: the Middle East, more of Africa, Central America, Southeast Asia —
+  { id:'ghana',    name:'Ghana',         flag:'🇬🇭', area:238533,   color:'#c1443a', color2:'#2f7a4a', aspect:1.3 },
+  { id:'tanzania', name:'Tanzania',      flag:'🇹🇿', area:947303,   color:'#2f7a4a', color2:'#2a4a9f', aspect:1.2 },
+  { id:'uganda',   name:'Uganda',        flag:'🇺🇬', area:241038,   color:'#f0c14b', color2:'#c1443a', aspect:1.15 },
+  { id:'zimbabwe', name:'Zimbabwe',      flag:'🇿🇼', area:390757,   color:'#2f7a4a', color2:'#c1443a', aspect:1.3 },
+  { id:'namibia',  name:'Namibia',       flag:'🇳🇦', area:825615,   color:'#2a4a9f', color2:'#2f7a4a', aspect:1.4 },
+  { id:'zambia',   name:'Zambia',        flag:'🇿🇲', area:752618,   color:'#2f7a4a', color2:'#e8a23c', aspect:1.3 },
+  { id:'tunisia',  name:'Tunisia',       flag:'🇹🇳', area:163610,   color:'#c1443a', color2:'#eef3fb', aspect:1.6 },
+  { id:'senegal',  name:'Senegal',       flag:'🇸🇳', area:196722,   color:'#2f7a4a', color2:'#f0c14b', aspect:1.4 },
+  { id:'ivorycoast',name:'Ivory Coast',  flag:'🇨🇮', area:322463,   color:'#e8a23c', color2:'#2f7a4a', aspect:1.3 },
+  { id:'cameroon', name:'Cameroon',      flag:'🇨🇲', area:475442,   color:'#2f7a4a', color2:'#f0c14b', aspect:1.5 },
+  { id:'uae',      name:'UAE',           flag:'🇦🇪', area:83600,    color:'#c1443a', color2:'#2f7a4a', aspect:1.4, delight:'🐪' },
+  { id:'qatar',    name:'Qatar',         flag:'🇶🇦', area:11586,    color:'#8a3a3a', color2:'#eef3fb', aspect:1.5 },
+  { id:'kuwait',   name:'Kuwait',        flag:'🇰🇼', area:17818,    color:'#2f7a4a', color2:'#c1443a', aspect:1.3 },
+  { id:'jordan',   name:'Jordan',        flag:'🇯🇴', area:89342,    color:'#2f7a4a', color2:'#c1443a', aspect:1.4 },
+  { id:'lebanon',  name:'Lebanon',       flag:'🇱🇧', area:10452,    color:'#c1443a', color2:'#2f7a4a', aspect:1.6, delight:'🌲' },
+  { id:'oman',     name:'Oman',          flag:'🇴🇲', area:309500,   color:'#c1443a', color2:'#2f7a4a', aspect:1.8 },
+  { id:'cambodia', name:'Cambodia',      flag:'🇰🇭', area:181035,   color:'#2a4a9f', color2:'#c1443a', aspect:1.3, delight:'🛕' },
+  { id:'laos',     name:'Laos',          flag:'🇱🇦', area:236800,   color:'#2a4a9f', color2:'#c1443a', aspect:1.6 },
+  { id:'northkorea',name:'North Korea',  flag:'🇰🇵', area:120538,   color:'#2a4a9f', color2:'#c1443a', aspect:1.5 },
+  { id:'kazakhstan',name:'Kazakhstan',   flag:'🇰🇿', area:2724900,  color:'#2a4a9f', color2:'#f0c14b', aspect:1.7, delight:'🐎' },
+  { id:'afghanistan',name:'Afghanistan', flag:'🇦🇫', area:652230,   color:'#c1443a', color2:'#2f7a4a', aspect:1.4 },
+  { id:'austria',  name:'Austria',       flag:'🇦🇹', area:83879,    color:'#c1443a', color2:'#eef3fb', aspect:1.6 },
+  { id:'ireland',  name:'Ireland',       flag:'🇮🇪', area:70273,    color:'#2f7a4a', color2:'#e8a23c', aspect:1.3, delight:'🍀' },
+  { id:'costarica',name:'Costa Rica',    flag:'🇨🇷', area:51100,    color:'#2a4a9f', color2:'#c1443a', aspect:1.4, delight:'🦥' },
+  { id:'uruguay',  name:'Uruguay',       flag:'🇺🇾', area:176215,   color:'#2a4a9f', color2:'#f0c14b', aspect:1.3 },
+];
+const MAX_AREA = Math.max(...ENTRIES.map(e=>e.area));
+const MAX_RADIUS = 130;
+const MIN_RADIUS = 9;
+
+function radiusFor(area){
+  const r = Math.sqrt(area/MAX_AREA)*MAX_RADIUS;
+  return Math.max(MIN_RADIUS, r);
+}
+
+/* seeded blob polygon so each country has a consistent, organic (not geographically precise) silhouette */
+function seedFromString(str){ let h=0; for(let i=0;i<str.length;i++){ h=(h<<5)-h+str.charCodeAt(i); h|=0; } return Math.abs(h); }
+function seededRandom(seed){ let s = seed%2147483647; if(s<=0) s+=2147483646;
+  return function(){ s = s*16807 % 2147483647; return (s-1)/2147483646; }; }
+
+function buildBlob(entry){
+  const seed = seedFromString(entry.id);
+  const rand = seededRandom(seed);
+  const points = 11 + Math.floor(rand()*3);
+  const pts = [];
+  for(let i=0;i<points;i++){
+    const a = (i/points)*Math.PI*2;
+    const wobble = 0.72 + rand()*0.4;
+    pts.push({ a, r: wobble });
+  }
+  return pts;
+}
+ENTRIES.forEach(e=>{ e.blob = buildBlob(e); e.radius = radiusFor(e.area); });
+
+const discovered = new Set();
+
+/* ============================================================
+   SHELF UI
+   ============================================================ */
+function formatArea(km2){
+  if(km2 < 1) return km2.toFixed(2)+' km²';
+  if(km2 < 1000) return Math.round(km2).toLocaleString()+' km²';
+  return Math.round(km2).toLocaleString()+' km²';
+}
+
+function renderShelf(){
+  shelf.innerHTML = '';
+  ENTRIES.forEach(e=>{
+    const el = document.createElement('div');
+    el.className = 'shelf-item';
+    el.innerHTML = `<div class="flag">${e.flag}</div><div class="label">${e.name}</div><div class="area">${formatArea(e.area)}</div>`;
+    el.dataset.id = e.id;
+    el.addEventListener('pointerdown', ev=> startDrag(ev, e));
+    shelf.appendChild(el);
+  });
+}
+renderShelf();
+
+function renderLog(){
+  logCount.textContent = discovered.size + '/' + ENTRIES.length;
+  logList.innerHTML = '';
+  ENTRIES.forEach(e=>{
+    const row = document.createElement('div');
+    row.className = 'log-row' + (discovered.has(e.id)?' found':'');
+    row.innerHTML = `<span class="log-flag">${e.flag}</span><span>${discovered.has(e.id)? e.name+' — '+formatArea(e.area) : '???'}</span>`;
+    logList.appendChild(row);
+  });
+}
+renderLog();
+
+let logOpen=false;
+logBtn.addEventListener('click', ()=>{ logOpen=!logOpen; logPanel.classList.toggle('show', logOpen); Sound.click(); });
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.className = 'toast';
+  void toast.offsetWidth;
+  toast.classList.add('show');
+}
+function showReadout(html){
+  compareReadout.innerHTML = html;
+  compareReadout.className = 'compare-readout';
+  void compareReadout.offsetWidth;
+  compareReadout.classList.add('show');
+}
+
+/* ============================================================
+   BOARD — placed tokens the player can drag & compare
+   ============================================================ */
+let board = [];
+let particles = [];
+
+function placeOnBoard(entry, x, y){
+  const tok = {
+    entry, x, y, vx:0, vy:0,
+    dragging:false, dragLagX:x, dragLagY:y,
+    scale:0, targetScale:1, rot:(Math.random()-0.5)*0.06,
+  };
+  board.push(tok);
+  if(!discovered.has(entry.id)){
+    discovered.add(entry.id);
+    renderLog();
+  }
+  checkDelight(entry);
+  return tok;
+}
+
+function checkDelight(entry){
+  if(entry.delight){
+    setTimeout(()=>{
+      spawnEmojiPop(entry.__lastX||window.innerWidth/2, entry.__lastY||window.innerHeight/2, entry.delight);
+      if(entry.id==='vatican') showToast("That's... the whole country. 😄");
+    }, 250);
+  }
+}
+
+function spawnEmojiPop(x,y,emoji){
+  particles.push({ type:'emoji', emoji, x, y, vx:(Math.random()-0.5)*40, vy:-70, life:1.2, maxLife:1.2, rot:0 });
+}
+
+/* ============================================================
+   DRAG LOGIC
+   ============================================================ */
+let dragging = null; // {entry, isNew, boardTok}
+let dragPos = {x:0,y:0};
+
+function startDrag(e, entry){
+  e.preventDefault();
+  Sound.lift();
+  entry.__lastX = e.clientX; entry.__lastY = e.clientY;
+  dragging = { entry, tok: { entry, x:e.clientX, y:e.clientY, scale:1 } };
+  dragPos = { x:e.clientX, y:e.clientY };
+  boardHint.classList.add('hidden');
+  const move = ev=>{ dragPos = {x:ev.clientX,y:ev.clientY}; entry.__lastX=ev.clientX; entry.__lastY=ev.clientY; };
+  const up = ev=>{
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+    finishDrag(ev.clientX, ev.clientY);
+  };
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+}
+
+function finishDrag(x,y){
+  if(!dragging) return;
+  const entry = dragging.entry;
+  Sound.drop();
+  const tok = placeOnBoard(entry, x, y);
+  tok.scale = 0.4; tok.targetScale = 1;
+  dragging = null;
+}
+
+/* Already-placed tokens can be picked back up and rearranged so new
+   comparisons can form live, not just on first drop from the shelf. */
+let selectedTok = null;
+function hitTestBoard(x,y){
+  for(let i=board.length-1;i>=0;i--){
+    const tok = board[i];
+    const r = tok.entry.radius * tok.scale;
+    if(Math.hypot(x-tok.x, y-tok.y) < Math.max(r, 22)) return tok;
+  }
+  return null;
+}
+mainCanvas.addEventListener('pointerdown', e=>{
+  if(state!=='main' || dragging) return;
+  const hit = hitTestBoard(e.clientX, e.clientY);
+  if(!hit) return;
+  selectedTok = hit;
+  selectedTok.dragging = true;
+  Sound.lift();
+  boardHint.classList.add('hidden');
+  const move = ev=>{ selectedTok.x = ev.clientX; selectedTok.y = ev.clientY; };
+  const up = ()=>{
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+    if(selectedTok){ selectedTok.dragging = false; Sound.drop(); }
+    selectedTok = null;
+  };
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+});
+
+/* pairs that have already triggered the big one-time reveal toast */
+const revealedPairs = new Set();
+
+function pairKey(a,b){ return [a.id,b.id].sort().join('|'); }
+
+function roundRectPath(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+function ratioText(big, small){
+  const ratio = big.area / small.area;
+  return ratio >= 10 ? Math.round(ratio) + '×' : ratio.toFixed(1) + '×';
+}
+
+/* Draws a persistent "N×" pill for every pair currently overlapping on the
+   board, and fires the one-time celebratory toast the first time any given
+   pair ever touches. Called every frame — the numbers stay live as you drag
+   things around, not just at the moment of the first drop. */
+function drawComparisonLabels(){
+  for(let i=0;i<board.length;i++){
+    for(let j=i+1;j<board.length;j++){
+      const a = board[i], b = board[j];
+      const dist = Math.hypot(a.x-b.x, a.y-b.y);
+      const threshold = (a.entry.radius*a.scale + b.entry.radius*b.scale) * 0.9;
+      if(dist >= threshold) continue;
+
+      const big = a.entry.area >= b.entry.area ? a.entry : b.entry;
+      const small = a.entry.area >= b.entry.area ? b.entry : a.entry;
+      const label = ratioText(big, small);
+      const key = pairKey(a.entry, b.entry);
+
+      if(!revealedPairs.has(key)){
+        revealedPairs.add(key);
+        Sound.reveal();
+        showReadout(`${big.flag} <b>${big.name}</b> is <span class="ratio">${label}</span> the area of ${small.flag} <b>${small.name}</b>`);
+      }
+
+      const mx = (a.x+b.x)/2, my = (a.y+b.y)/2;
+      mctx.save();
+      mctx.font = '700 13px "JetBrains Mono", monospace';
+      const textW = mctx.measureText(label).width;
+      const boxW = textW+20, boxH = 22;
+      roundRectPath(mctx, mx-boxW/2, my-boxH/2, boxW, boxH, 11);
+      mctx.fillStyle = 'rgba(13,26,51,0.88)';
+      mctx.fill();
+      mctx.strokeStyle = 'rgba(240,193,75,0.55)';
+      mctx.lineWidth = 1;
+      mctx.stroke();
+      mctx.fillStyle = '#f0c14b';
+      mctx.textAlign = 'center'; mctx.textBaseline = 'middle';
+      mctx.fillText(label, mx, my+1);
+      mctx.restore();
+    }
+  }
+}
+
+/* ============================================================
+   BOARD PHYSICS + RENDER
+   ============================================================ */
+function drawBlobPath(ctx, cx, cy, radius, aspect, blob, scale){
+  ctx.beginPath();
+  blob.forEach((p,i)=>{
+    const rx = radius*aspect*p.r*scale;
+    const ry = radius/Math.sqrt(aspect)*p.r*scale;
+    const x = cx + Math.cos(p.a)*rx;
+    const y = cy + Math.sin(p.a)*ry;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+}
+
+function drawToken(tok, alpha){
+  const e = tok.entry;
+  mctx.save();
+  mctx.globalAlpha = alpha!==undefined ? alpha : 1;
+  mctx.translate(tok.x, tok.y);
+  mctx.rotate(tok.rot);
+  drawBlobPath(mctx, 0, 0, e.radius, e.aspect, e.blob, tok.scale);
+  const grad = mctx.createRadialGradient(-e.radius*0.2,-e.radius*0.2,4,0,0,e.radius*1.2);
+  grad.addColorStop(0, lighten(e.color,0.3));
+  grad.addColorStop(0.6, e.color);
+  grad.addColorStop(1, e.color2 || darken(e.color,0.25));
+  mctx.fillStyle = grad;
+  mctx.fill();
+  mctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  mctx.lineWidth = 1.5;
+  mctx.stroke();
+  mctx.restore();
+
+  // label
+  mctx.save();
+  mctx.globalAlpha = (alpha!==undefined?alpha:1) * 0.9;
+  mctx.fillStyle = '#eef3fb';
+  mctx.font = '600 11px Fredoka, sans-serif';
+  mctx.textAlign = 'center';
+  mctx.fillText(e.flag + ' ' + e.name, tok.x, tok.y + e.radius*tok.scale*0.75 + 14);
+  mctx.restore();
+}
+function lighten(hex, amt){ const v=parseInt(hex.slice(1),16); const r=(v>>16)&255,g=(v>>8)&255,b=v&255;
+  return `rgb(${Math.min(255,r+255*amt)|0},${Math.min(255,g+255*amt)|0},${Math.min(255,b+255*amt)|0})`; }
+function darken(hex, amt){ const v=parseInt(hex.slice(1),16); const r=(v>>16)&255,g=(v>>8)&255,b=v&255;
+  return `rgb(${(r*(1-amt))|0},${(g*(1-amt))|0},${(b*(1-amt))|0})`; }
+
+function updateBoard(dt){
+  board.forEach(tok=>{
+    tok.scale += (tok.targetScale - tok.scale) * Math.min(1, dt*6);
+  });
+}
+
+function updateParticles(dt){
+  particles.forEach(p=>{
+    if(p.type==='emoji'){
+      p.vy += 160*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.life -= dt*0.8;
+    }
+  });
+  particles = particles.filter(p=>p.life>0);
+}
+function drawParticles(){
+  particles.forEach(p=>{
+    mctx.save();
+    mctx.globalAlpha = Math.max(0,p.life/p.maxLife);
+    mctx.font = '28px sans-serif';
+    mctx.textAlign='center';
+    mctx.fillText(p.emoji, p.x, p.y);
+    mctx.restore();
+  });
+}
+
+/* ============================================================
+   BACKGROUND SCENE (ocean / clouds / stars)
+   ============================================================ */
+let clouds = [];
+for(let i=0;i<6;i++){ clouds.push({ x:Math.random()*1400, y:40+Math.random()*100, s:0.5+Math.random()*0.7, speed:5+Math.random()*5 }); }
+let stars = [];
+for(let i=0;i<50;i++){ stars.push({ x:Math.random(), y:Math.random()*0.4, tw:Math.random()*Math.PI*2 }); }
+
+function drawScene(dt, now){
+  const w = window.innerWidth, h = window.innerHeight;
+  const bg = mctx.createLinearGradient(0,0,0,h);
+  bg.addColorStop(0,'#050a16'); bg.addColorStop(0.5,'#0d1a33'); bg.addColorStop(1,'#0f2540');
+  mctx.fillStyle = bg;
+  mctx.fillRect(0,0,w,h);
+
+  stars.forEach(s=>{
+    mctx.globalAlpha = 0.4 + Math.sin(now/700 + s.tw)*0.3;
+    mctx.fillStyle = '#eef3fb';
+    mctx.beginPath(); mctx.arc(s.x*w, s.y*h, 1.2, 0, Math.PI*2); mctx.fill();
+  });
+  mctx.globalAlpha = 1;
+
+  clouds.forEach(c=>{
+    c.x += c.speed*dt;
+    if(c.x > w+150) c.x = -150;
+    mctx.save();
+    mctx.globalAlpha = 0.14;
+    mctx.fillStyle = '#eef3fb';
+    mctx.beginPath();
+    mctx.ellipse(c.x, c.y, 44*c.s, 15*c.s, 0, 0, Math.PI*2);
+    mctx.ellipse(c.x+30*c.s, c.y+4, 30*c.s, 12*c.s, 0, 0, Math.PI*2);
+    mctx.fill();
+    mctx.restore();
+  });
+}
+
+/* ============================================================
+   MAIN LOOP
+   ============================================================ */
+let state = 'globe';
+let lastTime = 0;
+
+function mainLoop(now){
+  const dt = Math.min(0.033,(now-lastTime)/1000 || 0.016);
+  lastTime = now;
+
+  if(state==='globe'){ drawGlobe(dt, now); }
+  else if(state==='main'){
+    drawScene(dt, now);
+    updateBoard(dt);
+    updateParticles(dt);
+    board.forEach(tok=> drawToken(tok, 1));
+    drawComparisonLabels();
+    if(dragging){
+      const t = dragging.tok;
+      t.x = dragPos.x; t.y = dragPos.y;
+      drawToken(t, 0.92);
+    }
+    drawParticles();
+  }
+  requestAnimationFrame(mainLoop);
+}
+requestAnimationFrame(mainLoop);
+
+/* ============================================================
+   GLOBE INTRO
+   ============================================================ */
+let globeRotation = 0;
+let globeBlobs = [];
+for(let i=0;i<10;i++){
+  globeBlobs.push({ lon: (i/10)*Math.PI*2, lat:(Math.random()-0.5)*1.4, w:20+Math.random()*30, h:14+Math.random()*20 });
+}
+let globeHoverTilt = 0;
+
+function drawGlobe(dt, now){
+  const w = window.innerWidth, h = window.innerHeight;
+  gctx.clearRect(0,0,w,h);
+  gctx.fillStyle = '#050a16';
+  gctx.fillRect(0,0,w,h);
+
+  const cx = w*0.5, cy = h*0.42;
+  const R = Math.min(w,h)*0.28;
+
+  globeRotation += dt*0.15;
+
+  // atmosphere glow
+  const glow = gctx.createRadialGradient(cx,cy,R*0.9,cx,cy,R*1.3);
+  glow.addColorStop(0,'rgba(90,180,255,0.35)'); glow.addColorStop(1,'rgba(90,180,255,0)');
+  gctx.fillStyle = glow;
+  gctx.beginPath(); gctx.arc(cx,cy,R*1.3,0,Math.PI*2); gctx.fill();
+
+  // sphere base
+  const sphereGrad = gctx.createRadialGradient(cx-R*0.3,cy-R*0.3,R*0.1,cx,cy,R);
+  sphereGrad.addColorStop(0,'#1c3a5e'); sphereGrad.addColorStop(1,'#08111f');
+  gctx.fillStyle = sphereGrad;
+  gctx.beginPath(); gctx.arc(cx,cy,R,0,Math.PI*2); gctx.fill();
+
+  // continent blobs with fake-3D rotation
+  gctx.save();
+  gctx.beginPath(); gctx.arc(cx,cy,R,0,Math.PI*2); gctx.clip();
+  globeBlobs.forEach(b=>{
+    const ang = b.lon + globeRotation;
+    const facing = Math.cos(ang);
+    if(facing < -0.15) return;
+    const x = cx + Math.sin(ang)*R*0.92;
+    const y = cy + b.lat*R*0.75;
+    const squish = Math.max(0.12, facing);
+    gctx.save();
+    gctx.globalAlpha = 0.85;
+    gctx.translate(x,y);
+    gctx.scale(squish,1);
+    gctx.fillStyle = '#3fae5c';
+    gctx.beginPath();
+    gctx.ellipse(0,0,b.w,b.h,0,0,Math.PI*2);
+    gctx.fill();
+    gctx.restore();
+  });
+  gctx.restore();
+
+  // rim light
+  gctx.strokeStyle = 'rgba(150,200,255,0.4)';
+  gctx.lineWidth = 2;
+  gctx.beginPath(); gctx.arc(cx,cy,R,0,Math.PI*2); gctx.stroke();
+}
+
+/* hover-lean on the globe before Start (wordless "it noticed you" tell) */
+window.addEventListener('mousemove', e=>{
+  if(state!=='globe') return;
+  const cx = window.innerWidth*0.5, cy=window.innerHeight*0.42;
+  const dx = e.clientX-cx;
+  globeHoverTilt = dx*0.00004;
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+startBtn.addEventListener('click', ()=>{
+  ac(); Sound.chime();
+  titleScreen.classList.add('hidden');
+  mainCanvas.style.transition = 'opacity 1s ease';
+  mainCanvas.style.opacity = '1';
+  setTimeout(()=>{
+    state = 'main';
+    hud.classList.add('show');
+  }, 500);
+});
+
+})();
+</script>
+</body>
+</html>

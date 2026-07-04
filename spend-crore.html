@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Spend ₹10,000 Crore™ — Can You Spend It All?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#151027; --bg-mid:#241a3d; --gold:#f0c14b; --gold-bright:#ffe08a;
+  --sky-day:#3a5a8f; --sky-dusk:#c9714a; --sky-horizon:#ffcf8a; --ground:#2a3a2c; --ground-dark:#1c2a1e;
+  --chalk:#f7f1e2; --chalk-dim:#c9c2b0;
+  --ui-glass:rgba(247,241,226,.08); --ui-glass-border:rgba(247,241,226,.16);
+  --font-display:'Fredoka', system-ui, sans-serif; --font-chalk:'Kalam', cursive;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--bg-deep);
+  font-family:var(--font-display); -webkit-tap-highlight-color:transparent; user-select:none; }
+#app{ position:relative; width:100vw; height:100vh; height:100dvh; overflow:hidden; }
+
+#worldCanvas{ position:absolute; inset:0; width:100%; height:100%; transition: filter .6s ease; }
+
+/* ============================================================
+   TITLE SCREEN
+   ============================================================ */
+#titleScreen{ position:absolute; inset:0; z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:.4em; background:radial-gradient(90% 70% at 50% 55%, rgba(240,193,75,.16), rgba(21,16,39,.92));
+  transition: opacity .7s ease, visibility .7s; }
+#titleScreen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.floatMoney{ position:absolute; font-size:2rem; opacity:.85; animation: moneyDrift linear infinite; pointer-events:none; }
+@keyframes moneyDrift{
+  0%{ transform:translateY(10vh) rotate(0deg); opacity:0; }
+  10%{ opacity:.9; }
+  90%{ opacity:.7; }
+  100%{ transform:translateY(-115vh) rotate(340deg); opacity:0; }
+}
+.eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.14em; text-transform:uppercase; font-size:.76rem; font-weight:500; animation: fadeUp .7s ease both; z-index:2; }
+.headline{ font-weight:700; color:var(--chalk); font-size:clamp(1.8rem,7vw,3.6rem); margin:0; z-index:2;
+  text-shadow:0 8px 30px rgba(0,0,0,.5); animation: logoIn .8s cubic-bezier(.2,.9,.3,1) both .15s; }
+@keyframes logoIn{ from{ filter:blur(10px); transform:scale(1.15); opacity:0;} to{ filter:blur(0); transform:scale(1); opacity:1;} }
+.subtitle{ font-family:var(--font-chalk); color:var(--chalk); font-size:clamp(1rem,2.3vw,1.35rem); opacity:0;
+  animation: fadeUp .7s ease both .9s; z-index:2; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+
+.balance-hero{ display:flex; gap:.06em; margin:.6em 0; z-index:2; }
+.balance-digit{ font-family:var(--font-display); font-weight:700; font-size:clamp(1.6rem,6vw,3rem); color:var(--gold);
+  text-shadow:0 0 24px rgba(240,193,75,.5); background:var(--ui-glass); border:1px solid var(--ui-glass-border);
+  border-radius:10px; padding:.1em .18em; min-width:.9em; text-align:center; }
+
+#startBtn{ z-index:2; margin-top:.6rem; padding:.9em 2.4em; font-family:var(--font-display); font-weight:600; font-size:1.05rem;
+  color:var(--bg-deep); background:linear-gradient(180deg,#fff7e0,var(--gold)); border:none; border-radius:999px; cursor:pointer;
+  box-shadow:0 12px 30px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.3) inset;
+  opacity:0; animation: fadeUp .7s ease both 1.4s, floatBtn 2.6s ease-in-out infinite 2s;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+#startBtn:active{ transform:scale(.94); }
+@keyframes floatBtn{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-5px);} }
+
+/* ============================================================
+   MAIN EXPERIENCE
+   ============================================================ */
+#main{ position:absolute; inset:0; z-index:10; opacity:0; visibility:hidden; transition: opacity .6s ease, visibility .6s; }
+#main.show{ opacity:1; visibility:visible; }
+
+.topbar{ position:absolute; top:0; left:0; right:0; z-index:30; display:flex; justify-content:space-between; align-items:flex-start;
+  padding:max(14px, env(safe-area-inset-top)) 16px 0; }
+.balance-card{ background:var(--ui-glass); backdrop-filter:blur(14px); border:1px solid var(--ui-glass-border); border-radius:20px;
+  padding:.55em 1.1em; box-shadow:0 10px 26px rgba(0,0,0,.35); }
+.balance-label{ font-size:.6rem; letter-spacing:.14em; color:var(--chalk-dim); text-transform:uppercase; display:block; }
+.balance-amount{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:var(--gold); }
+.topbar-right{ display:flex; gap:.5em; }
+.icon-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--ui-glass);
+  backdrop-filter:blur(10px); color:var(--chalk); font-size:1rem; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+.icon-btn:active{ transform:scale(.88); }
+.view-world-btn{ border-radius:999px; width:auto; padding:0 1em; font-family:var(--font-display); font-weight:600; font-size:.82rem; gap:.4em; }
+
+.layout{ position:absolute; inset:0; display:flex; padding-top:70px; gap:0; }
+.category-rail{ width:74px; flex-shrink:0; display:flex; flex-direction:column; gap:.5em; padding:.5em; overflow-y:auto; z-index:20; }
+.cat-btn{ background:var(--ui-glass); backdrop-filter:blur(10px); border:1px solid var(--ui-glass-border); border-radius:14px;
+  padding:.6em .3em; display:flex; flex-direction:column; align-items:center; gap:.25em; cursor:pointer; color:var(--chalk-dim);
+  font-size:.58rem; text-align:center; animation: catBob 3.4s ease-in-out infinite; transition: all .2s ease; }
+@keyframes catBob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-2px);} }
+.cat-btn .cat-icon{ font-size:1.3rem; }
+.cat-btn.active{ background:rgba(240,193,75,.18); border-color:rgba(240,193,75,.4); color:var(--chalk); }
+.cat-btn.soon{ opacity:.45; }
+.cat-btn .soon-pill{ font-size:.5rem; background:rgba(247,241,226,.15); border-radius:6px; padding:0 .3em; margin-top:.1em; }
+
+.card-area{ flex:1; overflow-y:auto; padding:1em 1em 2em; z-index:20; }
+.card-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:.8em; max-width:900px; margin:0 auto; }
+.pcard{ background:rgba(36,26,61,.55); backdrop-filter:blur(12px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:.9em; text-align:center; animation: cardFloat 4s ease-in-out infinite; transition: transform .18s ease, box-shadow .18s ease;
+  transform-style:preserve-3d; }
+@keyframes cardFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-3px);} }
+.pcard:hover{ transform:translateY(-6px) scale(1.02); box-shadow:0 16px 34px rgba(0,0,0,.4); }
+.pcard-icon{ font-size:2.6rem; margin-bottom:.3em; filter: drop-shadow(0 6px 10px rgba(0,0,0,.4)); }
+.pcard-name{ font-weight:600; color:var(--chalk); font-size:.92rem; }
+.pcard-desc{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.74rem; margin:.3em 0; min-height:2.2em; }
+.pcard-price{ color:var(--gold); font-weight:700; font-size:.86rem; margin-bottom:.5em; }
+.pcard-owned{ font-size:.66rem; color:var(--chalk-dim); margin-bottom:.3em; }
+.buy-btn{ width:100%; padding:.55em; border:none; border-radius:999px; font-family:var(--font-display); font-weight:600;
+  font-size:.82rem; cursor:pointer; background:linear-gradient(180deg,#fff2d0,var(--gold)); color:var(--bg-deep);
+  box-shadow:0 6px 14px rgba(0,0,0,.3); transition: transform .12s cubic-bezier(.3,1.6,.5,1); position:relative; overflow:hidden; }
+.buy-btn:active{ transform:scale(.93); }
+.buy-btn.disabled{ background:rgba(247,241,226,.12); color:var(--chalk-dim); box-shadow:none; cursor:not-allowed; }
+.buy-btn::after{ content:''; position:absolute; top:0; left:-60%; width:40%; height:100%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.6), transparent); transform:skewX(-20deg); }
+.buy-btn:hover:not(.disabled)::after{ animation: sheen .8s ease; }
+@keyframes sheen{ to{ left:140%; } }
+
+.view-back-btn{ position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:35; padding:.7em 1.6em;
+  border:none; border-radius:999px; font-family:var(--font-display); font-weight:600; font-size:.9rem; cursor:pointer;
+  background:var(--ui-glass); backdrop-filter:blur(12px); color:var(--chalk); border:1px solid var(--ui-glass-border);
+  opacity:0; visibility:hidden; transition: all .4s ease; }
+.view-back-btn.show{ opacity:1; visibility:visible; }
+
+.toast{ position:absolute; left:50%; top:14%; transform:translate(-50%,-50%) scale(.6); font-family:var(--font-chalk);
+  font-size:clamp(1rem,3vw,1.4rem); color:var(--chalk); opacity:0; z-index:60; text-shadow:0 6px 20px rgba(0,0,0,.5);
+  pointer-events:none; text-align:center; background:rgba(21,16,39,.55); backdrop-filter:blur(8px); padding:.4em 1.2em; border-radius:999px;
+  border:1px solid rgba(240,193,75,.35); }
+.toast.show{ animation: toastPop 2s cubic-bezier(.2,1.2,.3,1) forwards; }
+@keyframes toastPop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.6);}
+  14%{ opacity:1; transform:translate(-50%,-50%) scale(1.06);}
+  24%{ transform:translate(-50%,-50%) scale(1);}
+  84%{ opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{ opacity:0; transform:translate(-50%,-60%) scale(.96);} }
+
+.flying-coin{ position:fixed; font-size:1.4rem; z-index:70; pointer-events:none; }
+
+@media (max-width:640px){
+  .category-rail{ width:60px; }
+  .cat-btn{ font-size:.5rem; padding:.5em .2em; }
+  .cat-btn .cat-icon{ font-size:1.05rem; }
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="worldCanvas"></canvas>
+
+  <div id="titleScreen">
+    <p class="eyebrow">Playrium presents</p>
+    <h1 class="headline">💰 Spend ₹10,000 Crore</h1>
+    <p class="subtitle">Can You Spend It All?</p>
+    <div class="balance-hero" id="balanceHero"></div>
+    <button id="startBtn">Start Spending</button>
+  </div>
+
+  <div id="main">
+    <div class="topbar">
+      <div class="balance-card">
+        <span class="balance-label">Balance Remaining</span>
+        <span class="balance-amount" id="balanceAmount">₹10,000 Cr</span>
+      </div>
+      <div class="topbar-right">
+        <div class="icon-btn view-world-btn" id="viewWorldBtn">🏙️ View Your World</div>
+        <div class="icon-btn" id="muteBtn" title="Mute">🔊</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="category-rail" id="categoryRail"></div>
+      <div class="card-area"><div class="card-grid" id="cardGrid"></div></div>
+    </div>
+
+    <button class="view-back-btn" id="backBtn">← Back to Shopping</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const app = document.getElementById('app');
+const worldCanvas = document.getElementById('worldCanvas');
+const wctx = worldCanvas.getContext('2d');
+const titleScreen = document.getElementById('titleScreen');
+const balanceHero = document.getElementById('balanceHero');
+const startBtn = document.getElementById('startBtn');
+const main = document.getElementById('main');
+const balanceAmount = document.getElementById('balanceAmount');
+const categoryRail = document.getElementById('categoryRail');
+const cardGrid = document.getElementById('cardGrid');
+const viewWorldBtn = document.getElementById('viewWorldBtn');
+const backBtn = document.getElementById('backBtn');
+const muteBtn = document.getElementById('muteBtn');
+const toast = document.getElementById('toast');
+
+function resize(){
+  worldCanvas.width = window.innerWidth*devicePixelRatio;
+  worldCanvas.height = window.innerHeight*devicePixelRatio;
+  worldCanvas.style.width = window.innerWidth+'px';
+  worldCanvas.style.height = window.innerHeight+'px';
+  wctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+let actx=null, muted=false;
+function ac(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function envGain(ctx,dur,peak){ const g=ctx.createGain(); g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(peak,ctx.currentTime+0.008); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur); return g; }
+function tone(freq,dur,type,peak){ if(muted)return; const ctx=ac(); const o=ctx.createOscillator(); o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,ctx.currentTime); const g=envGain(ctx,dur,peak||0.16); o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+dur+0.05); }
+function noiseBurst(dur,freq,type,peak){ if(muted)return; const ctx=ac(); const n=Math.floor(ctx.sampleRate*dur);
+  const buf=ctx.createBuffer(1,n,ctx.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i]=(Math.random()*2-1)*(1-i/n); }
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const f=ctx.createBiquadFilter(); f.type=type||'bandpass'; f.frequency.value=freq||1500;
+  const g=envGain(ctx,dur,peak||0.18); src.connect(f).connect(g).connect(ctx.destination); src.start(); }
+const Sound = {
+  click(){ tone(1300,0.05,'sine',0.1); },
+  coin(){ tone(1500+Math.random()*300,0.08,'sine',0.13); setTimeout(()=>tone(2000,0.06,'sine',0.08),40); },
+  tick(){ tone(700,0.03,'sine',0.05); },
+  grow(){ tone(300,0.35,'sine',0.1); setTimeout(()=>tone(500,0.3,'sine',0.08),100); },
+  chime(){ [1046,1318,1568].forEach((f,i)=>setTimeout(()=>tone(f,0.4,'sine',0.13),i*130)); },
+  denied(){ tone(220,0.12,'sine',0.1); },
+};
+muteBtn.addEventListener('click', ()=>{ muted=!muted; muteBtn.textContent=muted?'🔇':'🔊'; Sound.click(); });
+
+/* ============================================================
+   MONEY DRIFT (title screen)
+   ============================================================ */
+const moneyEmojis = ['💵','🪙','💰'];
+for(let i=0;i<9;i++){
+  const el = document.createElement('div');
+  el.className='floatMoney';
+  el.textContent = moneyEmojis[i%moneyEmojis.length];
+  el.style.left = (5+Math.random()*90)+'%';
+  el.style.animationDuration = (7+Math.random()*5)+'s';
+  el.style.animationDelay = (Math.random()*6)+'s';
+  titleScreen.appendChild(el);
+}
+
+/* ============================================================
+   BALANCE (tracked in Crore)
+   ============================================================ */
+const TOTAL_CR = 10000;
+let balanceCr = TOTAL_CR;
+
+function formatCr(n){ return '₹' + Math.round(n).toLocaleString('en-IN') + ' Cr'; }
+
+function renderBalanceHero(value){
+  const digits = String(Math.round(value));
+  balanceHero.innerHTML = '';
+  digits.split('').forEach((d,i)=>{
+    const span = document.createElement('span');
+    span.className = 'balance-digit';
+    span.textContent = '0';
+    balanceHero.appendChild(span);
+    setTimeout(()=>{ span.textContent = d; Sound.tick(); }, 250+i*90);
+  });
+}
+renderBalanceHero(TOTAL_CR);
+
+function animateBalanceTo(target, dur){
+  const start = balanceCr;
+  const t0 = performance.now();
+  dur = dur || 700;
+  function step(now){
+    const t = Math.min(1, (now-t0)/dur);
+    const ease = 1-Math.pow(1-t,3);
+    const val = start + (target-start)*ease;
+    balanceAmount.textContent = formatCr(val);
+    if(t<1) requestAnimationFrame(step); else { balanceCr = target; balanceAmount.textContent = formatCr(target); }
+  }
+  requestAnimationFrame(step);
+}
+
+/* ============================================================
+   CATEGORIES + ITEMS
+   ============================================================ */
+const CATEGORIES = [
+  { key:'realestate', icon:'🏠', label:'Real Estate', enabled:true },
+  { key:'vehicles',   icon:'🚗', label:'Vehicles', enabled:false },
+  { key:'aircraft',   icon:'✈️', label:'Aircraft', enabled:false },
+  { key:'space',      icon:'🚀', label:'Space', enabled:false },
+  { key:'luxury',     icon:'🏝️', label:'Luxury', enabled:false },
+  { key:'charity',    icon:'❤️', label:'Charity', enabled:false },
+  { key:'crazy',      icon:'🎉', label:'Crazy', enabled:false },
+  { key:'world',      icon:'🌍', label:'World', enabled:false },
+];
+
+const REAL_ESTATE = [
+  { id:'village',    name:'Village House',  price:15,   icon:'🏚️', desc:'Cozy, humble, honestly kind of perfect.', draw:'house', slotW:36 },
+  { id:'apartment',  name:'Apartment',      price:60,   icon:'🏢', desc:'A nice view and a nicer elevator.', draw:'apartment', slotW:34 },
+  { id:'farmhouse',  name:'Farm House',     price:120,  icon:'🌾', desc:'Fresh air, and somehow always mango season.', draw:'farm', slotW:44 },
+  { id:'beachhouse', name:'Beach House',    price:280,  icon:'🏖️', desc:'Sand in every shoe, forever.', draw:'beach', slotW:46 },
+  { id:'villa',      name:'Luxury Villa',   price:500,  icon:'🏡', desc:'Marble floors you feel bad walking on.', draw:'villa', slotW:52 },
+  { id:'resort',     name:'Resort',         price:1400, icon:'🏨', desc:'A whole vacation, but you own it.', draw:'resort', slotW:70 },
+  { id:'skyscraper', name:'Skyscraper',     price:3200, icon:'🏙️', desc:'Your name on the top floor. Obviously.', draw:'skyscraper', slotW:40 },
+  { id:'island',     name:'Private Island', price:4500, icon:'🏝️', desc:'Its own coastline. Its own rules.', draw:'island', slotW:80 },
+  { id:'smartcity',  name:'Smart City',     price:6000, icon:'🌆', desc:'Traffic lights that actually make sense.', draw:'smartcity', slotW:90 },
+  { id:'floatingcity', name:'Floating City', price:8500, icon:'🛰️', desc:'A city. That floats. Sure, why not.', draw:'floatingcity', slotW:90 },
+  { id:'moonbase',   name:'Moon Base',      price:9999, icon:'🌕', desc:'The commute is rough, the view is not.', draw:'moonbase', slotW:60 },
+];
+
+let activeCategory = 'realestate';
+const owned = {}; // id -> count
+
+/* ============================================================
+   WORLD CANVAS — persistent skyline diorama
+   ============================================================ */
+let buildings = []; // {item, x, w, h, grow(0..1), bob}
+let nextSlotX = 40;
+let clouds = [];
+for(let i=0;i<5;i++){ clouds.push({ x:Math.random()*1400, y:60+Math.random()*90, s:0.6+Math.random()*0.8, speed:6+Math.random()*6 }); }
+let bird = { x:-100, y:120, active:false };
+let sparkleT = 0;
+
+function groundY(){ return window.innerHeight*0.78; }
+
+function slotFor(item){
+  const x = nextSlotX + item.slotW/2;
+  nextSlotX += item.slotW + 10;
+  return x;
+}
+
+function addBuilding(item){
+  const x = slotFor(item);
+  const baseH = 30 + item.price*0.012;
+  const h = Math.min(baseH, window.innerHeight*0.55);
+  buildings.push({ item, x, w:item.slotW, targetH:h, h:0, bobPhase:Math.random()*Math.PI*2 });
+}
+
+function drawWorld(dt, now){
+  const w = window.innerWidth, h = window.innerHeight;
+  const gY = groundY();
+
+  // sky
+  const skyGrad = wctx.createLinearGradient(0,0,0,gY);
+  skyGrad.addColorStop(0, '#20264a');
+  skyGrad.addColorStop(0.6, '#3a4a7a');
+  skyGrad.addColorStop(1, '#c9714a');
+  wctx.fillStyle = skyGrad;
+  wctx.fillRect(0,0,w,gY);
+
+  // sun glow
+  wctx.beginPath();
+  const sunGrad = wctx.createRadialGradient(w*0.82,gY*0.35,10,w*0.82,gY*0.35,140);
+  sunGrad.addColorStop(0,'rgba(255,230,180,0.5)'); sunGrad.addColorStop(1,'rgba(255,230,180,0)');
+  wctx.fillStyle = sunGrad;
+  wctx.fillRect(0,0,w,gY);
+
+  // clouds
+  clouds.forEach(c=>{
+    c.x += c.speed*dt;
+    if(c.x > w+150) c.x = -150;
+    wctx.save();
+    wctx.globalAlpha = 0.5;
+    wctx.fillStyle = '#fff';
+    wctx.beginPath();
+    wctx.ellipse(c.x, c.y, 40*c.s, 16*c.s, 0, 0, Math.PI*2);
+    wctx.ellipse(c.x+30*c.s, c.y+4, 30*c.s, 13*c.s, 0, 0, Math.PI*2);
+    wctx.ellipse(c.x-28*c.s, c.y+5, 26*c.s, 12*c.s, 0, 0, Math.PI*2);
+    wctx.fill();
+    wctx.restore();
+  });
+
+  // occasional bird
+  if(!bird.active && Math.random()<0.0025){ bird.active=true; bird.x=-40; bird.y=60+Math.random()*80; }
+  if(bird.active){
+    bird.x += 90*dt;
+    wctx.strokeStyle = 'rgba(20,15,30,0.6)'; wctx.lineWidth=2;
+    wctx.beginPath();
+    const wing = Math.sin(now*0.02)*6;
+    wctx.moveTo(bird.x-8,bird.y+wing); wctx.lineTo(bird.x,bird.y-4); wctx.lineTo(bird.x+8,bird.y+wing);
+    wctx.stroke();
+    if(bird.x > w+40) bird.active=false;
+  }
+
+  // ground
+  const groundGrad = wctx.createLinearGradient(0,gY,0,h);
+  groundGrad.addColorStop(0,'#2a3a2c'); groundGrad.addColorStop(1,'#182018');
+  wctx.fillStyle = groundGrad;
+  wctx.fillRect(0,gY,w,h-gY);
+
+  // buildings
+  buildings.forEach(b=>{
+    b.h += (b.targetH - b.h)*Math.min(1,dt*3.2);
+    b.bobPhase += dt*1.2;
+    const bob = Math.sin(b.bobPhase)*1.2;
+    drawBuilding(b, gY, bob);
+  });
+
+  sparkleT += dt;
+}
+
+function drawBuilding(b, gY, bob){
+  const x = b.x, w = b.w, hgt = b.h;
+  const top = gY - hgt + bob;
+  wctx.save();
+  wctx.translate(x, 0);
+  const type = b.item.draw;
+  let color = '#c1703f';
+  if(type==='skyscraper'||type==='smartcity'||type==='floatingcity') color = '#7fa8d9';
+  if(type==='moonbase') color = '#d8d8e8';
+  if(type==='island') color = '#3a8f6a';
+  if(type==='resort') color='#e0a868';
+  if(type==='villa') color='#e8c58a';
+  if(type==='beach') color='#f2d9a0';
+  if(type==='farm') color='#b5a05a';
+
+  wctx.fillStyle = color;
+  if(type==='island'){
+    wctx.beginPath(); wctx.ellipse(0, gY+6, w*0.6, 8, 0,0,Math.PI*2); wctx.fillStyle='#e8d090'; wctx.fill();
+    wctx.beginPath(); wctx.arc(0, gY-4, w*0.32, Math.PI, 0); wctx.fillStyle=color; wctx.fill();
+  } else if(type==='moonbase'){
+    wctx.globalAlpha=0.9;
+    wctx.beginPath(); wctx.arc(0, top+hgt*0.5, w*0.4, 0, Math.PI*2); wctx.fillStyle=color; wctx.fill();
+    wctx.shadowColor='rgba(216,216,232,0.7)'; wctx.shadowBlur=20;
+    wctx.fill();
+    wctx.shadowBlur=0; wctx.globalAlpha=1;
+  } else {
+    wctx.beginPath();
+    const r = Math.min(6, w*0.15);
+    roundRect(wctx, -w/2, top, w, hgt, r);
+    wctx.fill();
+    // windows
+    wctx.fillStyle = 'rgba(255,230,150,0.55)';
+    const rows = Math.max(1, Math.floor(hgt/14));
+    const cols = Math.max(1, Math.floor(w/12));
+    for(let r2=0;r2<rows;r2++){
+      for(let c2=0;c2<cols;c2++){
+        if(Math.random()<0.7){
+          wctx.fillRect(-w/2+6+c2*11, top+8+r2*13, 4,5);
+        }
+      }
+    }
+  }
+  wctx.restore();
+}
+function roundRect(g,x,y,w,h,r){
+  g.beginPath();
+  g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r);
+  g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r);
+  g.arcTo(x,y,x+w,y,r);
+  g.closePath();
+}
+
+let lastTime = 0;
+function loop(now){
+  const dt = Math.min(0.033,(now-lastTime)/1000 || 0.016);
+  lastTime = now;
+  drawWorld(dt, now);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ============================================================
+   TOAST + MILESTONES
+   ============================================================ */
+function showToast(msg){
+  toast.textContent = msg;
+  toast.className = 'toast';
+  void toast.offsetWidth;
+  toast.classList.add('show');
+}
+
+const unlockedMilestones = new Set();
+function checkMilestones(spentCr, item){
+  const pct = Math.round((spentCr/TOTAL_CR)*100);
+  const checks = [
+    ['first_purchase', spentCr>0, 'Welcome, Owner! 🏠'],
+    ['25pct', pct>=25, "Quarter of the way there! 🎉"],
+    ['50pct', pct>=50, 'Halfway spent! 💸'],
+    ['75pct', pct>=75, 'Almost there! 🔥'],
+    ['skyscraper', item && item.id==='skyscraper', 'First Skyscraper! 🏙️'],
+    ['island', item && item.id==='island', 'You own an island. An actual island. 🏝️'],
+    ['moonbase', item && item.id==='moonbase', 'One small step... for your bank balance. 🌕'],
+    ['five_buildings', buildings.length>=5, 'Growing Skyline! 🏗️'],
+  ];
+  checks.forEach(([key,cond,msg])=>{
+    if(cond && !unlockedMilestones.has(key)){
+      unlockedMilestones.add(key);
+      setTimeout(()=>{ showToast(msg); Sound.chime(); }, 500);
+    }
+  });
+}
+
+/* ============================================================
+   CARDS / CATEGORY RAIL
+   ============================================================ */
+function renderCategoryRail(){
+  categoryRail.innerHTML = '';
+  CATEGORIES.forEach((c,i)=>{
+    const btn = document.createElement('div');
+    btn.className = 'cat-btn' + (c.key===activeCategory?' active':'') + (!c.enabled?' soon':'');
+    btn.style.animationDelay = (i*0.15)+'s';
+    btn.innerHTML = `<span class="cat-icon">${c.icon}</span><span>${c.label}</span>` + (!c.enabled?'<span class="soon-pill">Soon</span>':'');
+    btn.addEventListener('click', ()=>{
+      Sound.click();
+      if(!c.enabled){ showToast(c.label + ' is coming in a future update ✨'); return; }
+      activeCategory = c.key;
+      renderCategoryRail();
+      renderCards();
+    });
+    categoryRail.appendChild(btn);
+  });
+}
+
+function renderCards(){
+  cardGrid.innerHTML = '';
+  const items = activeCategory==='realestate' ? REAL_ESTATE : [];
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'pcard';
+    const count = owned[item.id]||0;
+    const affordable = balanceCr >= item.price;
+    card.innerHTML = `
+      <div class="pcard-icon">${item.icon}</div>
+      <div class="pcard-name">${item.name}</div>
+      <div class="pcard-desc">${item.desc}</div>
+      <div class="pcard-price">₹${item.price.toLocaleString('en-IN')} Cr</div>
+      ${count>0?`<div class="pcard-owned">Owned: ${count}</div>`:''}
+      <button class="buy-btn ${affordable?'':'disabled'}">${affordable?'Buy':'Not enough funds'}</button>
+    `;
+    const buyBtn = card.querySelector('.buy-btn');
+    buyBtn.addEventListener('click', (e)=> purchaseItem(item, card, e));
+    cardGrid.appendChild(card);
+  });
+}
+
+function purchaseItem(item, cardEl, e){
+  if(balanceCr < item.price){ Sound.denied(); showToast("You can't quite afford that yet"); return; }
+  Sound.coin();
+  const newBalance = balanceCr - item.price;
+  animateBalanceTo(newBalance, 650);
+
+  owned[item.id] = (owned[item.id]||0) + 1;
+
+  // flying coin from button to world
+  const rect = e.target.getBoundingClientRect();
+  const coin = document.createElement('div');
+  coin.className = 'flying-coin';
+  coin.textContent = '💰';
+  coin.style.left = rect.left+rect.width/2 + 'px';
+  coin.style.top = rect.top + 'px';
+  document.body.appendChild(coin);
+  const targetX = Math.min(window.innerWidth-60, nextSlotX);
+  const targetY = groundY()-20;
+  const t0 = performance.now();
+  function flyStep(now){
+    const t = Math.min(1,(now-t0)/550);
+    const ease = 1-Math.pow(1-t,2);
+    const cx = rect.left+rect.width/2 + (targetX-(rect.left+rect.width/2))*ease;
+    const cy = rect.top + (targetY-rect.top)*ease - Math.sin(ease*Math.PI)*80;
+    coin.style.left = cx+'px'; coin.style.top = cy+'px';
+    coin.style.transform = `scale(${1-ease*0.4}) rotate(${ease*360}deg)`;
+    if(t<1) requestAnimationFrame(flyStep);
+    else {
+      coin.remove();
+      addBuilding(item);
+      Sound.grow();
+      checkMilestones(TOTAL_CR-newBalance, item);
+      renderCards();
+      if(newBalance<=0){ setTimeout(()=>enterWorldView(true), 900); }
+    }
+  }
+  requestAnimationFrame(flyStep);
+
+  setTimeout(()=>{ if(cardEl) cardEl.querySelectorAll('.buy-btn').forEach(()=>{}); }, 0);
+}
+
+/* ============================================================
+   VIEW YOUR WORLD
+   ============================================================ */
+let inWorldView = false;
+function enterWorldView(isFinal){
+  inWorldView = true;
+  main.querySelector('.layout').style.opacity = '0';
+  main.querySelector('.layout').style.pointerEvents = 'none';
+  main.querySelector('.topbar').style.opacity = '0';
+  backBtn.classList.add('show');
+  worldCanvas.style.filter = 'saturate(1.15)';
+  if(isFinal){
+    Sound.chime();
+    setTimeout(()=> showToast("You spent it all. Here's your world. 🌆"), 400);
+  }
+}
+function exitWorldView(){
+  inWorldView = false;
+  main.querySelector('.layout').style.opacity = '1';
+  main.querySelector('.layout').style.pointerEvents = 'auto';
+  main.querySelector('.topbar').style.opacity = '1';
+  backBtn.classList.remove('show');
+  worldCanvas.style.filter = '';
+}
+viewWorldBtn.addEventListener('click', ()=>{ Sound.click(); enterWorldView(false); });
+backBtn.addEventListener('click', ()=>{ Sound.click(); exitWorldView(); });
+
+/* ============================================================
+   INIT
+   ============================================================ */
+startBtn.addEventListener('click', ()=>{
+  ac(); Sound.chime();
+  titleScreen.classList.add('hidden');
+  main.classList.add('show');
+  renderCategoryRail();
+  renderCards();
+});
+
+})();
+</script>
+</body>
+</html>

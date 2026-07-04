@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Rangoli Maker</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --night: #191033;
+    --night-light: #2A1B4D;
+    --gold: #F4C463;
+    --cream: #F6EEDD;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: radial-gradient(circle at 50% 35%, var(--night-light), var(--night) 70%);
+    color: var(--cream);
+    font-family:'Nunito Sans', sans-serif;
+    overflow:hidden;
+  }
+  .wrap{ position:relative; width:100%; height:100vh; }
+  canvas{ display:block; width:100%; height:100%; touch-action:none; }
+  #bgCanvas{ position:absolute; inset:0; pointer-events:none; }
+  #canvas{ position:absolute; inset:0; cursor:crosshair; }
+
+  .title-bar{
+    position:absolute; top:16px; left:18px;
+    font-family:'Yatra One', cursive; font-size:26px;
+    color: var(--gold);
+    pointer-events:none;
+  }
+
+  .panel{
+    position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; gap:12px; align-items:center;
+    background: rgba(25,16,51,0.72);
+    border:1px solid rgba(244,196,99,0.35);
+    border-radius:18px;
+    padding:14px 20px;
+    max-width:94vw;
+  }
+  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:center; }
+
+  .swatch{
+    width:30px; height:30px; border-radius:50%;
+    border:2px solid rgba(246,238,221,0.4);
+    cursor:pointer;
+  }
+  .swatch.active{ border-color: var(--gold); transform:scale(1.15); }
+
+  .shape-btn{
+    width:36px; height:36px; border-radius:10px;
+    background: rgba(246,238,221,0.08);
+    border:1px solid rgba(246,238,221,0.3);
+    color: var(--cream);
+    cursor:pointer; font-size:16px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .shape-btn.active{ background: var(--gold); color:#191033; border-color:var(--gold); }
+
+  .tool-btn{
+    font-family:'Nunito Sans', sans-serif; font-weight:700; font-size:12.5px;
+    background: rgba(246,238,221,0.08);
+    border:1px solid rgba(246,238,221,0.3);
+    color: var(--cream);
+    border-radius:12px;
+    padding:8px 16px;
+    cursor:pointer;
+  }
+  .tool-btn:hover{ background: rgba(246,238,221,0.18); }
+  .tool-btn.primary{ background: var(--gold); color:#191033; border-color:var(--gold); }
+
+  .hint{ font-size:12px; color:#cbbfe8; text-align:center; }
+
+  .sound-toggle{
+    position:absolute; top:16px; right:18px;
+    background: rgba(25,16,51,0.6); border:1px solid rgba(244,196,99,0.4);
+    color: var(--cream);
+    border-radius:20px; font-family:'Nunito Sans', sans-serif; font-weight:600; font-size:12.5px;
+    padding:7px 15px; cursor:pointer;
+  }
+
+  .overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(15,9,30,0.94);
+    text-align:center; padding:24px;
+    flex-direction:column; gap:16px;
+  }
+  .overlay.hide{ display:none; }
+  .overlay h1{ font-family:'Yatra One', cursive; font-size: clamp(30px, 7vw, 48px); margin:0; color: var(--gold); }
+  .overlay p{ max-width:420px; font-size:15.5px; line-height:1.6; margin:0; color:var(--cream); }
+  .overlay button{
+    font-family:'Nunito Sans', sans-serif; font-weight:700; font-size:16px;
+    background: var(--gold); color:#191033;
+    border:none; border-radius:16px;
+    padding:12px 28px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-bar">Rangoli Maker</div>
+  <button class="sound-toggle" id="soundToggle">sound: on</button>
+
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="canvas"></canvas>
+
+  <div class="panel">
+    <div class="row" id="colorRow"></div>
+    <div class="row">
+      <button class="shape-btn active" data-shape="dot" title="dot">●</button>
+      <button class="shape-btn" data-shape="petal" title="petal">✿</button>
+      <button class="shape-btn" data-shape="diamond" title="diamond">◆</button>
+      <button class="shape-btn" data-shape="leaf" title="leaf">❀</button>
+      <span style="width:14px;"></span>
+      <button class="tool-btn" id="symToggle">symmetry: 8</button>
+      <button class="tool-btn" id="clearBtn">clear</button>
+      <button class="tool-btn primary" id="saveBtn">save as image</button>
+    </div>
+    <div class="hint">click or drag anywhere — every mark mirrors around the center</div>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <h1>Rangoli Maker</h1>
+    <p>Click or drag anywhere on the canvas. Every mark you place is mirrored automatically around the center, so simple taps build a symmetric pattern. Pick a color, a shape, and just play — there's no wrong way to do this.</p>
+    <button id="startBtn">Begin</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- audio ---- */
+  var muted = false, audioCtx = null, audioStarted = false, ambienceTimer = null;
+  function ensureCtx(){ if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+  function tone(freq, dur, type, vol, delay){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx(); var t0 = ctx.currentTime + (delay||0);
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'sine'; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol||0.1, t0+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }catch(e){}
+  }
+  var bellScale = [523.25, 587.33, 659.25, 783.99, 880.00, 987.77];
+  function chime(){ tone(bellScale[Math.floor(Math.random()*bellScale.length)], 0.5, 'sine', 0.06); }
+  var ambPent = [392.00, 440.00, 493.88, 587.33, 659.25];
+  function startAmbience(){
+    if (muted || ambienceTimer) return;
+    ambienceTimer = setInterval(function(){
+      tone(ambPent[Math.floor(Math.random()*ambPent.length)], 0.9, 'sine', 0.022);
+    }, 1100);
+  }
+  function stopAmbience(){ if (ambienceTimer){ clearInterval(ambienceTimer); ambienceTimer=null; } }
+  var soundBtn = document.getElementById('soundToggle');
+  soundBtn.addEventListener('click', function(){
+    muted = !muted;
+    soundBtn.textContent = muted ? 'sound: off' : 'sound: on';
+    if (muted) stopAmbience(); else if (audioStarted) startAmbience();
+  });
+  function firstGesture(){
+    audioStarted = true; ensureCtx();
+    if (!muted) startAmbience();
+    window.removeEventListener('pointerdown', firstGesture);
+    window.removeEventListener('keydown', firstGesture);
+  }
+  window.addEventListener('pointerdown', firstGesture, { once:true });
+  window.addEventListener('keydown', firstGesture, { once:true });
+
+  /* ---- setup ---- */
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var W=0,H=0,DPR=window.devicePixelRatio||1;
+  var center = {x:0,y:0};
+  var bgCanvas = document.getElementById('bgCanvas');
+  var bgCtx = bgCanvas.getContext('2d');
+
+  function resize(){
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    bgCanvas.width = W*DPR; bgCanvas.height = H*DPR;
+    bgCtx.setTransform(DPR,0,0,DPR,0,0);
+    center.x = W/2; center.y = H/2;
+    drawGuides();
+  }
+  window.addEventListener('resize', resize);
+
+  var colors = ['#F4C463','#E8546B','#4FB0A5','#7A6FF0','#F27C3C','#5FC77E','#F6EEDD'];
+  var activeColor = colors[0];
+  var activeShape = 'dot';
+  var symmetry = 8;
+
+  var colorRow = document.getElementById('colorRow');
+  colors.forEach(function(c, i){
+    var b = document.createElement('button');
+    b.className = 'swatch' + (i===0?' active':'');
+    b.style.background = c;
+    b.addEventListener('click', function(){
+      activeColor = c;
+      Array.prototype.forEach.call(colorRow.children, function(el){ el.classList.remove('active'); });
+      b.classList.add('active');
+    });
+    colorRow.appendChild(b);
+  });
+
+  document.querySelectorAll('.shape-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      activeShape = b.getAttribute('data-shape');
+      document.querySelectorAll('.shape-btn').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+    });
+  });
+
+  document.getElementById('symToggle').addEventListener('click', function(){
+    var options = [6,8,10,12];
+    var idx = (options.indexOf(symmetry)+1) % options.length;
+    symmetry = options[idx];
+    this.textContent = 'symmetry: ' + symmetry;
+    drawGuides();
+  });
+
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    ctx.clearRect(0,0,W,H);
+    drawGuides();
+  });
+
+  document.getElementById('saveBtn').addEventListener('click', function(){
+    var link = document.createElement('a');
+    link.download = 'rangoli.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  document.getElementById('startBtn').addEventListener('click', function(){
+    audioStarted = true; ensureCtx(); if (!muted) startAmbience();
+    document.getElementById('startOverlay').classList.add('hide');
+  });
+
+  function drawGuides(){
+    ctx.save();
+    ctx.strokeStyle = 'rgba(244,196,99,0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, Math.min(W,H)*0.44, 0, Math.PI*2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(center.x, center.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(244,196,99,0.4)';
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function drawShape(x, y, angle, color, shape){
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = color;
+    if (shape === 'dot'){
+      var dg = ctx.createRadialGradient(-2,-2,1, 0,0,7);
+      dg.addColorStop(0, lighten(color)); dg.addColorStop(1, color);
+      ctx.fillStyle = dg;
+      ctx.beginPath(); ctx.arc(0,0,7,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 0.6; ctx.stroke();
+    } else if (shape === 'petal'){
+      var pg = ctx.createLinearGradient(0,0,0,-26);
+      pg.addColorStop(0, color); pg.addColorStop(1, lighten(color));
+      ctx.fillStyle = pg;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.quadraticCurveTo(10,-14, 0,-26);
+      ctx.quadraticCurveTo(-10,-14, 0,0);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 0.6;
+      ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(0,-23); ctx.stroke();
+    } else if (shape === 'diamond'){
+      var dmg = ctx.createLinearGradient(0,-10,0,10);
+      dmg.addColorStop(0, lighten(color)); dmg.addColorStop(1, color);
+      ctx.fillStyle = dmg;
+      ctx.beginPath();
+      ctx.moveTo(0,-10); ctx.lineTo(8,0); ctx.lineTo(0,10); ctx.lineTo(-8,0);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 0.6; ctx.stroke();
+    } else if (shape === 'leaf'){
+      var lg = ctx.createLinearGradient(-14,0,14,-22);
+      lg.addColorStop(0, color); lg.addColorStop(1, lighten(color));
+      ctx.fillStyle = lg;
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.quadraticCurveTo(14,-8, 0,-22);
+      ctx.quadraticCurveTo(-14,-8, 0,0);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0,-2); ctx.lineTo(0,-20); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,-8); ctx.lineTo(6,-13); ctx.moveTo(0,-8); ctx.lineTo(-6,-13); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function lighten(hex){
+    var c = hex.replace('#','');
+    var num = parseInt(c,16);
+    var r = Math.min(255,(num>>16)+50), g = Math.min(255,((num>>8)&0xff)+50), b = Math.min(255,(num&0xff)+50);
+    return 'rgb('+r+','+g+','+b+')';
+  }
+
+  function stampAt(px, py){
+    var dx = px - center.x, dy = py - center.y;
+    var dist = Math.hypot(dx,dy);
+    var baseAngle = Math.atan2(dy,dx);
+    for (var i=0;i<symmetry;i++){
+      var a = baseAngle + (i * Math.PI*2/symmetry);
+      var x = center.x + Math.cos(a)*dist;
+      var y = center.y + Math.sin(a)*dist;
+      drawShape(x, y, a + Math.PI/2, activeColor, activeShape);
+    }
+    chime();
+  }
+
+  var drawing = false, lastStamp = 0;
+  canvas.addEventListener('pointerdown', function(e){
+    drawing = true;
+    var r = canvas.getBoundingClientRect();
+    stampAt(e.clientX-r.left, e.clientY-r.top);
+  });
+  canvas.addEventListener('pointermove', function(e){
+    if (!drawing) return;
+    var now = performance.now();
+    if (now - lastStamp < 70) return;
+    lastStamp = now;
+    var r = canvas.getBoundingClientRect();
+    stampAt(e.clientX-r.left, e.clientY-r.top);
+  });
+  window.addEventListener('pointerup', function(){ drawing = false; });
+
+  /* ---- ambient background: diyas + drifting petals ---- */
+  var petals = [];
+  var petalColors = ['#F4C463','#E8546B','#7A6FF0','#F27C3C'];
+  for (var pi=0; pi<14; pi++){
+    petals.push({
+      x: Math.random(), y: Math.random(),
+      speed: 8 + Math.random()*10,
+      sway: Math.random()*Math.PI*2,
+      size: 3 + Math.random()*3,
+      color: petalColors[pi % petalColors.length]
+    });
+  }
+
+  function drawDiya(x, y, now){
+    var ctx2 = bgCtx;
+    ctx2.save();
+    ctx2.translate(x, y);
+    // base bowl
+    ctx2.fillStyle = '#B5732E';
+    ctx2.beginPath();
+    ctx2.moveTo(-16,0);
+    ctx2.quadraticCurveTo(0,12,16,0);
+    ctx2.quadraticCurveTo(16,-6,10,-6);
+    ctx2.lineTo(-10,-6);
+    ctx2.quadraticCurveTo(-16,-6,-16,0);
+    ctx2.fill();
+    ctx2.strokeStyle = 'rgba(0,0,0,0.25)'; ctx2.lineWidth = 1; ctx2.stroke();
+    // flame (flickers)
+    var flick = 1 + Math.sin(now*0.012 + x)*0.12 + Math.sin(now*0.031+y)*0.06;
+    ctx2.save();
+    ctx2.translate(0,-8);
+    ctx2.scale(flick, flick);
+    var fg = ctx2.createRadialGradient(0,-2,0, 0,-6,12);
+    fg.addColorStop(0, 'rgba(255,240,180,0.95)');
+    fg.addColorStop(0.5, 'rgba(244,150,60,0.75)');
+    fg.addColorStop(1, 'rgba(244,150,60,0)');
+    ctx2.fillStyle = fg;
+    ctx2.beginPath();
+    ctx2.moveTo(0,4);
+    ctx2.quadraticCurveTo(7,-6, 0,-16);
+    ctx2.quadraticCurveTo(-7,-6, 0,4);
+    ctx2.fill();
+    ctx2.restore();
+    ctx2.restore();
+  }
+
+  function drawPetal(p){
+    bgCtx.save();
+    bgCtx.globalAlpha = 0.75;
+    bgCtx.fillStyle = p.color;
+    bgCtx.translate(p.x*W, p.y*H);
+    bgCtx.rotate(p.sway);
+    bgCtx.beginPath();
+    bgCtx.ellipse(0,0,p.size,p.size*0.5,0,0,Math.PI*2);
+    bgCtx.fill();
+    bgCtx.restore();
+  }
+
+  var lastBg = performance.now();
+  function bgLoop(now){
+    requestAnimationFrame(bgLoop);
+    var dt = Math.min(0.05, (now-lastBg)/1000);
+    lastBg = now;
+    if (W===0) return;
+
+    bgCtx.clearRect(0,0,W,H);
+
+    drawDiya(38, H-30, now);
+    drawDiya(W-38, H-30, now);
+
+    petals.forEach(function(p){
+      p.y -= (p.speed*dt)/H;
+      p.sway += dt*0.6;
+      p.x += Math.sin(p.sway)*0.0006;
+      if (p.y < -0.05){ p.y = 1.05; p.x = Math.random(); }
+      drawPetal(p);
+    });
+  }
+  requestAnimationFrame(bgLoop);
+
+  resize();
+
+})();
+</script>
+</body>
+</html>

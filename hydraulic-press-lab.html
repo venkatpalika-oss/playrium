@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Hydraulic Press Lab™ — What Happens If You Crush It?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#1a1612; --bg-mid:#2b2420; --amber:#e8a23c; --amber-bright:#ffcf7a;
+  --steel:#9aa4ac; --steel-dark:#5a636a;
+  --chalk:#f7f1e2; --chalk-dim:#c9c2b0;
+  --ui-glass:rgba(247,241,226,.08); --ui-glass-border:rgba(247,241,226,.16);
+  --font-display:'Fredoka', system-ui, sans-serif; --font-chalk:'Kalam', cursive;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--bg-deep);
+  font-family:var(--font-display); -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none; }
+#app{ position:relative; width:100vw; height:100vh; height:100dvh; overflow:hidden; }
+#pressCanvas{ position:absolute; inset:0; width:100%; height:100%; }
+
+/* ============================================================
+   TITLE
+   ============================================================ */
+#titleScreen{ position:absolute; inset:0; z-index:80; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:.5em; background:radial-gradient(90% 70% at 50% 45%, rgba(232,162,60,.14), rgba(26,22,18,.92));
+  transition: opacity .7s ease, visibility .7s; }
+#titleScreen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.14em; text-transform:uppercase; font-size:.76rem; font-weight:500; animation: fadeUp .7s ease both; }
+.headline{ font-weight:700; color:var(--chalk); font-size:clamp(1.7rem,6.6vw,3.4rem); margin:0;
+  text-shadow:0 2px 0 #000, 0 8px 24px rgba(0,0,0,.5); animation: stampIn .7s cubic-bezier(.2,.9,.3,1) both .15s;
+  letter-spacing:.02em; }
+@keyframes stampIn{ from{ filter:blur(6px); transform:scale(1.25); opacity:0;} to{ filter:blur(0); transform:scale(1); opacity:1;} }
+.tagline{ font-family:var(--font-chalk); color:var(--chalk); font-size:clamp(1rem,2.2vw,1.3rem); opacity:0;
+  animation: fadeUp .7s ease both .85s; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+#startBtn{ margin-top:1.2rem; padding:.9em 2.3em; font-family:var(--font-display); font-weight:600; font-size:1.02rem;
+  color:var(--bg-deep); background:linear-gradient(180deg,#fff2d8,var(--amber)); border:none; border-radius:999px; cursor:pointer;
+  box-shadow:0 12px 28px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.3) inset;
+  opacity:0; animation: fadeUp .7s ease both 1.2s, pulse 2.4s ease-in-out infinite 1.9s;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+#startBtn:active{ transform:scale(.94); }
+@keyframes pulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.035);} }
+
+/* ============================================================
+   HUD
+   ============================================================ */
+.hud{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; justify-content:space-between; align-items:flex-start;
+  padding:max(14px, env(safe-area-inset-top)) 16px 0; opacity:0; transition:opacity .5s ease; }
+.hud.show{ opacity:1; }
+.hud-card{ background:var(--ui-glass); backdrop-filter:blur(12px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:.5em .9em; display:flex; align-items:center; gap:.5em; box-shadow:0 8px 22px rgba(0,0,0,.3); cursor:pointer;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); color:var(--chalk); font-size:.85rem; font-weight:600; }
+.hud-card:active{ transform:scale(.95); }
+.hud-right{ display:flex; gap:.5em; }
+.icon-btn{ width:38px; height:38px; border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--ui-glass);
+  backdrop-filter:blur(10px); color:var(--chalk); font-size:1rem; display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+.icon-btn:active{ transform:scale(.88); }
+.icon-btn.toggled{ background:rgba(232,162,60,.25); border-color:rgba(232,162,60,.5); }
+
+#crushLogPanel{ position:absolute; top:64px; left:18px; z-index:45; width:min(230px,78vw);
+  background:var(--ui-glass); backdrop-filter:blur(14px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:1em; box-shadow:0 20px 40px rgba(0,0,0,.4); opacity:0; visibility:hidden; transform:translateY(-10px) scale(.96);
+  transition: all .3s cubic-bezier(.2,1,.3,1); }
+#crushLogPanel.show{ opacity:1; visibility:visible; transform:translateY(0) scale(1); }
+.log-title{ font-family:var(--font-chalk); color:var(--chalk); font-size:1.05rem; margin:0 0 .5em; }
+.log-row{ display:flex; align-items:center; gap:.5em; padding:.3em 0; color:var(--chalk-dim); font-size:.82rem; }
+.log-row.found{ color:var(--chalk); }
+.log-icon{ width:22px; text-align:center; opacity:.35; filter:grayscale(1); }
+.log-row.found .log-icon{ opacity:1; filter:none; }
+
+/* ============================================================
+   SHELF
+   ============================================================ */
+.shelf-wrap{ position:absolute; bottom:0; left:0; right:0; z-index:30; padding:0 12px max(12px, env(safe-area-inset-bottom));
+  display:flex; justify-content:center; }
+.shelf{ display:flex; gap:.6em; background:var(--ui-glass); backdrop-filter:blur(14px); border:1px solid var(--ui-glass-border);
+  border-radius:20px; padding:.7em; max-width:96vw; overflow-x:auto; }
+.shelf-item{ display:flex; flex-direction:column; align-items:center; gap:.15em; width:64px; flex-shrink:0; cursor:grab;
+  padding:.4em .2em; border-radius:12px; transition: transform .15s cubic-bezier(.3,1.6,.5,1), background .15s; }
+.shelf-item:hover{ background:rgba(247,241,226,.08); transform:translateY(-3px); }
+.shelf-item .emoji{ font-size:1.8rem; animation: shelfIdle 3s ease-in-out infinite; }
+@keyframes shelfIdle{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-2px);} }
+.shelf-item .label{ font-size:.6rem; color:var(--chalk-dim); text-align:center; }
+.shelf-item.dragging{ opacity:.3; }
+
+.drag-ghost{ position:fixed; font-size:2.4rem; z-index:90; pointer-events:none; transform:translate(-50%,-50%); filter:drop-shadow(0 8px 12px rgba(0,0,0,.5)); }
+
+/* ============================================================
+   PRESS CONTROLS
+   ============================================================ */
+.controls{ position:absolute; right:16px; bottom:max(110px, calc(14vh)); z-index:35; display:flex; flex-direction:column; gap:.6em; align-items:center; }
+#pressBtn{ width:92px; height:92px; border-radius:50%; border:none; cursor:pointer;
+  background:radial-gradient(circle at 35% 30%, #d8dee2, var(--steel) 55%, var(--steel-dark));
+  box-shadow:0 12px 26px rgba(0,0,0,.5), 0 0 0 4px rgba(247,241,226,.08);
+  color:#1a1612; font-family:var(--font-display); font-weight:700; font-size:.78rem;
+  transition: transform .12s cubic-bezier(.3,1.6,.5,1); }
+#pressBtn:active, #pressBtn.pressing{ transform:scale(.93); box-shadow:0 6px 14px rgba(0,0,0,.5), 0 0 0 4px rgba(247,241,226,.08); }
+#pressBtn:disabled{ opacity:.4; cursor:not-allowed; }
+.slowmo-toggle{ display:flex; align-items:center; gap:.4em; background:var(--ui-glass); backdrop-filter:blur(10px);
+  border:1px solid var(--ui-glass-border); border-radius:999px; padding:.4em .8em; font-size:.72rem; color:var(--chalk-dim); cursor:pointer; }
+.slowmo-toggle.active{ color:var(--chalk); background:rgba(232,162,60,.2); border-color:rgba(232,162,60,.4); }
+
+.toast{ position:absolute; left:50%; top:14%; transform:translate(-50%,-50%) scale(.6); font-family:var(--font-chalk);
+  font-size:clamp(1rem,3vw,1.4rem); color:var(--chalk); opacity:0; z-index:60; text-shadow:0 6px 20px rgba(0,0,0,.5);
+  pointer-events:none; text-align:center; background:rgba(26,22,18,.55); backdrop-filter:blur(8px); padding:.4em 1.2em; border-radius:999px;
+  border:1px solid rgba(232,162,60,.35); }
+.toast.show{ animation: toastPop 2s cubic-bezier(.2,1.2,.3,1) forwards; }
+@keyframes toastPop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.6);}
+  14%{ opacity:1; transform:translate(-50%,-50%) scale(1.06);}
+  24%{ transform:translate(-50%,-50%) scale(1);}
+  84%{ opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{ opacity:0; transform:translate(-50%,-60%) scale(.96);} }
+
+@media (max-width:640px){
+  .controls{ right:10px; bottom:96px; }
+  #pressBtn{ width:76px; height:76px; font-size:.68rem; }
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="pressCanvas"></canvas>
+
+  <div id="titleScreen">
+    <p class="eyebrow">Playrium presents</p>
+    <h1 class="headline">HYDRAULIC PRESS LAB™</h1>
+    <p class="tagline">What Happens If You Crush It?</p>
+    <button id="startBtn">Enter the Lab</button>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="hud-card" id="logBtn">📖 Crush Log <span id="logCount">0/7</span></div>
+    <div class="hud-right">
+      <div class="icon-btn" id="muteBtn" title="Mute">🔊</div>
+    </div>
+  </div>
+
+  <div id="crushLogPanel">
+    <p class="log-title">Crush Log</p>
+    <div id="logList"></div>
+  </div>
+
+  <div class="shelf-wrap">
+    <div class="shelf" id="shelf"></div>
+  </div>
+
+  <div class="controls">
+    <div class="slowmo-toggle" id="slowmoToggle">🐢 Slow-Mo</div>
+    <button id="pressBtn" disabled>HOLD<br>TO PRESS</button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const app = document.getElementById('app');
+const canvas = document.getElementById('pressCanvas');
+const ctx = canvas.getContext('2d');
+const titleScreen = document.getElementById('titleScreen');
+const startBtn = document.getElementById('startBtn');
+const hud = document.getElementById('hud');
+const logBtn = document.getElementById('logBtn');
+const logCount = document.getElementById('logCount');
+const logPanel = document.getElementById('crushLogPanel');
+const logList = document.getElementById('logList');
+const shelf = document.getElementById('shelf');
+const pressBtn = document.getElementById('pressBtn');
+const slowmoToggle = document.getElementById('slowmoToggle');
+const muteBtn = document.getElementById('muteBtn');
+const toast = document.getElementById('toast');
+
+function resize(){
+  canvas.width = window.innerWidth*devicePixelRatio;
+  canvas.height = window.innerHeight*devicePixelRatio;
+  canvas.style.width = window.innerWidth+'px';
+  canvas.style.height = window.innerHeight+'px';
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* ============================================================
+   AUDIO
+   ============================================================ */
+let actx=null, muted=false;
+function ac(){ if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function envGain(ctx,dur,peak){ const g=ctx.createGain(); g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(peak,ctx.currentTime+0.008); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur); return g; }
+function tone(freq,dur,type,peak){ if(muted)return; const ctx=ac(); const o=ctx.createOscillator(); o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,ctx.currentTime); const g=envGain(ctx,dur,peak||0.16); o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+dur+0.05); }
+function noiseBurst(dur,freq,type,peak){ if(muted)return; const ctx=ac(); const n=Math.floor(ctx.sampleRate*dur);
+  const buf=ctx.createBuffer(1,n,ctx.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i]=(Math.random()*2-1)*(1-i/n); }
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const f=ctx.createBiquadFilter(); f.type=type||'bandpass'; f.frequency.value=freq||1500;
+  const g=envGain(ctx,dur,peak||0.2); src.connect(f).connect(g).connect(ctx.destination); src.start(); }
+
+const Sound = {
+  click(){ tone(900,0.05,'sine',0.1); },
+  hiss(vol){ noiseBurst(0.12, 3000,'highpass', Math.min(0.14, (vol||0.3)*0.14)); },
+  thunk(){ tone(90,0.18,'sine',0.22); },
+  softCrush(){ noiseBurst(0.3,700,'bandpass',0.24); setTimeout(()=>tone(180,0.2,'sine',0.16),20); },
+  glassCrush(){ noiseBurst(0.35,2600,'highpass',0.26); setTimeout(()=>noiseBurst(0.2,4000,'highpass',0.16),60); },
+  chime(){ [1046,1318,1568].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sine',0.13),i*130)); },
+};
+muteBtn.addEventListener('click', ()=>{ muted=!muted; muteBtn.textContent=muted?'🔇':'🔊'; Sound.click(); });
+
+/* ============================================================
+   OBJECT CATALOGUE
+   ============================================================ */
+const OBJECTS = [
+  { id:'watermelon', emoji:'🍉', label:'Watermelon', toughness:0.58, kind:'soft', tint:'#e0453f' },
+  { id:'apple',      emoji:'🍎', label:'Apple',      toughness:0.4,  kind:'soft', tint:'#e0453f' },
+  { id:'egg',        emoji:'🥚', label:'Egg',        toughness:0.22, kind:'soft', tint:'#f2e6c9' },
+  { id:'coconut',    emoji:'🥥', label:'Coconut',    toughness:0.72, kind:'soft', tint:'#f7f1e2' },
+  { id:'glassball',  emoji:'🔮', label:'Glass Ball', toughness:0.36, kind:'glass', tint:'#bfe6f2' },
+  { id:'wineglass',  emoji:'🍷', label:'Wine Glass', toughness:0.26, kind:'glass', tint:'#bfe6f2' },
+  { id:'bottle',     emoji:'🍾', label:'Bottle',     toughness:0.46, kind:'glass', tint:'#bfe6f2' },
+];
+const discovered = new Set();
+
+function renderShelf(){
+  shelf.innerHTML = '';
+  OBJECTS.forEach(o=>{
+    const el = document.createElement('div');
+    el.className = 'shelf-item';
+    el.innerHTML = `<div class="emoji">${o.emoji}</div><div class="label">${o.label}</div>`;
+    el.dataset.id = o.id;
+    el.addEventListener('pointerdown', e=> startDrag(e, o, el));
+    shelf.appendChild(el);
+  });
+}
+renderShelf();
+
+function renderLog(){
+  logCount.textContent = discovered.size + '/' + OBJECTS.length;
+  logList.innerHTML = '';
+  OBJECTS.forEach(o=>{
+    const row = document.createElement('div');
+    row.className = 'log-row' + (discovered.has(o.id)?' found':'');
+    row.innerHTML = `<span class="log-icon">${o.emoji}</span><span>${discovered.has(o.id)?o.label:'???'}</span>`;
+    logList.appendChild(row);
+  });
+}
+renderLog();
+
+let logOpen=false;
+logBtn.addEventListener('click', ()=>{ logOpen=!logOpen; logPanel.classList.toggle('show', logOpen); Sound.click(); });
+
+function showToast(msg){
+  toast.textContent = msg;
+  toast.className='toast';
+  void toast.offsetWidth;
+  toast.classList.add('show');
+}
+
+const unlocked = new Set();
+function checkMilestones(obj){
+  const foodIds = OBJECTS.filter(o=>o.kind==='soft').map(o=>o.id);
+  const glassIds = OBJECTS.filter(o=>o.kind==='glass').map(o=>o.id);
+  const checks = [
+    ['first', discovered.size>=1, 'First Crush! 🔨'],
+    ['food_scientist', foodIds.every(id=>discovered.has(id)), 'Food Scientist! 🍉'],
+    ['glass_master', glassIds.every(id=>discovered.has(id)), 'Glass Master! 🔮'],
+  ];
+  checks.forEach(([key,cond,msg])=>{
+    if(cond && !unlocked.has(key)){
+      unlocked.add(key);
+      setTimeout(()=>{ showToast(msg); Sound.chime(); }, 700);
+    }
+  });
+}
+
+/* ============================================================
+   PRESS + WORKSHOP SCENE
+   ============================================================ */
+let padX, padY, padW;
+function layout(){
+  padX = window.innerWidth*0.5;
+  padY = window.innerHeight*0.62;
+  padW = Math.min(window.innerWidth,window.innerHeight)*0.16;
+}
+layout();
+window.addEventListener('resize', layout);
+
+let piston = { travel:0 }; // 0 = top rest, 1 = fully down
+const RETRACT_SPEED = 1.1;
+const PRESS_SPEED = 0.5;
+let pressing = false;
+let slowmoManual = false;
+let slowmoAutoT = 0, slowmoAutoTarget = 0;
+let shakeT = 0;
+
+let placedObject = null; // {def, squashX, squashY, crackSeed, crushed, crackAlpha}
+let particles = [];
+
+function placeObject(def){
+  placedObject = {
+    def, squashX:1, squashY:1, crushed:false, crackAlpha:0,
+    crackSeed: Array.from({length:7},()=> ({a:Math.random()*Math.PI*2, len:0.3+Math.random()*0.5}))
+  };
+  piston.travel = 0;
+  pressBtn.disabled = false;
+}
+
+/* ---- drag from shelf ---- */
+let dragGhost=null, dragDef=null;
+function startDrag(e, def, el){
+  e.preventDefault();
+  dragDef = def;
+  dragGhost = document.createElement('div');
+  dragGhost.className='drag-ghost';
+  dragGhost.textContent = def.emoji;
+  dragGhost.style.left = e.clientX+'px';
+  dragGhost.style.top = e.clientY+'px';
+  document.body.appendChild(dragGhost);
+  Sound.click();
+  const move = ev=>{
+    dragGhost.style.left = ev.clientX+'px';
+    dragGhost.style.top = ev.clientY+'px';
+  };
+  const up = ev=>{
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerup', up);
+    dragGhost.remove(); dragGhost=null;
+    const dist = Math.hypot(ev.clientX-padX, ev.clientY-padY);
+    if(dist < padW*1.8 || ev.clientY > window.innerHeight*0.3){
+      placeObject(dragDef);
+    }
+  };
+  window.addEventListener('pointermove', move);
+  window.addEventListener('pointerup', up);
+}
+
+/* ---- press button ---- */
+pressBtn.addEventListener('pointerdown', ()=>{
+  if(!placedObject || placedObject.crushed) return;
+  pressing = true;
+  pressBtn.classList.add('pressing');
+});
+function stopPress(){ pressing=false; pressBtn.classList.remove('pressing'); }
+window.addEventListener('pointerup', stopPress);
+window.addEventListener('pointercancel', stopPress);
+
+slowmoToggle.addEventListener('click', ()=>{
+  slowmoManual = !slowmoManual;
+  slowmoToggle.classList.toggle('active', slowmoManual);
+  Sound.click();
+});
+
+/* ============================================================
+   PARTICLES
+   ============================================================ */
+function spawnCrushParticles(def, x, y){
+  const n = def.kind==='glass' ? 22 : 18;
+  for(let i=0;i<n;i++){
+    const a = Math.random()*Math.PI*2;
+    const sp = 90+Math.random()*180;
+    particles.push({
+      x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 120,
+      life:0.9, maxLife:0.9, size: def.kind==='glass'? (1.5+Math.random()*2.5) : (2+Math.random()*3),
+      color: def.kind==='glass' ? (Math.random()<0.5?'#dff5fb':'#8fd0e8') : def.tint,
+      grav: def.kind==='glass'? 420 : 520,
+      shape: def.kind==='glass' ? 'shard' : 'blob',
+      rot: Math.random()*Math.PI*2, rotSpeed:(Math.random()-0.5)*8
+    });
+  }
+  if(def.kind==='soft'){
+    for(let i=0;i<8;i++){
+      const a=Math.random()*Math.PI*2, sp=60+Math.random()*100;
+      particles.push({ x,y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-80, life:1, maxLife:1, size:1.6,
+        color:'#3a2a20', grav:480, shape:'seed', rot:0, rotSpeed:0 });
+    }
+  }
+}
+function updateParticles(dt){
+  particles.forEach(p=>{
+    p.vy += p.grav*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.life -= dt*0.9; p.rot += p.rotSpeed*dt;
+  });
+  particles = particles.filter(p=>p.life>0);
+}
+function drawParticles(){
+  particles.forEach(p=>{
+    ctx.save();
+    ctx.globalAlpha = Math.max(0,p.life/p.maxLife);
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rot);
+    ctx.fillStyle = p.color;
+    if(p.shape==='shard'){
+      ctx.beginPath(); ctx.moveTo(0,-p.size*1.6); ctx.lineTo(p.size,p.size); ctx.lineTo(-p.size,p.size); ctx.closePath(); ctx.fill();
+    } else {
+      ctx.beginPath(); ctx.arc(0,0,p.size,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  });
+  ctx.globalAlpha=1;
+}
+
+/* ============================================================
+   CRUSH LOGIC
+   ============================================================ */
+function triggerCrush(){
+  const obj = placedObject;
+  obj.crushed = true;
+  pressing = false;
+  pressBtn.classList.remove('pressing');
+
+  const px = padX, py = padY - padW*0.25;
+  spawnCrushParticles(obj.def, px, py);
+  if(obj.def.kind==='glass') Sound.glassCrush(); else Sound.softCrush();
+
+  slowmoAutoTarget = 1;
+  setTimeout(()=>{ slowmoAutoTarget = 0; }, 900);
+  shakeT = 0.18;
+
+  if(!discovered.has(obj.def.id)){
+    discovered.add(obj.def.id);
+    renderLog();
+    showToast('Discovered: ' + obj.def.label + '!');
+  }
+  checkMilestones(obj);
+
+  setTimeout(()=>{
+    placedObject = null;
+    pressBtn.disabled = true;
+    piston.travel = 0;
+  }, 1500);
+}
+
+/* ============================================================
+   RENDER — workshop + press + object
+   ============================================================ */
+let gaugePressure = 0;
+function drawWorkshop(dt){
+  const w = window.innerWidth, h = window.innerHeight;
+  const bg = ctx.createLinearGradient(0,0,0,h);
+  bg.addColorStop(0,'#221c17'); bg.addColorStop(0.6,'#2b2420'); bg.addColorStop(1,'#181310');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,w,h);
+
+  // warm light pool behind press
+  const glow = ctx.createRadialGradient(padX,padY-h*0.2,20,padX,padY-h*0.2,h*0.5);
+  glow.addColorStop(0,'rgba(232,162,60,0.14)'); glow.addColorStop(1,'rgba(232,162,60,0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0,0,w,h);
+
+  // bench
+  ctx.fillStyle = '#3a3128';
+  ctx.fillRect(0, padY+padW*0.55, w, h-(padY+padW*0.55));
+
+  drawPress(dt);
+}
+
+function drawPress(dt){
+  const colX1 = padX - padW*1.5, colX2 = padX + padW*1.5;
+  const topY = padY - window.innerHeight*0.34;
+  const baseY = padY + padW*0.5;
+  const baseTopY = padY; // fixed surface the object rests on — never moves
+  const plateThickness = 18;
+  const baseSize = Math.min(window.innerWidth, window.innerHeight)*0.09;
+
+  // columns
+  ctx.fillStyle = '#7a838a';
+  ctx.fillRect(colX1-8, topY, 16, baseY-topY);
+  ctx.fillRect(colX2-8, topY, 16, baseY-topY);
+
+  // top crossbar
+  const crossGrad = ctx.createLinearGradient(0,topY-14,0,topY+14);
+  crossGrad.addColorStop(0,'#c7ced2'); crossGrad.addColorStop(1,'#5a636a');
+  ctx.fillStyle = crossGrad;
+  ctx.fillRect(colX1-14, topY-16, (colX2-colX1)+28, 30);
+
+  // gauges
+  drawGauge(colX1-40, topY+10, gaugePressure);
+  drawGauge(colX2+40, topY+10, gaugePressure*0.85);
+
+  // base pad (fixed — the object always sits flush on top of this)
+  ctx.fillStyle = '#4a5258';
+  ctx.beginPath();
+  ctx.roundRect ? ctx.roundRect(padX-padW, baseTopY, padW*2, padW*0.5, 6) : ctx.rect(padX-padW, baseTopY, padW*2, padW*0.5);
+  ctx.fill();
+
+  // --- real two-stage piston travel ---
+  // Stage 1: plate free-falls from its retracted rest (near the crossbar) down through open air.
+  // Stage 2: once it reaches the object's surface, it can't go further than the object allows.
+  const pistonRestY = topY + 16;                    // fully retracted position, travel = 0
+  const fullyBottomedY = baseTopY - plateThickness;  // where it'd sit with zero object in the way
+  const idlePistonY = pistonRestY + Math.sin(performance.now()/900)*3; // gentle idle breathing when nothing placed
+
+  let plateY = idlePistonY;
+  let squashY = 1, squashX = 1;
+
+  if(placedObject && !placedObject.crushed){
+    const def = placedObject.def;
+    const idealPlateY = pistonRestY + piston.travel * (fullyBottomedY - pistonRestY);
+    const objectRestTopY = baseTopY - baseSize*0.6; // where the object's top sits before any pressure
+    const contactPlateY = objectRestTopY - plateThickness;
+
+    if(def.kind==='soft'){
+      const penetration = Math.max(0, idealPlateY - contactPlateY);
+      const maxCompressibleDepth = baseSize*0.6*0.5;
+      const squashFactor = Math.min(1, penetration / maxCompressibleDepth);
+      squashY = 1 - squashFactor*0.5;
+      squashX = 1 + squashFactor*0.4;
+      const objectCompressedTopY = baseTopY - baseSize*0.6*squashY;
+      plateY = Math.min(idealPlateY, objectCompressedTopY - plateThickness);
+    } else {
+      // glass: rigid — plate travels freely until it touches, then simply cannot go further
+      plateY = Math.min(idealPlateY, contactPlateY);
+      const t = Math.max(0, (piston.travel - def.toughness*0.55) / (def.toughness*0.45));
+      placedObject.crackAlpha = Math.min(1, t);
+      if(plateY >= contactPlateY - 0.5){
+        const stressT = Math.min(1, piston.travel / def.toughness);
+        if(stressT>0.5) plateY += (Math.random()-0.5) * stressT * 3;
+      }
+    }
+  }
+
+  ctx.fillStyle = '#8a939a';
+  ctx.fillRect(padX-10, pistonRestY, 20, plateY-pistonRestY);
+  const plateGrad = ctx.createLinearGradient(0,plateY,0,plateY+plateThickness);
+  plateGrad.addColorStop(0,'#d8dee2'); plateGrad.addColorStop(1,'#5a636a');
+  ctx.fillStyle = plateGrad;
+  ctx.fillRect(padX-padW*0.95, plateY, padW*1.9, plateThickness);
+
+  // object — drawn last so it visibly sits between the plate above and the base below
+  if(placedObject && !placedObject.crushed){
+    drawObject(placedObject, padX, baseTopY, squashY, squashX);
+  }
+}
+
+function drawGauge(x,y,val){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.beginPath(); ctx.arc(0,0,16,0,Math.PI*2);
+  ctx.fillStyle='#2a2420'; ctx.fill();
+  ctx.strokeStyle='rgba(247,241,226,0.3)'; ctx.lineWidth=2; ctx.stroke();
+  const ang = -Math.PI*0.75 + val*Math.PI*1.5;
+  ctx.strokeStyle='#e8a23c'; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(ang)*12, Math.sin(ang)*12); ctx.stroke();
+  ctx.restore();
+}
+
+function drawObject(obj, cx, baseTopY, squashY, squashX){
+  const def = obj.def;
+  const baseSize = Math.min(window.innerWidth, window.innerHeight)*0.09;
+  // anchor the object's BOTTOM to the fixed base plate; it compresses upward from there,
+  // so the top surface moves down toward the base as it gets squeezed — never floats free of the plate.
+  const bottomY = baseTopY;
+  const y = bottomY - (baseSize*squashY*0.6);
+
+  ctx.save();
+  ctx.translate(cx, y);
+  ctx.scale(squashX, squashY);
+  ctx.font = baseSize+'px sans-serif';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(def.emoji, 0, 0);
+  ctx.restore();
+
+  if(def.kind==='glass' && obj.crackAlpha>0){
+    ctx.save();
+    ctx.translate(cx, y);
+    ctx.globalAlpha = obj.crackAlpha;
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+    ctx.lineWidth = 1.2;
+    obj.crackSeed.forEach(c=>{
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.lineTo(Math.cos(c.a)*baseSize*c.len, Math.sin(c.a)*baseSize*c.len);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+}
+
+/* ============================================================
+   MAIN LOOP
+   ============================================================ */
+let lastTime=0, started=false;
+function loop(now){
+  const rawDt = Math.min(0.033,(now-lastTime)/1000 || 0.016);
+  lastTime = now;
+
+  if(started){
+    slowmoAutoT += (slowmoAutoTarget - slowmoAutoT)*Math.min(1,rawDt*4);
+    const scale = (slowmoManual?0.35:1) * (1 - slowmoAutoT*0.75);
+    const dt = rawDt*scale;
+
+    if(placedObject && !placedObject.crushed){
+      if(pressing){
+        piston.travel += PRESS_SPEED*dt;
+        if(Math.random()<0.3) Sound.hiss(piston.travel);
+        gaugePressure = Math.min(1, piston.travel);
+        if(piston.travel >= placedObject.def.toughness){
+          piston.travel = placedObject.def.toughness;
+          triggerCrush();
+        }
+      } else {
+        piston.travel = Math.max(0, piston.travel - RETRACT_SPEED*dt);
+        gaugePressure = piston.travel;
+      }
+    } else {
+      gaugePressure *= 0.9;
+    }
+    updateParticles(rawDt);
+    if(shakeT>0) shakeT -= rawDt;
+  }
+
+  ctx.save();
+  if(shakeT>0){
+    ctx.translate((Math.random()-0.5)*shakeT*30, (Math.random()-0.5)*shakeT*30);
+  }
+  drawWorkshop(rawDt);
+  drawParticles();
+  ctx.restore();
+
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ============================================================
+   INIT
+   ============================================================ */
+startBtn.addEventListener('click', ()=>{
+  ac(); Sound.thunk();
+  titleScreen.classList.add('hidden');
+  hud.classList.add('show');
+  started = true;
+});
+
+})();
+</script>
+</body>
+</html>

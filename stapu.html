@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Stapu</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --asphalt: #3D4C5C;
+    --asphalt-dark: #2A3644;
+    --pink: #FF4FA3;
+    --yellow: #FFD23F;
+    --cyan: #3FDBFF;
+    --cream: #F3F5F8;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: linear-gradient(180deg, var(--asphalt) 0%, var(--asphalt-dark) 100%);
+    color: var(--cream);
+    font-family:'Quicksand', sans-serif;
+    overflow:hidden;
+  }
+  .wrap{ position:relative; width:100%; height:100vh; }
+  canvas{ display:block; width:100%; height:100%; touch-action:none; cursor:pointer; }
+
+  .title-bar{
+    position:absolute; top:14px; left:18px;
+    font-family:'Bungee', cursive; font-size:20px;
+    color: var(--yellow);
+    pointer-events:none;
+  }
+  .hud{
+    position:absolute; top:16px; right:18px;
+    display:flex; gap:10px;
+    pointer-events:none;
+  }
+  .hud-pill{
+    background: rgba(0,0,0,0.32);
+    border:2px solid var(--cyan);
+    border-radius:20px;
+    padding:7px 15px;
+    font-family:'Quicksand', sans-serif; font-weight:700; font-size:12.5px;
+  }
+
+  .swing-meter{
+    position:absolute; bottom:96px; left:50%; transform:translateX(-50%);
+    width:min(340px, 80vw); height:18px;
+    background: rgba(0,0,0,0.35);
+    border:2px solid var(--yellow);
+    border-radius:10px; overflow:hidden;
+    display:none;
+  }
+  .swing-meter.show{ display:block; }
+  .swing-meter .zone{ position:absolute; top:0; bottom:0; background: rgba(63,219,255,0.55); }
+  .swing-meter .needle{ position:absolute; top:-2px; bottom:-2px; width:4px; background: var(--cream); border-radius:2px; }
+
+  .action-btn{
+    position:absolute; bottom:24px; left:50%; transform:translateX(-50%);
+    font-family:'Bungee', cursive; font-size:15px;
+    background: var(--pink); color:#fff;
+    border:none; border-radius:14px;
+    padding:13px 30px; cursor:pointer;
+    box-shadow: 0 4px 0 #B02E6F;
+  }
+  .action-btn:active{ transform:translateX(-50%) translateY(3px); box-shadow:0 1px 0 #B02E6F; }
+  .action-btn.hide{ display:none; }
+
+  .message{
+    position:absolute; top:60px; left:50%; transform:translateX(-50%);
+    font-family:'Quicksand', sans-serif; font-weight:700; font-size:13.5px;
+    background: rgba(0,0,0,0.32);
+    border-radius:12px; padding:7px 16px;
+    text-align:center; max-width:84vw;
+    pointer-events:none;
+  }
+
+  .overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(15,20,28,0.94);
+    text-align:center; padding:24px;
+    flex-direction:column; gap:16px;
+  }
+  .overlay.hide{ display:none; }
+  .overlay h1{
+    font-family:'Bungee', cursive;
+    font-size: clamp(28px, 7vw, 46px);
+    margin:0; color: var(--yellow);
+  }
+  .overlay p{ max-width:440px; font-size:15px; line-height:1.6; margin:0; }
+  .overlay .stat{ font-family:'Bungee', cursive; font-size:16px; color: var(--cyan); }
+  .overlay button{
+    font-family:'Bungee', cursive; font-size:15px;
+    background: var(--pink); color:#fff;
+    border:none; border-radius:14px;
+    padding:12px 28px; cursor:pointer;
+    box-shadow: 0 4px 0 #B02E6F;
+  }
+  .overlay .best{ font-size:12.5px; color:#a9b6c4; }
+
+  .sound-toggle{
+    position:absolute; bottom:18px; left:18px;
+    background: rgba(0,0,0,0.32); border:2px solid var(--yellow);
+    color: var(--cream);
+    border-radius:20px; font-family:'Quicksand', sans-serif; font-weight:700; font-size:11.5px;
+    padding:8px 15px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-bar">STAPU</div>
+  <div class="hud">
+    <div class="hud-pill" id="targetPill">target: 1</div>
+    <div class="hud-pill" id="foulsPill">fouls: 0</div>
+  </div>
+  <button class="sound-toggle" id="soundToggle">sound: on</button>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="message" id="message">tap "Throw" when the needle crosses the blue zone</div>
+  <div class="swing-meter" id="swingMeter"><div class="zone" id="swingZone"></div><div class="needle" id="swingNeedle"></div></div>
+  <button class="action-btn" id="actionBtn">Throw the stone</button>
+
+  <div class="overlay" id="startOverlay">
+    <h1>Stapu</h1>
+    <p>Toss the stone into the target square when the needle crosses the zone. Then hop through every other square in order, skipping the stone's square, all the way to square 8.</p>
+    <div class="best" id="bestLine">not mastered yet</div>
+    <button id="startBtn">Play</button>
+  </div>
+
+  <div class="overlay hide" id="endOverlay">
+    <h1>Stapu Mastered!</h1>
+    <p id="endLine"></p>
+    <div class="best" id="bestLine2"></div>
+    <button id="againBtn">Play again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- audio ---- */
+  var muted = false, audioCtx = null, audioStarted = false, ambienceTimer = null;
+  function ensureCtx(){ if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+  function tone(freq, dur, type, vol, delay){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx(); var t0 = ctx.currentTime + (delay||0);
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'sine'; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol||0.12, t0+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }catch(e){}
+  }
+  function hopSound(i){ tone(400+i*40, 0.08, 'square', 0.08); }
+  function tossGood(){ tone(700, 0.14, 'triangle', 0.11); tone(950, 0.1, 'triangle', 0.07, 0.06); }
+  function foulBuzz(){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx();
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sawtooth'; o.frequency.setValueAtTime(160, ctx.currentTime);
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.3);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.32);
+    }catch(e){}
+  }
+  function fanfare(){ [523.25,659.25,783.99,1046.5].forEach(function(f,i){ tone(f, 0.3, 'triangle', 0.12, i*0.09); }); }
+  function startAmbience(){
+    if (muted || ambienceTimer) return;
+    ambienceTimer = setInterval(function(){ tone(1400+Math.random()*300, 0.5, 'sine', 0.012); }, 550);
+  }
+  function stopAmbience(){ if (ambienceTimer){ clearInterval(ambienceTimer); ambienceTimer=null; } }
+  var soundBtn = document.getElementById('soundToggle');
+  soundBtn.addEventListener('click', function(){
+    muted = !muted;
+    soundBtn.textContent = muted ? 'sound: off' : 'sound: on';
+    if (muted) stopAmbience(); else if (audioStarted) startAmbience();
+  });
+  function firstGesture(){
+    audioStarted = true; ensureCtx();
+    if (!muted) startAmbience();
+    window.removeEventListener('pointerdown', firstGesture);
+    window.removeEventListener('keydown', firstGesture);
+  }
+  window.addEventListener('pointerdown', firstGesture, { once:true });
+  window.addEventListener('keydown', firstGesture, { once:true });
+
+  /* ---- setup ---- */
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var W=0,H=0,DPR=window.devicePixelRatio||1;
+  function resize(){
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var layout = {
+    1:{col:0,row:0}, 2:{col:-1,row:1}, 3:{col:1,row:1}, 4:{col:0,row:2},
+    5:{col:-1,row:3}, 6:{col:1,row:3}, 7:{col:0,row:4}, 8:{col:0,row:5}
+  };
+  var cellW = 0, cellH = 0, originX = 0, baseY = 0;
+  function layoutBoard(){
+    cellW = Math.min(90, W*0.22);
+    cellH = Math.min(64, H*0.11);
+    originX = W*0.5;
+    baseY = H*0.86;
+  }
+  layoutBoard();
+  window.addEventListener('resize', layoutBoard);
+
+  function squarePx(n){
+    var p = layout[n];
+    return { x: originX + p.col*cellW, y: baseY - p.row*cellH };
+  }
+
+  var target = 1, fouls = 0, bestFouls = null;
+  var phase = 'throw'; // throw | hop
+  var needleT = 0, needleDir = 1, zoneCenter = 0.5, zoneWidth = 0.16;
+  var hopIndex = 0, hopSequence = [];
+  var raindrops = [];
+  for (var ri=0; ri<40; ri++){ raindrops.push({ x:Math.random(), y:Math.random(), speed: 200+Math.random()*200 }); }
+
+  function buildHopSequence(){
+    hopSequence = [];
+    for (var i=1;i<=8;i++){ if (i !== target) hopSequence.push(i); }
+  }
+
+  function resetGame(){
+    target = 1; fouls = 0; phase = 'throw';
+    document.getElementById('targetPill').textContent = 'target: 1';
+    document.getElementById('foulsPill').textContent = 'fouls: 0';
+    document.getElementById('message').textContent = 'tap "Throw" when the needle crosses the blue zone';
+    document.getElementById('actionBtn').textContent = 'Throw the stone';
+    document.getElementById('actionBtn').classList.remove('hide');
+    document.getElementById('swingMeter').classList.remove('show');
+    buildHopSequence();
+  }
+
+  function startThrow(){
+    zoneCenter = 0.3+Math.random()*0.4;
+    zoneWidth = 0.14+Math.random()*0.05;
+    document.getElementById('swingZone').style.left = ((zoneCenter-zoneWidth/2)*100)+'%';
+    document.getElementById('swingZone').style.width = (zoneWidth*100)+'%';
+    document.getElementById('swingMeter').classList.add('show');
+    needleT = 0; needleDir = 1;
+    document.getElementById('actionBtn').textContent = 'Throw!';
+  }
+
+  function resolveThrow(){
+    var dist = Math.abs(needleT-zoneCenter);
+    var success = dist < zoneWidth*0.7;
+    document.getElementById('swingMeter').classList.remove('show');
+    if (success){
+      tossGood();
+      phase = 'hop'; hopIndex = 0;
+      document.getElementById('actionBtn').classList.add('hide');
+      document.getElementById('message').textContent = 'hop to square ' + hopSequence[0] + ' — skip the stone!';
+    } else {
+      foulBuzz();
+      fouls++;
+      document.getElementById('foulsPill').textContent = 'fouls: ' + fouls;
+      document.getElementById('message').textContent = 'missed the square — try the throw again';
+      document.getElementById('actionBtn').textContent = 'Throw the stone';
+    }
+  }
+
+  document.getElementById('actionBtn').addEventListener('click', function(){
+    if (phase !== 'throw') return;
+    if (document.getElementById('swingMeter').classList.contains('show')) resolveThrow();
+    else startThrow();
+  });
+
+  canvas.addEventListener('pointerdown', function(e){
+    if (phase !== 'hop') return;
+    var r = canvas.getBoundingClientRect();
+    var x = e.clientX-r.left, y = e.clientY-r.top;
+    for (var n=1;n<=8;n++){
+      var p = squarePx(n);
+      if (Math.abs(x-p.x) < cellW*0.45 && Math.abs(y-p.y) < cellH*0.45){
+        handleSquareTap(n);
+        return;
+      }
+    }
+  });
+
+  function handleSquareTap(n){
+    var expected = hopSequence[hopIndex];
+    if (n === target || n !== expected){
+      foulBuzz();
+      fouls++;
+      document.getElementById('foulsPill').textContent = 'fouls: ' + fouls;
+      hopIndex = 0;
+      document.getElementById('message').textContent = 'wrong square — start the hop again from ' + hopSequence[0];
+      return;
+    }
+    hopSound(hopIndex);
+    hopIndex++;
+    if (hopIndex >= hopSequence.length){
+      roundComplete();
+    } else {
+      document.getElementById('message').textContent = 'hop to square ' + hopSequence[hopIndex] + ' — skip the stone!';
+    }
+  }
+
+  function roundComplete(){
+    if (target >= 8){
+      winGame();
+      return;
+    }
+    target++;
+    document.getElementById('targetPill').textContent = 'target: ' + target;
+    phase = 'throw';
+    buildHopSequence();
+    document.getElementById('actionBtn').classList.remove('hide');
+    document.getElementById('actionBtn').textContent = 'Throw the stone';
+    document.getElementById('message').textContent = 'square ' + (target-1) + ' cleared! now throw for square ' + target + '.';
+  }
+
+  function winGame(){
+    fanfare();
+    if (bestFouls === null || fouls < bestFouls) bestFouls = fouls;
+    document.getElementById('endLine').innerHTML = 'You cleared all eight squares with <span class="stat">' + fouls + '</span> foul' + (fouls===1?'':'s') + '.';
+    document.getElementById('bestLine2').textContent = 'best: ' + bestFouls + ' foul' + (bestFouls===1?'':'s');
+    document.getElementById('endOverlay').classList.remove('hide');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', function(){
+    audioStarted = true; ensureCtx(); if (!muted) startAmbience();
+    document.getElementById('startOverlay').classList.add('hide');
+  });
+  document.getElementById('againBtn').addEventListener('click', function(){
+    document.getElementById('endOverlay').classList.add('hide');
+    resetGame();
+  });
+
+  function drawBoard(){
+    for (var n=1;n<=8;n++){
+      var p = squarePx(n);
+      var w = cellW*0.86, h = cellH*0.8;
+      var isTarget = n===target && phase==='hop';
+      var isDone = phase==='hop' && hopSequence.indexOf(n) !== -1 && hopSequence.indexOf(n) < hopIndex;
+      ctx.strokeStyle = isTarget ? '#FFD23F' : (isDone ? '#3FDBFF' : 'rgba(243,245,248,0.55)');
+      ctx.lineWidth = isTarget ? 3.5 : 2.5;
+      ctx.strokeRect(p.x-w/2, p.y-h/2, w, h);
+      ctx.fillStyle = 'rgba(255,255,255,0.04)';
+      ctx.fillRect(p.x-w/2, p.y-h/2, w, h);
+      ctx.fillStyle = 'rgba(243,245,248,0.75)';
+      ctx.font = 'bold ' + Math.max(11,cellH*0.3) + 'px Quicksand, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(n, p.x, p.y);
+      if (isTarget){
+        ctx.fillStyle = '#7A2E00';
+        ctx.beginPath(); ctx.arc(p.x, p.y-h*0.35, Math.max(5,cellW*0.09), 0, Math.PI*2); ctx.fill();
+        ctx.strokeStyle = '#3A1408'; ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
+  }
+
+  var last = performance.now();
+  function loop(now){
+    requestAnimationFrame(loop);
+    var dt = Math.min(0.033, (now-last)/1000);
+    last = now;
+
+    ctx.clearRect(0,0,W,H);
+    var g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#3D4C5C'); g.addColorStop(1,'#232C36');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+    // rain
+    ctx.strokeStyle = 'rgba(200,220,240,0.25)'; ctx.lineWidth = 1.4;
+    raindrops.forEach(function(d){
+      d.y += (d.speed*dt)/H;
+      if (d.y > 1){ d.y = -0.05; d.x = Math.random(); }
+      var x = d.x*W, y = d.y*H;
+      ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-2,y+10); ctx.stroke();
+    });
+
+    // puddle shine near board
+    ctx.fillStyle = 'rgba(63,219,255,0.06)';
+    ctx.beginPath(); ctx.ellipse(originX, baseY+18, cellW*1.6, 14, 0, 0, Math.PI*2); ctx.fill();
+
+    if (phase === 'throw' && document.getElementById('swingMeter').classList.contains('show')){
+      needleT += needleDir*dt*0.9;
+      if (needleT>1){ needleT=1; needleDir=-1; }
+      if (needleT<0){ needleT=0; needleDir=1; }
+      document.getElementById('swingNeedle').style.left = (needleT*100)+'%';
+    }
+
+    drawBoard();
+  }
+  requestAnimationFrame(loop);
+
+  resetGame();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pie Break</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --wood: #4A2F22;
+    --wood-light: #6B4530;
+    --cream: #F3E6C8;
+    --accent: #FFC857;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: var(--wood);
+    background-image: radial-gradient(circle at 50% 30%, var(--wood-light), var(--wood) 75%);
+    color: var(--cream);
+    font-family:'Quicksand', sans-serif;
+    overflow:hidden;
+  }
+
+  .wrap{ position:relative; width:100%; height:100vh; }
+  canvas{ display:block; width:100%; height:100%; touch-action:none; }
+
+  .title-bar{
+    position:absolute; top:16px; left:18px;
+    font-family:'Baloo 2', cursive; font-weight:700; font-size:22px;
+    color: var(--accent);
+    text-shadow: 0 2px 0 rgba(0,0,0,0.3);
+    pointer-events:none;
+  }
+
+  .hud{
+    position:absolute; top:16px; right:18px;
+    display:flex; gap:10px;
+    pointer-events:none;
+  }
+  .hud-pill{
+    background: rgba(0,0,0,0.28);
+    border:2px solid var(--accent);
+    border-radius:20px;
+    padding:7px 16px;
+    font-family:'Baloo 2', cursive;
+    font-weight:700;
+    font-size:14px;
+    color: var(--cream);
+  }
+
+  .reset-btn{
+    position:absolute; bottom:18px; right:18px;
+    background: rgba(0,0,0,0.28);
+    border:2px solid var(--cream);
+    color: var(--cream);
+    border-radius:20px;
+    font-family:'Quicksand', sans-serif; font-weight:600;
+    font-size:12.5px;
+    padding:8px 16px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{ background: rgba(0,0,0,0.45); }
+
+  .message{
+    position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+    font-family:'Quicksand', sans-serif; font-weight:600; font-size:14px;
+    background: rgba(0,0,0,0.28);
+    border-radius:14px;
+    padding:8px 18px;
+    text-align:center; max-width:80vw;
+    pointer-events:none;
+  }
+
+  .overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(30,18,12,0.94);
+    text-align:center; padding:24px;
+    flex-direction:column; gap:16px;
+  }
+  .overlay.hide{ display:none; }
+  .overlay h1{
+    font-family:'Baloo 2', cursive; font-weight:700;
+    font-size: clamp(34px, 8vw, 58px);
+    margin:0;
+    color: var(--accent);
+  }
+  .overlay p{ max-width:420px; font-size:16px; line-height:1.55; margin:0; color:var(--cream); }
+  .overlay .stat{ font-family:'Baloo 2', cursive; font-weight:700; font-size:18px; color:#8FD19E; }
+  .overlay button{
+    font-family:'Baloo 2', cursive; font-weight:700; font-size:17px;
+    background: var(--accent); color:#3A2416;
+    border:none; border-radius:16px;
+    padding:13px 30px; cursor:pointer;
+    box-shadow: 0 4px 0 #B8862F;
+    transition: transform .08s ease, box-shadow .08s ease;
+  }
+  .overlay button:hover{ transform:translateY(2px); box-shadow:0 2px 0 #B8862F; }
+  .overlay .best{ font-size:13px; color:#c9b89a; }
+
+  .sound-toggle{
+    position:absolute; bottom:18px; left:18px;
+    background: rgba(0,0,0,0.28); border:2px solid var(--accent);
+    color: var(--cream);
+    border-radius:20px; font-family:'Quicksand', sans-serif; font-weight:600; font-size:12.5px;
+    padding:8px 16px; cursor:pointer;
+  }
+  .sound-toggle:hover{ background: rgba(0,0,0,0.45); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-bar">Pie Break</div>
+  <div class="hud">
+    <div class="hud-pill" id="attemptsPill">throws: 0</div>
+    <div class="hud-pill" id="remainingPill">10 left</div>
+  </div>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="message" id="message">pull back the stone and let go to throw</div>
+  <button class="reset-btn" id="resetBtn">reset board</button>
+  <button class="sound-toggle" id="soundToggle">sound: on</button>
+
+  <div class="overlay" id="startOverlay">
+    <h1>Pie Break</h1>
+    <p>Ten slices, one ring. Drag the stone back like a slingshot and let go to send it flying. Knock every slice out of the ring in as few throws as you can.</p>
+    <div class="best" id="bestLine">no attempts yet</div>
+    <button id="startBtn">Start</button>
+  </div>
+
+  <div class="overlay hide" id="endOverlay">
+    <h1 id="endTitle">Ring Cleared!</h1>
+    <p id="endLine"></p>
+    <div class="best" id="bestLine2"></div>
+    <button id="againBtn">Play again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- audio ---- */
+  var muted = false, audioCtx = null, audioStarted = false, ambienceTimer = null;
+  function ensureCtx(){ if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+  function tone(freq, dur, type, vol, delay){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx(); var t0 = ctx.currentTime + (delay||0);
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'sine'; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol||0.12, t0+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }catch(e){}
+  }
+  function whoosh(dur){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx(); dur = dur||0.35;
+      var size = Math.floor(ctx.sampleRate*dur);
+      var buf = ctx.createBuffer(1, size, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i=0;i<size;i++){ data[i] = Math.random()*2-1; }
+      var noise = ctx.createBufferSource(); noise.buffer = buf;
+      var filter = ctx.createBiquadFilter();
+      filter.type='bandpass';
+      filter.frequency.setValueAtTime(400, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(1600, ctx.currentTime+dur*0.7);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0.18, ctx.currentTime+0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+      noise.connect(filter); filter.connect(g); g.connect(ctx.destination);
+      noise.start(); noise.stop(ctx.currentTime+dur+0.05);
+    }catch(e){}
+  }
+  function clack(){ tone(180+Math.random()*80, 0.07, 'square', 0.09); }
+  function chime(){ tone(880, 0.28, 'triangle', 0.12); tone(1318.5, 0.3, 'triangle', 0.09, 0.05); }
+  function fanfare(){
+    [523.25,659.25,783.99,1046.5].forEach(function(f,i){ tone(f, 0.35, 'triangle', 0.13, i*0.1); });
+  }
+  var pentatonic = [261.63, 293.66, 329.63, 392.00, 440.00];
+  function startAmbience(){
+    if (muted || ambienceTimer) return;
+    ambienceTimer = setInterval(function(){
+      var f = pentatonic[Math.floor(Math.random()*pentatonic.length)];
+      tone(f, 0.7, 'triangle', 0.03);
+    }, 850);
+  }
+  function stopAmbience(){
+    if (ambienceTimer){ clearInterval(ambienceTimer); ambienceTimer = null; }
+  }
+  var soundBtn = document.getElementById('soundToggle');
+  soundBtn.addEventListener('click', function(){
+    muted = !muted;
+    soundBtn.textContent = muted ? 'sound: off' : 'sound: on';
+    if (muted) stopAmbience(); else if (audioStarted) startAmbience();
+  });
+  function firstGesture(){
+    audioStarted = true; ensureCtx();
+    if (!muted) startAmbience();
+    window.removeEventListener('pointerdown', firstGesture);
+    window.removeEventListener('keydown', firstGesture);
+  }
+  window.addEventListener('pointerdown', firstGesture, { once:true });
+  window.addEventListener('keydown', firstGesture, { once:true });
+
+  /* ---- setup ---- */
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var W=0, H=0, DPR = window.devicePixelRatio || 1;
+  var boardCenter = { x:0, y:0 };
+  var boardRadius = 0;
+
+  function resize(){
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    boardCenter.x = W/2; boardCenter.y = H*0.46;
+    boardRadius = Math.max(90, Math.min(W,H) * 0.32);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var sliceColors = ['#E63946','#F3722C','#F8961E','#F9C74F','#90BE6D','#43AA8B','#4D908E','#577590','#277DA1','#9B5DE5'];
+  var PIECE_R = 15, STONE_R = 14;
+  var pieces = [], stone = null;
+  var attempts = 0, cleared = 0, bestAttempts = null;
+  var state = 'idle'; // idle | aiming | flying | won
+  var dragging = false, dragOrigin = {x:0,y:0}, dragCurrent = {x:0,y:0};
+  var lastClack = 0;
+
+  function launchPos(){ return { x: boardCenter.x, y: Math.min(H-40, boardCenter.y + boardRadius + 70) }; }
+
+  function makePieces(){
+    pieces = [];
+    for (var i=0;i<10;i++){
+      var a = (i/10)*Math.PI*2 - Math.PI/2;
+      var rad = boardRadius*0.55;
+      pieces.push({
+        x: boardCenter.x + Math.cos(a)*rad,
+        y: boardCenter.y + Math.sin(a)*rad,
+        vx:0, vy:0, r:PIECE_R, color:sliceColors[i],
+        out:false, outT:0
+      });
+    }
+  }
+
+  function resetGame(){
+    makePieces();
+    var lp = launchPos();
+    stone = { x:lp.x, y:lp.y, vx:0, vy:0, r:STONE_R, state:'settled' };
+    attempts = 0; cleared = 0;
+    state = 'aiming';
+    document.getElementById('attemptsPill').textContent = 'throws: 0';
+    document.getElementById('remainingPill').textContent = '10 left';
+    document.getElementById('message').textContent = 'pull back the stone and let go to throw';
+  }
+
+  function updateBestLine(){
+    var t = bestAttempts === null ? 'no attempts yet' : ('best: ' + bestAttempts + ' throw' + (bestAttempts===1?'':'s'));
+    document.getElementById('bestLine').textContent = t;
+  }
+
+  function endGame(){
+    state = 'won';
+    fanfare();
+    if (bestAttempts === null || attempts < bestAttempts) bestAttempts = attempts;
+    document.getElementById('endTitle').textContent = 'Ring Cleared!';
+    document.getElementById('endLine').innerHTML = 'You cleared all ten slices in <span class="stat">' + attempts + '</span> throw' + (attempts===1?'':'s') + '.';
+    document.getElementById('bestLine2').textContent = 'best: ' + bestAttempts + ' throw' + (bestAttempts===1?'':'s');
+    document.getElementById('endOverlay').classList.remove('hide');
+  }
+
+  /* ---- input: slingshot drag ---- */
+  var MAX_PULL = 130, POWER_SCALE = 5.2, MAX_SPEED = 640;
+
+  canvas.addEventListener('pointerdown', function(e){
+    if (state !== 'aiming' || stone.state !== 'settled') return;
+    var r = canvas.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    var d = Math.hypot(x-stone.x, y-stone.y);
+    if (d < stone.r + 30){
+      dragging = true;
+      dragOrigin = { x: stone.x, y: stone.y };
+      dragCurrent = { x:x, y:y };
+      try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
+    }
+  });
+  canvas.addEventListener('pointermove', function(e){
+    if (!dragging) return;
+    var r = canvas.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    var dx = x - dragOrigin.x, dy = y - dragOrigin.y;
+    var dist = Math.hypot(dx,dy);
+    if (dist > MAX_PULL){ dx = dx/dist*MAX_PULL; dy = dy/dist*MAX_PULL; }
+    dragCurrent = { x: dragOrigin.x + dx, y: dragOrigin.y + dy };
+  });
+  function releaseAim(){
+    if (!dragging) return;
+    dragging = false;
+    var dx = dragCurrent.x - dragOrigin.x, dy = dragCurrent.y - dragOrigin.y;
+    var dist = Math.hypot(dx,dy);
+    if (dist < 14) return; // too small, cancel, no attempt counted
+    var vx = -dx * POWER_SCALE, vy = -dy * POWER_SCALE;
+    var speed = Math.hypot(vx,vy);
+    if (speed > MAX_SPEED){ vx = vx/speed*MAX_SPEED; vy = vy/speed*MAX_SPEED; }
+    stone.vx = vx; stone.vy = vy; stone.state = 'moving';
+    attempts++;
+    document.getElementById('attemptsPill').textContent = 'throws: ' + attempts;
+    document.getElementById('message').textContent = '';
+    whoosh(0.3 + Math.min(0.3, speed/2000));
+    state = 'flying';
+  }
+  canvas.addEventListener('pointerup', releaseAim);
+  canvas.addEventListener('pointercancel', releaseAim);
+
+  document.getElementById('startBtn').addEventListener('click', function(){
+    audioStarted = true; ensureCtx(); if (!muted) startAmbience();
+    tone(500, 0.08, 'square', 0.06);
+    document.getElementById('startOverlay').classList.add('hide');
+  });
+  document.getElementById('againBtn').addEventListener('click', function(){
+    tone(500, 0.08, 'square', 0.06);
+    document.getElementById('endOverlay').classList.add('hide');
+    resetGame();
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    tone(400, 0.08, 'square', 0.06);
+    resetGame();
+  });
+
+  /* ---- physics ---- */
+  function moveEntity(e, dt){
+    e.vx *= Math.pow(0.985, dt*60);
+    e.vy *= Math.pow(0.985, dt*60);
+    e.x += e.vx*dt; e.y += e.vy*dt;
+    if (e.x < e.r){ e.x = e.r; e.vx *= -0.7; }
+    if (e.x > W-e.r){ e.x = W-e.r; e.vx *= -0.7; }
+    if (e.y < e.r){ e.y = e.r; e.vy *= -0.7; }
+    if (e.y > H-e.r){ e.y = H-e.r; e.vy *= -0.7; }
+  }
+  function speedOf(e){ return Math.hypot(e.vx, e.vy); }
+
+  function resolveCollision(a, b, now){
+    var dx = b.x-a.x, dy = b.y-a.y;
+    var dist = Math.hypot(dx,dy) || 0.001;
+    var minDist = a.r + b.r;
+    if (dist >= minDist) return;
+    var overlap = (minDist-dist)/2;
+    var nx = dx/dist, ny = dy/dist;
+    a.x -= nx*overlap; a.y -= ny*overlap;
+    b.x += nx*overlap; b.y += ny*overlap;
+    var rvx = b.vx-a.vx, rvy = b.vy-a.vy;
+    var velAlongNormal = rvx*nx + rvy*ny;
+    if (velAlongNormal > 0) return;
+    var restitution = 0.88;
+    var impulse = -(1+restitution)*velAlongNormal/2;
+    a.vx -= impulse*nx; a.vy -= impulse*ny;
+    b.vx += impulse*nx; b.vy += impulse*ny;
+    if (now - lastClack > 45){ lastClack = now; clack(); }
+  }
+
+  function drawPieChart(){
+    var cx = boardCenter.x, cy = boardCenter.y, r = boardRadius*0.9;
+    var sliceAngle = (Math.PI*2)/10;
+    for (var i=0;i<10;i++){
+      var startA = i*sliceAngle - Math.PI/2;
+      ctx.beginPath();
+      ctx.moveTo(cx,cy);
+      ctx.arc(cx,cy,r,startA,startA+sliceAngle);
+      ctx.closePath();
+      ctx.globalAlpha = pieces[i] && pieces[i].out ? 0.08 : 0.28;
+      ctx.fillStyle = sliceColors[i];
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  var last = performance.now();
+  function loop(now){
+    requestAnimationFrame(loop);
+    var dt = Math.min(0.033, (now-last)/1000);
+    last = now;
+
+    ctx.clearRect(0,0,W,H);
+
+    // board
+    drawPieChart();
+    ctx.beginPath();
+    ctx.arc(boardCenter.x, boardCenter.y, boardRadius, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(243,230,200,0.55)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    if (state === 'flying'){
+      moveEntity(stone, dt);
+      pieces.forEach(function(p){ if (!p.out) moveEntity(p, dt); });
+
+      var actives = pieces.filter(function(p){ return !p.out; });
+      for (var i=0;i<actives.length;i++){
+        resolveCollision(stone, actives[i], now);
+        for (var j=i+1;j<actives.length;j++){ resolveCollision(actives[i], actives[j], now); }
+      }
+
+      pieces.forEach(function(p){
+        if (p.out) return;
+        var d = Math.hypot(p.x-boardCenter.x, p.y-boardCenter.y);
+        if (d > boardRadius + p.r*0.4){
+          p.out = true; p.outT = 0;
+          cleared++;
+          chime();
+          document.getElementById('remainingPill').textContent = (10-cleared) + ' left';
+        }
+      });
+
+      var allSlow = speedOf(stone) < 6 && actives.every(function(p){ return speedOf(p) < 6; });
+      if (cleared >= 10){
+        state = 'won';
+        setTimeout(endGame, 250);
+      } else if (allSlow){
+        stone.vx = 0; stone.vy = 0;
+        var lp = launchPos();
+        stone.x = lp.x; stone.y = lp.y;
+        stone.state = 'settled';
+        state = 'aiming';
+        document.getElementById('message').textContent = 'pull back the stone and let go to throw';
+      }
+    }
+
+    // fading out-pieces
+    pieces.forEach(function(p){
+      if (p.out){
+        p.outT += dt;
+        p.x += p.vx*dt*0.4; p.y += p.vy*dt*0.4;
+      }
+      var alpha = p.out ? Math.max(0, 1 - p.outT*1.6) : 1;
+      if (alpha <= 0) return;
+      ctx.globalAlpha = alpha;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+
+    // stone
+    ctx.beginPath();
+    ctx.arc(stone.x, stone.y, stone.r, 0, Math.PI*2);
+    var sg = ctx.createRadialGradient(stone.x-4, stone.y-4, 1, stone.x, stone.y, stone.r);
+    sg.addColorStop(0, '#5A5A5A'); sg.addColorStop(1, '#1C1C1C');
+    ctx.fillStyle = sg;
+    ctx.fill();
+
+    // aim line
+    if (dragging){
+      ctx.save();
+      ctx.setLineDash([6,6]);
+      ctx.strokeStyle = 'rgba(255,200,87,0.8)';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(dragOrigin.x, dragOrigin.y);
+      ctx.lineTo(dragCurrent.x, dragCurrent.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // arrow in launch direction (opposite pull)
+      var lx = dragOrigin.x - (dragCurrent.x-dragOrigin.x);
+      var ly = dragOrigin.y - (dragCurrent.y-dragOrigin.y);
+      ctx.strokeStyle = '#FFC857';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(dragOrigin.x, dragOrigin.y);
+      ctx.lineTo(lx, ly);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  resetGame();
+  updateBestLine();
+  requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

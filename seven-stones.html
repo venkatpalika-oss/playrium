@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Seven Stones</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #E8DCC3;
+    --paper-dark: #D8C9A8;
+    --ink: #2B2620;
+    --coral: #FF6B5E;
+    --sky: #3E9DC9;
+    --chalk-yellow: #E8B93E;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family:'Patrick Hand', cursive;
+    overflow:hidden;
+    background-image: radial-gradient(circle, rgba(43,38,32,0.06) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .wrap{ position:relative; width:100%; height:100vh; }
+
+  canvas{ display:block; width:100%; height:100%; touch-action:none; }
+
+  .hud{
+    position:absolute; top:18px; left:0; right:0;
+    display:flex; justify-content:center; gap:14px;
+    pointer-events:none;
+  }
+  .hud-pill{
+    background:#fff;
+    border:3px solid var(--ink);
+    border-radius:14px;
+    padding:8px 18px;
+    font-family:'Kalam', cursive;
+    font-weight:700;
+    font-size:18px;
+    transform:rotate(-1.5deg);
+  }
+  .hud-pill.timer{ transform:rotate(1.5deg); color:var(--coral); }
+  .hud-pill.timer.low{ color:#c22; animation:pulse .4s infinite; }
+  @keyframes pulse{ 0%,100%{ transform:rotate(1.5deg) scale(1);} 50%{ transform:rotate(1.5deg) scale(1.08);} }
+
+  .title-bar{
+    position:absolute; top:18px; left:18px;
+    font-family:'Kalam', cursive; font-weight:700; font-size:20px;
+    color: var(--ink);
+    pointer-events:none;
+  }
+
+  .message{
+    position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
+    font-family:'Kalam', cursive; font-size:16px;
+    background:#fff; border:2px dashed var(--ink); border-radius:12px;
+    padding:8px 18px; text-align:center; max-width:86vw;
+    pointer-events:none;
+  }
+
+  .overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(232,220,195,0.97);
+    text-align:center; padding:24px;
+    flex-direction:column; gap:16px;
+  }
+  .overlay.hide{ display:none; }
+  .overlay h1{
+    font-family:'Kalam', cursive; font-weight:700;
+    font-size: clamp(34px, 8vw, 62px);
+    margin:0;
+    color:var(--ink);
+    transform:rotate(-1.5deg);
+  }
+  .overlay h1 span{ color:var(--coral); }
+  .overlay p{ max-width:420px; font-size:17px; line-height:1.5; margin:0; }
+  .overlay .stat{ font-family:'Kalam', cursive; font-weight:700; font-size:20px; color:var(--sky); }
+  .overlay button{
+    font-family:'Kalam', cursive; font-weight:700; font-size:18px;
+    background: var(--coral); color:#fff;
+    border:3px solid var(--ink); border-radius:14px;
+    padding:12px 28px; cursor:pointer;
+    box-shadow: 4px 4px 0 var(--ink);
+    transition: transform .1s ease, box-shadow .1s ease;
+  }
+  .overlay button:hover{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink); }
+  .overlay .best{ font-size:13px; color:#6b6656; }
+
+  .sound-toggle{
+    position:absolute; top:18px; right:18px; z-index:100;
+    background:#fff; border:3px solid var(--ink); border-radius:14px;
+    font-family:'Kalam', cursive; font-weight:700; font-size:14px;
+    padding:7px 14px; cursor:pointer; transform:rotate(-1.5deg);
+  }
+  .sound-toggle:hover{ background:var(--chalk-yellow); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-bar">Seven Stones</div>
+  <div class="hud">
+    <div class="hud-pill" id="stackCount">0 / 7 stacked</div>
+    <div class="hud-pill timer" id="timerDisplay">20.0</div>
+  </div>
+  <button class="sound-toggle" id="soundToggle">sound: on</button>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="message" id="message">tap the ball to throw it at the stack</div>
+
+  <div class="overlay" id="startOverlay">
+    <h1>Seven <span>Stones</span></h1>
+    <p>Knock the stack down, then race the clock — drag each stone back into the circle, one at a time, before time runs out.</p>
+    <div class="best" id="bestLine">no attempts yet</div>
+    <button id="startBtn">Throw the ball</button>
+  </div>
+
+  <div class="overlay hide" id="endOverlay">
+    <h1 id="endTitle">Time's Up</h1>
+    <p id="endLine"></p>
+    <div class="best" id="bestLine2"></div>
+    <button id="againBtn">Try again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- audio ---- */
+  var muted = false, audioCtx = null, audioStarted = false, ambience = null;
+  function ensureCtx(){ if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+  function tone(freq, dur, type, vol, delay){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx(); var t0 = ctx.currentTime + (delay||0);
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'sine'; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol||0.12, t0+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }catch(e){}
+  }
+  function click(freq){ tone(freq||500, 0.06, 'square', 0.06); }
+  function thud(){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx();
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sine'; o.frequency.setValueAtTime(170, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(55, ctx.currentTime+0.15);
+      g.gain.setValueAtTime(0.16, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.18);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.2);
+    }catch(e){}
+  }
+  function whoosh(dur){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx();
+      dur = dur || 0.4;
+      var size = Math.floor(ctx.sampleRate*dur);
+      var buf = ctx.createBuffer(1, size, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i=0;i<size;i++){ data[i] = Math.random()*2-1; }
+      var noise = ctx.createBufferSource(); noise.buffer = buf;
+      var filter = ctx.createBiquadFilter();
+      filter.type='bandpass';
+      filter.frequency.setValueAtTime(300, ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(1400, ctx.currentTime+dur*0.7);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0.2, ctx.currentTime+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+      noise.connect(filter); filter.connect(g); g.connect(ctx.destination);
+      noise.start(); noise.stop(ctx.currentTime+dur+0.05);
+    }catch(e){}
+  }
+  function crash(){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx();
+      var size = Math.floor(ctx.sampleRate*0.3);
+      var buf = ctx.createBuffer(1, size, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i=0;i<size;i++){ data[i] = (Math.random()*2-1) * (1 - i/size); }
+      var noise = ctx.createBufferSource(); noise.buffer = buf;
+      var filter = ctx.createBiquadFilter();
+      filter.type='highpass'; filter.frequency.value = 800;
+      var g = ctx.createGain(); g.gain.value = 0.22;
+      noise.connect(filter); filter.connect(g); g.connect(ctx.destination);
+      noise.start();
+    }catch(e){}
+  }
+  function chime(notes){
+    if (muted) return;
+    (notes||[523.25,659.25,783.99,1046.5]).forEach(function(f,i){ tone(f, 0.3, 'triangle', 0.11, i*0.1); });
+  }
+  function buzz(){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx();
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sawtooth'; o.frequency.setValueAtTime(110, ctx.currentTime);
+      o.frequency.linearRampToValueAtTime(70, ctx.currentTime+0.3);
+      g.gain.setValueAtTime(0.08, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.32);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.34);
+    }catch(e){}
+  }
+  function tick(){ tone(900, 0.05, 'square', 0.05); }
+  function startAmbience(){
+    if (muted || ambience) return;
+    try{
+      var ctx = ensureCtx();
+      var master = ctx.createGain();
+      master.gain.setValueAtTime(0, ctx.currentTime);
+      master.gain.linearRampToValueAtTime(0.028, ctx.currentTime+2);
+      master.connect(ctx.destination);
+      var oscs = [];
+      [196.00, 246.94, 293.66].forEach(function(f,i){
+        var o = ctx.createOscillator(), og = ctx.createGain();
+        o.type='sine'; o.frequency.value=f; og.gain.value=0.4;
+        o.connect(og); og.connect(master); o.start(); oscs.push(o);
+      });
+      var lfo = ctx.createOscillator(), lfoGain = ctx.createGain();
+      lfo.frequency.value=0.12; lfoGain.gain.value=0.012;
+      lfo.connect(lfoGain); lfoGain.connect(master.gain); lfo.start();
+      ambience = { master:master, oscs:oscs, lfo:lfo };
+    }catch(e){}
+  }
+  function stopAmbience(){
+    if (!ambience || !audioCtx) return;
+    var a = ambience;
+    a.master.gain.linearRampToValueAtTime(0, audioCtx.currentTime+0.5);
+    setTimeout(function(){ a.oscs.forEach(function(o){ try{o.stop();}catch(e){} }); try{a.lfo.stop();}catch(e){} }, 600);
+    ambience = null;
+  }
+  var soundBtn = document.getElementById('soundToggle');
+  soundBtn.addEventListener('click', function(){
+    muted = !muted;
+    soundBtn.textContent = muted ? 'sound: off' : 'sound: on';
+    if (muted) stopAmbience(); else if (audioStarted) startAmbience();
+  });
+  function firstGesture(){
+    audioStarted = true; ensureCtx();
+    if (!muted) startAmbience();
+    window.removeEventListener('pointerdown', firstGesture);
+    window.removeEventListener('keydown', firstGesture);
+  }
+  window.addEventListener('pointerdown', firstGesture, { once:true });
+  window.addEventListener('keydown', firstGesture, { once:true });
+
+  /* ---- game ---- */
+
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var W = 0, H = 0, DPR = window.devicePixelRatio || 1;
+
+  function resize(){
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var STONE_COLORS = ['#B9AE8F','#C9BFA0','#A79A78','#DCD3B8','#9C9178','#CBBE9C','#B0A585'];
+  var GAME_DURATION = 20; // seconds
+  var stones = [];
+  var ball = null;
+  var state = 'idle'; // idle | thrown | scattering | active | won | lost
+  var timerStart = 0;
+  var stackedCount = 0;
+  var lastTickSecond = -1;
+  var bestTime = null;
+
+  function groundY(){ return H * 0.82; }
+  function stackBaseX(){ return W * 0.5; }
+
+  function wobblyOval(cx, cy, rx, ry, seed){
+    // slightly irregular hand-drawn-looking stone outline
+    var pts = 10;
+    ctx.beginPath();
+    for (var i=0;i<=pts;i++){
+      var a = (i/pts) * Math.PI * 2;
+      var jitter = 1 + Math.sin(a*3 + seed) * 0.06;
+      var x = cx + Math.cos(a) * rx * jitter;
+      var y = cy + Math.sin(a) * ry * jitter;
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+  }
+
+  function makeStones(){
+    stones = [];
+    for (var i=0;i<7;i++){
+      stones.push({
+        id: i,
+        x: stackBaseX(),
+        y: groundY() - 16 - i*15,
+        vx: 0, vy: 0,
+        rx: 30 - i*0.3, ry: 13,
+        color: STONE_COLORS[i],
+        seed: Math.random()*10,
+        state: 'stacked', // stacked | scattering | settled | returning
+        targetX: 0, targetY: 0
+      });
+    }
+  }
+
+  function makeBall(){
+    ball = { x: W*0.15, y: groundY()-20, r: 16, state:'idle', t:0, fromX:0, fromY:0 };
+  }
+
+  function resetGame(){
+    makeStones();
+    makeBall();
+    state = 'idle';
+    stackedCount = 0;
+    document.getElementById('stackCount').textContent = '0 / 7 stacked';
+    document.getElementById('timerDisplay').textContent = GAME_DURATION.toFixed(1);
+    document.getElementById('timerDisplay').classList.remove('low');
+    document.getElementById('message').textContent = 'tap the ball to throw it at the stack';
+  }
+
+  function throwBall(){
+    if (state !== 'idle') return;
+    ball.state = 'flying';
+    ball.t = 0;
+    ball.fromX = ball.x; ball.fromY = ball.y;
+    state = 'thrown';
+    whoosh(0.4);
+    document.getElementById('message').textContent = 'here it comes...';
+  }
+
+  function scatterStack(){
+    state = 'scattering';
+    timerStart = performance.now();
+    crash();
+    document.getElementById('message').textContent = 'drag each stone into the circle, one at a time!';
+    stones.forEach(function(s){
+      var angle = Math.random() * Math.PI * 2;
+      var speed = 140 + Math.random()*160;
+      s.state = 'scattering';
+      s.vx = Math.cos(angle) * speed;
+      s.vy = -Math.abs(Math.sin(angle)) * speed * 0.8 - 80;
+    });
+  }
+
+  var dragTarget = null, dragOffX = 0, dragOffY = 0;
+
+  function completePlacement(s){
+    click(420 + stackedCount*20);
+    var idx = stackedCount;
+    s.state = 'returning';
+    s.fromX = s.x; s.fromY = s.y;
+    s.t = 0;
+    s.targetX = stackBaseX();
+    s.targetY = groundY() - 16 - idx*15;
+    stackedCount++;
+    document.getElementById('stackCount').textContent = stackedCount + ' / 7 stacked';
+    if (stackedCount >= 7){
+      setTimeout(function(){ endGame(true); }, 380);
+    }
+  }
+
+  function endGame(won){
+    var elapsed = (performance.now() - timerStart) / 1000;
+    if (won){
+      state = 'won';
+      chime();
+      if (bestTime === null || elapsed < bestTime){ bestTime = elapsed; }
+      document.getElementById('endTitle').innerHTML = 'Stack <span style="color:#3E9DC9">Rebuilt!</span>';
+      document.getElementById('endLine').textContent = 'All seven stones back in ' + elapsed.toFixed(1) + 's.';
+      document.getElementById('bestLine2').textContent = 'best time: ' + bestTime.toFixed(1) + 's';
+    } else {
+      state = 'lost';
+      buzz();
+      document.getElementById('endTitle').textContent = "Time's Up";
+      document.getElementById('endLine').textContent = 'You got ' + stackedCount + ' of 7 stones back on the pile.';
+      document.getElementById('bestLine2').textContent = bestTime === null ? 'no successful rebuild yet' : ('best time: ' + bestTime.toFixed(1) + 's');
+    }
+    document.getElementById('endOverlay').classList.remove('hide');
+  }
+
+  function pointInStone(s, x, y){
+    var dx = (x - s.x) / s.rx, dy = (y - s.y) / s.ry;
+    return dx*dx + dy*dy <= 1.15;
+  }
+
+  function dropZoneBounds(){
+    // tall enough to contain all 7 stacked stones plus a little breathing room
+    var cx = stackBaseX();
+    var top = groundY() - 16 - 6*15 - 20; // above the topmost (7th) stone slot
+    var bottom = groundY() + 12;
+    return { cx: cx, top: top, bottom: bottom, halfWidth: 42 };
+  }
+
+  function inDropZone(x, y){
+    var z = dropZoneBounds();
+    return Math.abs(x - z.cx) < z.halfWidth && y > z.top && y < z.bottom;
+  }
+
+  function roundRectPath(x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.arcTo(x+w, y, x+w, y+r, r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+    ctx.lineTo(x+r, y+h);
+    ctx.arcTo(x, y+h, x, y+h-r, r);
+    ctx.lineTo(x, y+r);
+    ctx.arcTo(x, y, x+r, y, r);
+    ctx.closePath();
+  }
+
+  canvas.addEventListener('pointerdown', function(e){
+    var r = canvas.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+
+    if (state === 'idle'){
+      var d = Math.hypot(x-ball.x, y-ball.y);
+      if (d < ball.r + 14) throwBall();
+      return;
+    }
+    if (state === 'scattering'){
+      for (var i=stones.length-1;i>=0;i--){
+        if (stones[i].state === 'settled' && pointInStone(stones[i], x, y)){
+          dragTarget = stones[i];
+          dragTarget.state = 'dragging';
+          dragOffX = x - dragTarget.x;
+          dragOffY = y - dragTarget.y;
+          try{ canvas.setPointerCapture(e.pointerId); }catch(err){}
+          break;
+        }
+      }
+    }
+  });
+
+  canvas.addEventListener('pointermove', function(e){
+    if (!dragTarget) return;
+    var r = canvas.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    dragTarget.x = x - dragOffX;
+    dragTarget.y = y - dragOffY;
+  });
+
+  function releaseDrag(){
+    if (!dragTarget) return;
+    var s = dragTarget;
+    dragTarget = null;
+    if (inDropZone(s.x, s.y)){
+      completePlacement(s);
+    } else {
+      s.state = 'settled';
+      s.y = Math.min(s.y, groundY() - s.ry);
+    }
+  }
+  canvas.addEventListener('pointerup', releaseDrag);
+  canvas.addEventListener('pointercancel', releaseDrag);
+
+  document.getElementById('startBtn').addEventListener('click', function(){
+    audioStarted = true;
+    ensureCtx();
+    if (!muted) startAmbience();
+    click(400);
+    document.getElementById('startOverlay').classList.add('hide');
+  });
+  document.getElementById('againBtn').addEventListener('click', function(){
+    click(400);
+    document.getElementById('endOverlay').classList.add('hide');
+    resetGame();
+  });
+
+  function updateBestLine(){
+    document.getElementById('bestLine').textContent = bestTime === null ? 'no attempts yet' : ('best time: ' + bestTime.toFixed(1) + 's');
+  }
+
+  var last = performance.now();
+  function loop(now){
+    requestAnimationFrame(loop);
+    var dt = Math.min(0.05, (now-last)/1000);
+    last = now;
+
+    ctx.clearRect(0,0,W,H);
+
+    // ground
+    ctx.strokeStyle = 'rgba(43,38,32,0.5)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([2,10]);
+    ctx.beginPath();
+    ctx.moveTo(0, groundY()+18);
+    ctx.lineTo(W, groundY()+18);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // drop zone marker
+    if (state === 'scattering'){
+      var zone = dropZoneBounds();
+      ctx.save();
+      ctx.strokeStyle = dragTarget ? '#3E9DC9' : 'rgba(43,38,32,0.35)';
+      ctx.lineWidth = dragTarget ? 3 : 2;
+      ctx.setLineDash([5,7]);
+      roundRectPath(zone.cx - zone.halfWidth, zone.top, zone.halfWidth*2, zone.bottom - zone.top, zone.halfWidth);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    // timer update
+    if (state === 'scattering'){
+      var elapsed = (now - timerStart) / 1000;
+      var remaining = Math.max(0, GAME_DURATION - elapsed);
+      var td = document.getElementById('timerDisplay');
+      td.textContent = remaining.toFixed(1);
+      td.classList.toggle('low', remaining < 5);
+      if (remaining < 5 && remaining > 0){
+        var sec = Math.ceil(remaining);
+        if (sec !== lastTickSecond){ lastTickSecond = sec; tick(); }
+      }
+      if (remaining <= 0){
+        endGame(false);
+      }
+    }
+
+    // ball
+    if (ball.state === 'flying'){
+      ball.t += dt / 0.45;
+      if (ball.t >= 1){
+        ball.t = 1;
+        ball.x = stackBaseX();
+        ball.y = groundY() - 60;
+        ball.state = 'done';
+        scatterStack();
+      } else {
+        ball.x = ball.fromX + (stackBaseX() - ball.fromX) * ball.t;
+        var arc = Math.sin(ball.t * Math.PI) * -70;
+        ball.y = ball.fromY + (groundY()-60 - ball.fromY) * ball.t + arc;
+      }
+    }
+    if (ball.state === 'idle' || ball.state === 'done'){
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+      ctx.fillStyle = '#E8B93E';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#2B2620';
+      ctx.stroke();
+    } else if (ball.state === 'flying'){
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+      ctx.fillStyle = '#E8B93E';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#2B2620';
+      ctx.stroke();
+    }
+
+    // stones
+    stones.forEach(function(s){
+      if (s.state === 'scattering'){
+        s.vy += 480 * dt;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        if (s.y + s.ry > groundY()){
+          var impactSpeed = s.vy;
+          s.y = groundY() - s.ry;
+          s.vy *= -0.35;
+          s.vx *= 0.7;
+          if (impactSpeed > 60) thud();
+          if (Math.abs(s.vy) < 30 && Math.abs(s.vx) < 15){
+            s.state = 'settled';
+          }
+        }
+        if (s.x < s.rx){ s.x = s.rx; s.vx *= -0.5; }
+        if (s.x > W-s.rx){ s.x = W-s.rx; s.vx *= -0.5; }
+      } else if (s.state === 'returning'){
+        s.t += dt / 0.35;
+        if (s.t >= 1){
+          s.t = 1;
+          s.x = s.targetX; s.y = s.targetY;
+          s.state = 'stacked';
+          thud();
+        } else {
+          var ease = 1 - Math.pow(1-s.t, 3);
+          s.x = s.fromX + (s.targetX - s.fromX) * ease;
+          s.y = s.fromY + (s.targetY - s.fromY) * ease - Math.sin(s.t*Math.PI)*40;
+        }
+      }
+
+      ctx.save();
+      wobblyOval(s.x, s.y+3, s.rx, s.ry, s.seed);
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';
+      ctx.fill();
+      ctx.restore();
+
+      wobblyOval(s.x, s.y, s.rx, s.ry, s.seed);
+      ctx.fillStyle = s.color;
+      ctx.fill();
+      ctx.lineWidth = 2.6;
+      ctx.strokeStyle = '#2B2620';
+      ctx.stroke();
+    });
+  }
+
+  resetGame();
+  updateBestLine();
+  requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>

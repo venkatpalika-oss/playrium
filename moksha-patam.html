@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Moksha Patam</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Mukta:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment: #E8D9B5;
+    --parchment-dark: #D4BE8C;
+    --maroon: #7A1F2B;
+    --gold: #B8860A;
+    --ink: #3A2A15;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+  body{
+    background: radial-gradient(circle at 50% 20%, var(--parchment), var(--parchment-dark) 80%);
+    color: var(--ink);
+    font-family:'Mukta', sans-serif;
+    overflow:hidden;
+  }
+  .wrap{ position:relative; width:100%; height:100vh; }
+  canvas{ display:block; width:100%; height:100%; }
+
+  .title-bar{
+    position:absolute; top:14px; left:18px;
+    font-family:'Cinzel', serif; font-weight:700; font-size:22px;
+    color: var(--maroon);
+    pointer-events:none;
+  }
+  .hud{
+    position:absolute; top:16px; right:18px;
+    display:flex; gap:10px;
+    pointer-events:none;
+  }
+  .hud-pill{
+    background: rgba(122,31,43,0.1);
+    border:1.5px solid var(--maroon);
+    border-radius:20px;
+    padding:6px 14px;
+    font-family:'Cinzel', serif; font-weight:500; font-size:12.5px;
+    color: var(--maroon);
+  }
+
+  .bottom-panel{
+    position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+    display:flex; align-items:center; gap:16px;
+    background: rgba(232,217,181,0.9);
+    border:1.5px solid var(--gold);
+    border-radius:16px;
+    padding:12px 20px;
+  }
+  .dice{
+    width:44px; height:44px; background:#FFF8E8; border:2px solid var(--ink);
+    border-radius:8px; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
+    padding:5px; gap:1px;
+  }
+  .dice .dot{ border-radius:50%; background:transparent; }
+  .dice .dot.on{ background: var(--maroon); }
+  .roll-btn{
+    font-family:'Cinzel', serif; font-weight:700; font-size:14px;
+    background: var(--maroon); color:#FFF8E8;
+    border:none; border-radius:12px;
+    padding:11px 22px; cursor:pointer;
+  }
+  .roll-btn:disabled{ opacity:0.5; cursor:default; }
+
+  .message{
+    position:absolute; top:56px; left:50%; transform:translateX(-50%);
+    font-family:'Mukta', sans-serif; font-weight:600; font-size:13.5px;
+    background: rgba(232,217,181,0.92);
+    border:1px solid var(--gold);
+    border-radius:12px; padding:8px 18px;
+    text-align:center; max-width:86vw;
+    color: var(--maroon);
+    min-height: 18px;
+  }
+
+  .overlay{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(35,20,10,0.92);
+    text-align:center; padding:24px;
+    flex-direction:column; gap:16px;
+  }
+  .overlay.hide{ display:none; }
+  .overlay h1{
+    font-family:'Cinzel', serif; font-weight:700;
+    font-size: clamp(28px, 7vw, 48px);
+    margin:0; color: var(--gold);
+  }
+  .overlay p{ max-width:440px; font-size:15px; line-height:1.65; margin:0; color:#F3E7CC; }
+  .overlay .stat{ font-family:'Cinzel', serif; font-weight:700; font-size:18px; color:#E0B84A; }
+  .overlay button{
+    font-family:'Cinzel', serif; font-weight:700; font-size:16px;
+    background: var(--gold); color:#3A2A15;
+    border:none; border-radius:14px;
+    padding:12px 28px; cursor:pointer;
+  }
+  .overlay .best{ font-size:12.5px; color:#c9b489; }
+
+  .sound-toggle{
+    position:absolute; bottom:18px; left:18px;
+    background: rgba(122,31,43,0.1); border:1.5px solid var(--maroon);
+    color: var(--maroon);
+    border-radius:20px; font-family:'Mukta', sans-serif; font-weight:600; font-size:12px;
+    padding:8px 16px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-bar">Moksha Patam</div>
+  <div class="hud">
+    <div class="hud-pill" id="rollsPill">rolls: 0</div>
+    <div class="hud-pill" id="bestPill">best: —</div>
+  </div>
+  <button class="sound-toggle" id="soundToggle">sound: on</button>
+
+  <canvas id="canvas"></canvas>
+
+  <div class="message" id="message">roll the dice to begin your journey toward moksha</div>
+
+  <div class="bottom-panel">
+    <div class="dice" id="dice">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    </div>
+    <button class="roll-btn" id="rollBtn">Roll Dice</button>
+  </div>
+
+  <div class="overlay" id="startOverlay">
+    <h1>Moksha Patam</h1>
+    <p>The original game behind Snakes &amp; Ladders. Climb ladders of virtue — Faith, Generosity, Knowledge — and beware serpents of vice — Greed, Pride, Vanity — on your journey from square 1 to square 100, liberation itself.</p>
+    <div class="best" id="bestLine">no journeys completed yet</div>
+    <button id="startBtn">Begin</button>
+  </div>
+
+  <div class="overlay hide" id="endOverlay">
+    <h1>Moksha Reached</h1>
+    <p id="endLine"></p>
+    <div class="best" id="bestLine2"></div>
+    <button id="againBtn">Play again</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- audio ---- */
+  var muted = false, audioCtx = null, audioStarted = false, ambienceTimer = null;
+  function ensureCtx(){ if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); if (audioCtx.state==='suspended') audioCtx.resume(); return audioCtx; }
+  function tone(freq, dur, type, vol, delay){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx(); var t0 = ctx.currentTime + (delay||0);
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'sine'; o.frequency.setValueAtTime(freq, t0);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol||0.12, t0+0.01);
+      g.gain.exponentialRampToValueAtTime(0.001, t0+dur);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0+dur+0.02);
+    }catch(e){}
+  }
+  function hopSound(){ tone(500+Math.random()*100, 0.06, 'square', 0.06); }
+  function ladderSound(){ tone(700, 0.35, 'triangle', 0.1); tone(900, 0.3, 'triangle', 0.08, 0.1); }
+  function snakeSound(){
+    if (muted) return;
+    try{
+      var ctx = ensureCtx();
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type='sawtooth'; o.frequency.setValueAtTime(400, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(90, ctx.currentTime+0.5);
+      g.gain.setValueAtTime(0.1, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.55);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime+0.56);
+    }catch(e){}
+  }
+  function fanfare(){ [523.25,659.25,783.99,1046.5,1318.5].forEach(function(f,i){ tone(f, 0.35, 'triangle', 0.12, i*0.1); }); }
+  var raga = [261.63, 293.66, 349.23, 392.00, 440.00, 466.16];
+  function startAmbience(){
+    if (muted || ambienceTimer) return;
+    ambienceTimer = setInterval(function(){
+      tone(raga[Math.floor(Math.random()*raga.length)], 1.0, 'sine', 0.02);
+    }, 1300);
+  }
+  function stopAmbience(){ if (ambienceTimer){ clearInterval(ambienceTimer); ambienceTimer=null; } }
+  var soundBtn = document.getElementById('soundToggle');
+  soundBtn.addEventListener('click', function(){
+    muted = !muted;
+    soundBtn.textContent = muted ? 'sound: off' : 'sound: on';
+    if (muted) stopAmbience(); else if (audioStarted) startAmbience();
+  });
+  function firstGesture(){
+    audioStarted = true; ensureCtx();
+    if (!muted) startAmbience();
+    window.removeEventListener('pointerdown', firstGesture);
+    window.removeEventListener('keydown', firstGesture);
+  }
+  window.addEventListener('pointerdown', firstGesture, { once:true });
+  window.addEventListener('keydown', firstGesture, { once:true });
+
+  /* ---- setup ---- */
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var W=0,H=0,DPR=window.devicePixelRatio||1;
+  var boardX=0, boardY=0, boardSize=0, cell=0;
+  function resize(){
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = W*DPR; canvas.height = H*DPR;
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+    var top = 92, bottom = H-96;
+    boardSize = Math.min(W*0.92, bottom-top);
+    boardX = (W-boardSize)/2;
+    boardY = top;
+    cell = boardSize/10;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  var ladders = [
+    { from:4, to:25, name:'Faith' },
+    { from:13, to:46, name:'Reliability' },
+    { from:33, to:49, name:'Generosity' },
+    { from:42, to:63, name:'Knowledge' },
+    { from:50, to:69, name:'Self-Control' },
+    { from:62, to:81, name:'Compassion' },
+    { from:74, to:92, name:'Asceticism' }
+  ];
+  var snakes = [
+    { from:27, to:5, name:'Disobedience' },
+    { from:40, to:3, name:'Vanity' },
+    { from:43, to:18, name:'Vulgarity' },
+    { from:54, to:34, name:'Alcoholism' },
+    { from:66, to:45, name:'Pride' },
+    { from:76, to:58, name:'Theft' },
+    { from:89, to:68, name:'Lust' },
+    { from:99, to:41, name:'Greed' }
+  ];
+  function findLadder(n){ return ladders.filter(function(l){ return l.from===n; })[0]; }
+  function findSnake(n){ return snakes.filter(function(s){ return s.from===n; })[0]; }
+
+  function squareXY(n){
+    var idx = n-1;
+    var row = Math.floor(idx/10);
+    var posInRow = idx%10;
+    var col = (row%2===0) ? posInRow : (9-posInRow);
+    var x = boardX + col*cell + cell/2;
+    var y = boardY + (9-row)*cell + cell/2;
+    return { x:x, y:y };
+  }
+
+  var current = 1, rolls = 0, best = null, animating = false, diceFace = 1;
+  var tokenPos = squareXY(1);
+  var slideAnim = null; // {fromXY, toXY, t, dur, kind}
+
+  var diceDots = {
+    1:[4], 2:[0,8], 3:[0,4,8], 4:[0,2,6,8], 5:[0,2,4,6,8], 6:[0,2,3,5,6,8]
+  };
+  function renderDice(face){
+    var dots = document.querySelectorAll('#dice .dot');
+    var on = diceDots[face];
+    dots.forEach(function(d,i){ d.classList.toggle('on', on.indexOf(i)!==-1); });
+  }
+  renderDice(1);
+
+  function resetGame(){
+    current = 1; rolls = 0; animating = false;
+    tokenPos = squareXY(1);
+    document.getElementById('rollsPill').textContent = 'rolls: 0';
+    document.getElementById('message').textContent = 'roll the dice to begin your journey toward moksha';
+    document.getElementById('rollBtn').disabled = false;
+  }
+
+  function rollDice(){
+    if (animating || current >= 100) return;
+    animating = true;
+    document.getElementById('rollBtn').disabled = true;
+    var rollFrames = 0;
+    var rollTimer = setInterval(function(){
+      diceFace = 1+Math.floor(Math.random()*6);
+      renderDice(diceFace);
+      rollFrames++;
+      if (rollFrames > 8){
+        clearInterval(rollTimer);
+        var result = 1+Math.floor(Math.random()*6);
+        diceFace = result;
+        renderDice(result);
+        rolls++;
+        document.getElementById('rollsPill').textContent = 'rolls: ' + rolls;
+        var target = Math.min(100, current+result);
+        var steps = [];
+        for (var s=current+1; s<=target; s++) steps.push(s);
+        if (steps.length === 0) steps.push(current);
+        stepThrough(steps, 0);
+      }
+    }, 70);
+  }
+
+  function stepThrough(steps, i){
+    if (i >= steps.length){
+      onArrive(steps[steps.length-1]);
+      return;
+    }
+    current = steps[i];
+    tokenPos = squareXY(current);
+    hopSound();
+    setTimeout(function(){ stepThrough(steps, i+1); }, 130);
+  }
+
+  function onArrive(sq){
+    var ladder = findLadder(sq);
+    var snake = findSnake(sq);
+    if (ladder){
+      document.getElementById('message').textContent = ladder.name + ' lifts you upward — climbing to ' + ladder.to + '.';
+      ladderSound();
+      slideAnim = { from: squareXY(sq), to: squareXY(ladder.to), t:0, dur:0.7, target: ladder.to };
+    } else if (snake){
+      document.getElementById('message').textContent = snake.name + ' brings you down — sliding to ' + snake.to + '.';
+      snakeSound();
+      slideAnim = { from: squareXY(sq), to: squareXY(snake.to), t:0, dur:0.7, target: snake.to };
+    } else {
+      finishTurn(sq);
+    }
+  }
+
+  function finishTurn(sq){
+    current = sq;
+    tokenPos = squareXY(sq);
+    animating = false;
+    document.getElementById('rollBtn').disabled = (current>=100);
+    if (current >= 100){
+      winGame();
+    } else if (!findLadder(sq) && !findSnake(sq)){
+      document.getElementById('message').textContent = 'square ' + sq + '. roll again.';
+    }
+  }
+
+  function winGame(){
+    fanfare();
+    if (best === null || rolls < best) best = rolls;
+    document.getElementById('endLine').innerHTML = 'You reached square 100 — moksha — in <span class="stat">' + rolls + '</span> roll' + (rolls===1?'':'s') + '.';
+    document.getElementById('bestLine2').textContent = 'best: ' + best + ' roll' + (best===1?'':'s');
+    document.getElementById('endOverlay').classList.remove('hide');
+  }
+
+  document.getElementById('rollBtn').addEventListener('click', rollDice);
+  document.getElementById('startBtn').addEventListener('click', function(){
+    audioStarted = true; ensureCtx(); if (!muted) startAmbience();
+    document.getElementById('startOverlay').classList.add('hide');
+  });
+  document.getElementById('againBtn').addEventListener('click', function(){
+    document.getElementById('endOverlay').classList.add('hide');
+    resetGame();
+  });
+
+  function drawBoard(){
+    // outer frame
+    ctx.fillStyle = '#FFF8E8';
+    ctx.fillRect(boardX-6, boardY-6, boardSize+12, boardSize+12);
+    ctx.strokeStyle = '#B8860A';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(boardX-6, boardY-6, boardSize+12, boardSize+12);
+
+    for (var n=1; n<=100; n++){
+      var pos = squareXY(n);
+      var row = Math.floor((n-1)/10);
+      var col = (row%2===0) ? (n-1)%10 : 9-((n-1)%10);
+      var isDark = (row+col)%2===0;
+      ctx.fillStyle = isDark ? '#E8D9B5' : '#F3E7CC';
+      ctx.fillRect(pos.x-cell/2, pos.y-cell/2, cell, cell);
+      ctx.strokeStyle = 'rgba(122,31,43,0.15)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(pos.x-cell/2, pos.y-cell/2, cell, cell);
+      ctx.fillStyle = 'rgba(58,42,21,0.55)';
+      ctx.font = Math.max(8, cell*0.24) + 'px Mukta, sans-serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText(n, pos.x-cell/2+3, pos.y-cell/2+2);
+    }
+
+    ladders.forEach(function(l){ drawLadder(squareXY(l.from), squareXY(l.to)); });
+    snakes.forEach(function(s){ drawSnake(squareXY(s.from), squareXY(s.to)); });
+  }
+
+  function drawLadder(a, b){
+    var dx = b.x-a.x, dy = b.y-a.y;
+    var len = Math.hypot(dx,dy);
+    var nx = -dy/len, ny = dx/len;
+    var railW = cell*0.16;
+    ctx.strokeStyle = '#8B5A2B'; ctx.lineWidth = Math.max(2, cell*0.07);
+    ctx.beginPath(); ctx.moveTo(a.x+nx*railW, a.y+ny*railW); ctx.lineTo(b.x+nx*railW, b.y+ny*railW); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(a.x-nx*railW, a.y-ny*railW); ctx.lineTo(b.x-nx*railW, b.y-ny*railW); ctx.stroke();
+    var rungs = Math.max(3, Math.floor(len/(cell*0.5)));
+    ctx.lineWidth = Math.max(1.5, cell*0.05);
+    for (var i=1;i<rungs;i++){
+      var t = i/rungs;
+      var rx = a.x+dx*t, ry = a.y+dy*t;
+      ctx.beginPath(); ctx.moveTo(rx+nx*railW, ry+ny*railW); ctx.lineTo(rx-nx*railW, ry-ny*railW); ctx.stroke();
+    }
+  }
+
+  function drawSnake(head, tail){
+    var dx = tail.x-head.x, dy = tail.y-head.y;
+    var len = Math.hypot(dx,dy);
+    var nx = -dy/len, ny = dx/len;
+    var segs = 10;
+    ctx.strokeStyle = '#4E7A3A';
+    ctx.lineWidth = Math.max(3, cell*0.12);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    for (var i=0;i<=segs;i++){
+      var t = i/segs;
+      var wob = Math.sin(t*Math.PI*2.4) * cell*0.35;
+      var px = head.x+dx*t + nx*wob;
+      var py = head.y+dy*t + ny*wob;
+      if (i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
+    }
+    ctx.stroke();
+    // pattern dots
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    for (var j=1;j<segs;j+=2){
+      var t2 = j/segs;
+      var wob2 = Math.sin(t2*Math.PI*2.4) * cell*0.35;
+      var dxp = head.x+dx*t2+nx*wob2, dyp = head.y+dy*t2+ny*wob2;
+      ctx.beginPath(); ctx.arc(dxp,dyp,Math.max(1.5,cell*0.05),0,Math.PI*2); ctx.fill();
+    }
+    // head
+    ctx.fillStyle = '#4E7A3A';
+    ctx.beginPath(); ctx.arc(head.x, head.y, Math.max(4,cell*0.16), 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#FFF8E8';
+    ctx.beginPath(); ctx.arc(head.x-cell*0.05, head.y-cell*0.04, cell*0.035, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(head.x+cell*0.05, head.y-cell*0.04, cell*0.035, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#C94C4C'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(head.x, head.y+cell*0.1); ctx.lineTo(head.x, head.y+cell*0.2); ctx.stroke();
+  }
+
+  function drawToken(){
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(tokenPos.x, tokenPos.y, Math.max(6,cell*0.28), 0, Math.PI*2);
+    var g = ctx.createRadialGradient(tokenPos.x-2,tokenPos.y-2,1, tokenPos.x,tokenPos.y,cell*0.28);
+    g.addColorStop(0,'#E0B84A'); g.addColorStop(1,'#B8860A');
+    ctx.fillStyle = g; ctx.fill();
+    ctx.strokeStyle = '#7A1F2B'; ctx.lineWidth = 2; ctx.stroke();
+    ctx.restore();
+  }
+
+  var last = performance.now();
+  function loop(now){
+    requestAnimationFrame(loop);
+    var dt = Math.min(0.033, (now-last)/1000);
+    last = now;
+
+    ctx.clearRect(0,0,W,H);
+    drawBoard();
+
+    if (slideAnim){
+      slideAnim.t += dt/slideAnim.dur;
+      if (slideAnim.t >= 1){
+        tokenPos = slideAnim.to;
+        var t = slideAnim.target;
+        slideAnim = null;
+        finishTurn(t);
+      } else {
+        var e = slideAnim.t;
+        tokenPos = {
+          x: slideAnim.from.x + (slideAnim.to.x-slideAnim.from.x)*e,
+          y: slideAnim.from.y + (slideAnim.to.y-slideAnim.from.y)*e
+        };
+      }
+    }
+
+    drawToken();
+  }
+  requestAnimationFrame(loop);
+
+  resetGame();
+
+})();
+</script>
+</body>
+</html>

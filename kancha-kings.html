@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Kancha Kings™ — Aim. Shoot. Rule The Circle.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dust:#c79a63; --dust-dark:#a5794a; --dust-shadow:#7a5836;
+  --chalk:#f7f1e2; --chalk-dim:#d8cdb4;
+  --emerald:#2ecc99; --sapphire:#4a7fe8; --amber:#e8a23c; --steel:#b9c4cc; --gold:#f0c14b; --cap:#8a9a86;
+  --ui-charcoal:#15100c; --ui-glass:rgba(247,241,226,.10); --ui-glass-border:rgba(247,241,226,.20);
+  --font-display:'Fredoka', system-ui, sans-serif; --font-chalk:'Kalam', cursive;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:var(--ui-charcoal);
+  font-family:var(--font-display); -webkit-tap-highlight-color:transparent; user-select:none; touch-action:none; }
+#app{ position:relative; width:100vw; height:100vh; height:100dvh; overflow:hidden; }
+#arena{ position:absolute; inset:0; display:block; width:100%; height:100%; }
+
+#titleScreen{ position:absolute; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:.5em; background:radial-gradient(120% 90% at 50% 30%, rgba(199,154,99,.25), rgba(21,16,12,.85));
+  transition: opacity .6s ease, visibility .6s; }
+#titleScreen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.eyebrow{ color:var(--chalk); opacity:.75; letter-spacing:.14em; text-transform:uppercase; font-size:.78rem; font-weight:500; animation: fadeUp .7s ease both; }
+.logo{ font-weight:700; color:var(--chalk); font-size:clamp(2rem,7.4vw,4.2rem); margin:0;
+  text-shadow:0 6px 24px rgba(0,0,0,.4); animation: logoIn .7s cubic-bezier(.2,.9,.3,1) both .15s; }
+.logo span{ font-size:.4em; vertical-align:super; opacity:.7; }
+@keyframes logoIn{ from{ filter:blur(8px); transform:scale(1.2); opacity:0;} to{ filter:blur(0); transform:scale(1); opacity:1;} }
+.underline-wrap{ width:min(240px,50vw); height:16px; position:relative; }
+#underlineCanvas{ width:100%; height:100%; }
+.tagline{ font-family:var(--font-chalk); color:var(--chalk); font-size:clamp(1rem,2.3vw,1.35rem); opacity:0; animation: fadeUp .7s ease both .95s; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+
+#playMarbleWrap{ margin-top:1.4rem; opacity:0; animation: fadeUp .7s ease both 1.3s; cursor:pointer; }
+#playMarbleCanvas{ width:70px; height:70px; display:block; animation: floatIdle 2.4s ease-in-out infinite; filter: drop-shadow(0 10px 14px rgba(0,0,0,.4)); }
+@keyframes floatIdle{ 0%,100%{ transform:translateY(0) scale(1);} 50%{ transform:translateY(-4px) scale(1.03);} }
+.play-hint{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.85rem; margin-top:.4em; opacity:0; animation: fadeUp .7s ease both 1.6s; }
+
+.hud{ position:absolute; top:0; left:0; right:0; z-index:40; display:flex; justify-content:space-between; align-items:flex-start;
+  padding:max(16px, env(safe-area-inset-top)) 18px 0; opacity:0; transition:opacity .5s ease; }
+.hud.show{ opacity:1; }
+.hud-card{ background:var(--ui-glass); backdrop-filter:blur(10px); border:1px solid var(--ui-glass-border); border-radius:18px;
+  padding:.5em 1em; display:flex; align-items:baseline; gap:.5em; box-shadow:0 8px 22px rgba(0,0,0,.3); }
+.hud-label{ font-size:.6rem; letter-spacing:.14em; color:var(--chalk-dim); text-transform:uppercase; }
+.hud-value{ font-family:var(--font-chalk); font-size:1.6rem; color:var(--chalk); font-weight:700; }
+#muteBtn{ position:absolute; top:max(16px, env(safe-area-inset-top)); right:18px; z-index:41; width:38px; height:38px;
+  border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--ui-glass); backdrop-filter:blur(10px);
+  color:var(--chalk); font-size:1rem; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+#muteBtn:active{ transform:scale(.88); }
+.hud-right{ display:flex; flex-direction:column; align-items:flex-end; gap:.4em; margin-top:52px; }
+
+.prompt{ position:absolute; left:50%; bottom:8%; transform:translateX(-50%); font-family:var(--font-chalk); font-size:1.1rem;
+  color:var(--chalk); background:rgba(21,16,12,.4); backdrop-filter:blur(6px); padding:.35em 1.1em; border-radius:999px;
+  z-index:35; opacity:0; transition:opacity .4s; }
+.prompt.show{ opacity:.9; animation:promptPulse 1.6s ease-in-out infinite; }
+@keyframes promptPulse{ 0%,100%{ opacity:.6;} 50%{ opacity:1;} }
+
+.outcome-text{ position:absolute; left:50%; top:30%; transform:translate(-50%,-50%) scale(.5); font-weight:700;
+  font-size:clamp(1.5rem,5.6vw,3.1rem); color:var(--chalk); opacity:0; z-index:55; text-shadow:0 8px 30px rgba(0,0,0,.45);
+  pointer-events:none; text-align:center; }
+.outcome-text.show{ animation: outcomePop .95s cubic-bezier(.2,1.4,.3,1) forwards; }
+@keyframes outcomePop{
+  0%{ opacity:0; transform:translate(-50%,-50%) scale(.4);}
+  20%{ opacity:1; transform:translate(-50%,-50%) scale(1.12);}
+  32%{ transform:translate(-50%,-50%) scale(1);}
+  75%{ opacity:1; transform:translate(-50%,-50%) scale(1);}
+  100%{ opacity:0; transform:translate(-50%,-60%) scale(.94);} }
+.outcome-text.gold{ color:var(--gold); }
+.outcome-text.cap{ color:var(--cap); }
+
+#app.shake{ animation: screenShake .4s cubic-bezier(.36,.07,.19,.97); }
+@keyframes screenShake{
+  10%,90%{ transform:translate3d(-1px,0,0);} 20%,80%{ transform:translate3d(2px,0,0);}
+  30%,50%,70%{ transform:translate3d(-3px,1px,0);} 40%,60%{ transform:translate3d(3px,-1px,0);} }
+
+#resultCard{ position:absolute; inset:0; z-index:70; display:flex; align-items:center; justify-content:center;
+  background:rgba(15,10,8,.55); backdrop-filter:blur(6px); transition:opacity .4s ease, visibility .4s; }
+#resultCard.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+.card{ background:var(--chalk); border-radius:14px; padding:1.1em 1.1em 1.4em; width:min(320px,78vw);
+  box-shadow:0 30px 60px rgba(0,0,0,.5); transform:rotate(-1.5deg) translateY(30px) scale(.9); opacity:0; text-align:center; }
+#resultCard:not(.hidden) .card{ animation: cardIn .55s cubic-bezier(.2,1.3,.3,1) forwards .1s; }
+@keyframes cardIn{ to{ transform:rotate(-1.5deg) translateY(0) scale(1); opacity:1; } }
+.card-photo{ background:linear-gradient(160deg,#f0c14b,#e8a23c 55%,#a5794a); border-radius:6px; height:140px;
+  display:flex; align-items:center; justify-content:center; font-size:3.1rem; margin-bottom:.8em; }
+.card-sub{ font-family:var(--font-display); font-size:.74rem; color:#8a7a68; margin:0 0 .3em; }
+.card-score{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:var(--ui-charcoal); margin:.2em 0 .1em; }
+.card-caption{ font-family:var(--font-chalk); font-size:1.02rem; color:#4a3c2c; margin:.2em 0; }
+.play-btn{ margin-top:1rem; padding:.7em 1.8em; font-family:var(--font-display); font-weight:600; font-size:.94rem;
+  color:var(--ui-charcoal); background:linear-gradient(180deg,#fff7e6,var(--chalk)); border:none; border-radius:999px; cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,.3); transition: transform .15s cubic-bezier(.3,1.6,.5,1); }
+.play-btn:active{ transform:scale(.94); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="arena"></canvas>
+
+  <button id="muteBtn" title="Mute sound">🔊</button>
+
+  <div id="titleScreen">
+    <p class="eyebrow">Playrium presents</p>
+    <h1 class="logo">KANCHA KINGS<span>™</span></h1>
+    <div class="underline-wrap"><canvas id="underlineCanvas" width="240" height="16"></canvas></div>
+    <p class="tagline">Aim. Shoot. Rule The Circle.</p>
+    <div id="playMarbleWrap">
+      <canvas id="playMarbleCanvas" width="140" height="140"></canvas>
+      <p class="play-hint">Drag me back to play</p>
+    </div>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="hud-card"><span class="hud-label">Shots</span><span class="hud-value" id="shotsValue">0</span></div>
+    <div class="hud-right">
+      <div class="hud-card"><span class="hud-label">Left</span><span class="hud-value" id="leftValue">0</span></div>
+    </div>
+  </div>
+
+  <div class="prompt" id="prompt">Drag back the shooter, then release</div>
+  <div class="outcome-text" id="outcomeText"></div>
+
+  <div id="resultCard" class="hidden">
+    <div class="card">
+      <div class="card-photo" id="resultEmoji">🏆</div>
+      <p class="card-sub">RING CLEARED</p>
+      <p class="card-score" id="resultScore">0 shots</p>
+      <p class="card-caption" id="resultCaption">Clean Sweep</p>
+      <button id="replayBtn" class="play-btn">Shoot Again</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const app = document.getElementById('app');
+const canvas = document.getElementById('arena');
+const ctx = canvas.getContext('2d');
+const titleScreen = document.getElementById('titleScreen');
+const playMarbleWrap = document.getElementById('playMarbleWrap');
+const playMarbleCanvas = document.getElementById('playMarbleCanvas');
+const playCtx = playMarbleCanvas.getContext('2d');
+const underlineCanvas = document.getElementById('underlineCanvas');
+const underlineCtx = underlineCanvas.getContext('2d');
+const hud = document.getElementById('hud');
+const shotsValue = document.getElementById('shotsValue');
+const leftValue = document.getElementById('leftValue');
+const prompt = document.getElementById('prompt');
+const outcomeText = document.getElementById('outcomeText');
+const resultCard = document.getElementById('resultCard');
+const resultScore = document.getElementById('resultScore');
+const resultCaption = document.getElementById('resultCaption');
+const resultEmoji = document.getElementById('resultEmoji');
+const replayBtn = document.getElementById('replayBtn');
+const muteBtn = document.getElementById('muteBtn');
+
+function resize(){
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* ============================================================
+   AUDIO — synthesized
+   ============================================================ */
+let actx=null, muted=false;
+function ac(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); } return actx; }
+function envGain(ctx,dur,peak){ const g=ctx.createGain(); g.gain.setValueAtTime(0,ctx.currentTime);
+  g.gain.linearRampToValueAtTime(peak,ctx.currentTime+0.006); g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+dur); return g; }
+function tone(freq,dur,type,peak){ if(muted)return; const ctx=ac(); const o=ctx.createOscillator(); o.type=type||'sine';
+  o.frequency.setValueAtTime(freq,ctx.currentTime); const g=envGain(ctx,dur,peak||0.2); o.connect(g).connect(ctx.destination);
+  o.start(); o.stop(ctx.currentTime+dur+0.05); }
+function noiseBurst(dur,freq,type,peak){ if(muted)return; const ctx=ac(); const n=Math.floor(ctx.sampleRate*dur);
+  const buf=ctx.createBuffer(1,n,ctx.sampleRate); const d=buf.getChannelData(0);
+  for(let i=0;i<n;i++){ d[i]=(Math.random()*2-1)*(1-i/n); }
+  const src=ctx.createBufferSource(); src.buffer=buf;
+  const f=ctx.createBiquadFilter(); f.type=type||'bandpass'; f.frequency.value=freq||1500;
+  const g=envGain(ctx,dur,peak||0.22); src.connect(f).connect(g).connect(ctx.destination); src.start(); }
+
+const Sound = {
+  click(){ tone(1500,0.05,'sine',0.1); },
+  collide(materials, force){
+    const heavy = materials.includes('steel') || materials.includes('king');
+    const f = Math.min(1, force/9);
+    if(heavy){ tone(220+Math.random()*40, 0.14, 'triangle', 0.12+f*0.22); }
+    else { tone(1100+Math.random()*300, 0.09, 'sine', 0.1+f*0.28); setTimeout(()=>tone(1700+Math.random()*300,0.06,'sine',0.06+f*0.1),15); }
+  },
+  capClatter(){ noiseBurst(0.22,2600,'highpass',0.18); setTimeout(()=>noiseBurst(0.16,1800,'highpass',0.14),70); setTimeout(()=>noiseBurst(0.12,1200,'highpass',0.1),140); },
+  exitPop(){ tone(1500,0.08,'sine',0.14); },
+  comboTing(i){ const notes=[1046,1175,1318,1568,1760]; tone(notes[Math.min(i,notes.length-1)],0.22,'sine',0.16); },
+  rollHum(){ /* placeholder for continuous roll; kept simple/omitted for perf */ },
+  slowmoIn(){ tone(200,0.4,'sine',0.1); },
+  victory(){ [1046,1318,1568,2093].forEach((f,i)=>setTimeout(()=>tone(f,0.4,'sine',0.14),i*130)); },
+};
+muteBtn.addEventListener('click', ()=>{ muted=!muted; muteBtn.textContent=muted?'🔇':'🔊'; Sound.click(); });
+
+/* ============================================================
+   MARBLE TYPES / RENDERING
+   ============================================================ */
+const TYPES = {
+  glass:  { colors:['#2ecc99','#4a7fe8','#e8a23c'], density:1.0, restitution:0.82 },
+  clay:   { colors:['#b5723f'], density:1.15, restitution:0.62 },
+  steel:  { colors:['#c7d2d8'], density:2.6, restitution:0.7 },
+  king:   { colors:['#f0c14b'], density:2.6, restitution:0.68 },
+  cap:    { colors:['#8a9a86'], density:0.55, restitution:0.55 },
+  shooter:{ colors:['#f7f1e2'], density:1.2, restitution:0.8 },
+};
+
+function drawMarble(g, m){
+  g.save();
+  g.translate(m.x, m.y);
+  // ground shadow
+  g.beginPath();
+  g.ellipse(0, m.r*0.75, m.r*0.95, m.r*0.35, 0, 0, Math.PI*2);
+  g.fillStyle = 'rgba(60,40,20,0.28)';
+  g.fill();
+
+  g.rotate(m.spinAngle||0);
+  const grad = g.createRadialGradient(-m.r*0.35,-m.r*0.4, m.r*0.1, 0,0, m.r*1.1);
+  grad.addColorStop(0, lighten(m.color, 0.55));
+  grad.addColorStop(0.5, m.color);
+  grad.addColorStop(1, darken(m.color, 0.35));
+  g.beginPath();
+  g.arc(0,0,m.r,0,Math.PI*2);
+  g.fillStyle = grad;
+  g.fill();
+
+  // specular highlight
+  g.beginPath();
+  g.ellipse(-m.r*0.32,-m.r*0.38, m.r*0.28, m.r*0.16, -0.5, 0, Math.PI*2);
+  g.fillStyle = 'rgba(255,255,255,0.75)';
+  g.fill();
+
+  // rim
+  g.beginPath();
+  g.arc(0,0,m.r,0,Math.PI*2);
+  g.strokeStyle = 'rgba(0,0,0,0.18)';
+  g.lineWidth = Math.max(1, m.r*0.06);
+  g.stroke();
+  g.restore();
+}
+function lighten(hex, amt){ const c=hexToRgb(hex); return `rgb(${Math.min(255,c.r+255*amt)|0},${Math.min(255,c.g+255*amt)|0},${Math.min(255,c.b+255*amt)|0})`; }
+function darken(hex, amt){ const c=hexToRgb(hex); return `rgb(${(c.r*(1-amt))|0},${(c.g*(1-amt))|0},${(c.b*(1-amt))|0})`; }
+function hexToRgb(hex){ const v=parseInt(hex.slice(1),16); return {r:(v>>16)&255,g:(v>>8)&255,b:v&255}; }
+
+/* ============================================================
+   ARENA / RING SETUP
+   ============================================================ */
+let cx, cy, chalkR, arenaR, baselineR;
+function layoutArena(){
+  cx = window.innerWidth * 0.5;
+  cy = window.innerHeight * 0.46;
+  chalkR = Math.min(window.innerWidth, window.innerHeight) * 0.28;
+  arenaR = chalkR * 1.38;
+  baselineR = Math.min(window.innerWidth, window.innerHeight) / 700 * 14;
+}
+layoutArena();
+window.addEventListener('resize', layoutArena);
+
+let ringJitter = [];
+function buildRingJitter(){
+  ringJitter = [];
+  const n = 64;
+  for(let i=0;i<n;i++){ ringJitter.push((Math.random()-0.5)*4); }
+}
+buildRingJitter();
+
+function drawGround(){
+  ctx.fillStyle = '#c79a63';
+  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  const grad = ctx.createRadialGradient(cx,cy,10,cx,cy,arenaR*1.6);
+  grad.addColorStop(0,'rgba(255,230,180,0.18)');
+  grad.addColorStop(1,'rgba(80,50,20,0.22)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+}
+
+function drawChalkRing(reveal){
+  const n = ringJitter.length;
+  const count = Math.max(2, Math.floor(n*reveal));
+  ctx.save();
+  ctx.strokeStyle = 'rgba(247,241,226,0.85)';
+  ctx.lineWidth = 3;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  for(let i=0;i<=count;i++){
+    const a = (i/n)*Math.PI*2 - Math.PI/2;
+    const r = chalkR + ringJitter[i%n];
+    const x = cx + Math.cos(a)*r;
+    const y = cy + Math.sin(a)*r*0.62;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+/* ============================================================
+   MARBLE ENTITIES
+   ============================================================ */
+let marbles = [];
+let shooter = null;
+let trophyPile = [];
+let capRevealed = false;
+
+function makeMarble(opts){
+  const type = TYPES[opts.type];
+  const color = opts.color || type.colors[Math.floor(Math.random()*type.colors.length)];
+  return {
+    x: opts.x, y: opts.y, vx:0, vy:0,
+    r: opts.r, mass: opts.r*opts.r*type.density,
+    restitution: type.restitution,
+    color, materialType: opts.type,
+    spinAngle:0, spinVel:0,
+    inRing: true, exited:false, isShooter: !!opts.isShooter,
+    exitAnim:null,
+  };
+}
+
+function shooterAnchor(){ return { x: cx, y: cy + chalkR*0.9 }; }
+
+function setupRing(){
+  marbles = [];
+  trophyPile = [];
+  capRevealed = false;
+  const cluster = Math.min(window.innerWidth, window.innerHeight) * 0.13;
+  const positions = [];
+  for(let i=0;i<7;i++){
+    positions.push({
+      x: cx + (Math.random()-0.5)*cluster,
+      y: cy*0.98 + (Math.random()-0.5)*cluster*0.7
+    });
+  }
+  // glass/clay/steel mix
+  const kindsOrder = ['glass','glass','glass','clay','clay','steel','cap'];
+  kindsOrder.forEach((k,i)=>{
+    marbles.push(makeMarble({ type:k, x:positions[i].x, y:positions[i].y, r:baselineR }));
+  });
+  // King marble
+  marbles.push(makeMarble({ type:'king', x: cx, y: cy*0.95, r: baselineR*1.55 }));
+  // resolve initial overlaps quickly
+  for(let iter=0; iter<8; iter++){ resolveOverlaps(marbles); }
+
+  const a = shooterAnchor();
+  shooter = makeMarble({ type:'shooter', x:a.x, y:a.y, r: baselineR*1.05, isShooter:true });
+  marbles.push(shooter);
+}
+
+function resolveOverlaps(list){
+  for(let i=0;i<list.length;i++){
+    for(let j=i+1;j<list.length;j++){
+      const a=list[i], b=list[j];
+      if(a.exited||b.exited) continue;
+      const dx=b.x-a.x, dy=b.y-a.y;
+      const dist=Math.hypot(dx,dy)||0.001;
+      const minDist=a.r+b.r;
+      if(dist<minDist){
+        const overlap=(minDist-dist)/2;
+        const nx=dx/dist, ny=dy/dist;
+        a.x-=nx*overlap; a.y-=ny*overlap;
+        b.x+=nx*overlap; b.y+=ny*overlap;
+      }
+    }
+  }
+}
+
+/* ============================================================
+   PHYSICS
+   ============================================================ */
+const FRICTION = 1.1; // exponential decay rate — tuned so a max-power shot travels well past the cluster
+const REST_EPS = 4; // px/s
+let shotActive = false;
+let comboCount = 0;
+let shotsTaken = 0;
+let slowMoT = 0; // 0..1 blend
+let slowMoTarget = 0;
+
+function anyMoving(){
+  return marbles.some(m=> !m.exited && (Math.abs(m.vx)>REST_EPS || Math.abs(m.vy)>REST_EPS));
+}
+
+function stepPhysics(dt){
+  const sub = 2;
+  const sdt = dt/sub;
+  for(let s=0;s<sub;s++){
+    marbles.forEach(m=>{
+      if(m.exited) return;
+      // integrate
+      m.x += m.vx*sdt;
+      m.y += m.vy*sdt;
+      m.spinAngle += m.spinVel*sdt;
+      // friction — natural exponential decay, no runaway multiplier
+      const decayFactor = Math.exp(-FRICTION*sdt);
+      m.vx *= decayFactor; m.vy *= decayFactor;
+      m.spinVel *= decayFactor;
+      if(Math.hypot(m.vx,m.vy) < REST_EPS){ m.vx=0; m.vy=0; }
+
+      // outer arena wall (soft bounce)
+      const dx = m.x-cx, dy=(m.y-cy)/0.62; // account for elliptical ring visual, keep physics circular in this space
+      const dist = Math.hypot(dx,dy);
+      if(dist + m.r > arenaR){
+        const nx=dx/dist, ny=dy/dist;
+        const pen = dist+m.r-arenaR;
+        m.x -= nx*pen; m.y -= ny*pen*0.62;
+        const vn = m.vx*nx + m.vy*ny;
+        if(vn>0){ m.vx -= 2*vn*nx*0.7; m.vy -= 2*vn*ny*0.7; }
+      }
+
+      // ring-exit check (score circle, uses same elliptical space)
+      if(!m.exited && !m.isShooter && dist > chalkR){
+        markExited(m);
+      } else if(!m.exited && m.isShooter && dist > chalkR*1.02){
+        // shooter allowed to sit near/at edge; if it fully leaves, we'll respawn after settle
+        m.leftRing = true;
+      }
+    });
+
+    // pairwise collisions
+    for(let i=0;i<marbles.length;i++){
+      const a = marbles[i];
+      if(a.exited) continue;
+      for(let j=i+1;j<marbles.length;j++){
+        const b = marbles[j];
+        if(b.exited) continue;
+        const dx=b.x-a.x, dy=b.y-a.y;
+        const dist=Math.hypot(dx,dy);
+        const minDist=a.r+b.r;
+        if(dist>0 && dist<minDist){
+          const nx=dx/dist, ny=dy/dist;
+          const overlap=(minDist-dist);
+          const totalMass=a.mass+b.mass;
+          a.x -= nx*overlap*(b.mass/totalMass);
+          a.y -= ny*overlap*(b.mass/totalMass);
+          b.x += nx*overlap*(a.mass/totalMass);
+          b.y += ny*overlap*(a.mass/totalMass);
+
+          const rvx=b.vx-a.vx, rvy=b.vy-a.vy;
+          const velAlongNormal = rvx*nx+rvy*ny;
+          if(velAlongNormal<0){
+            const e = Math.min(a.restitution,b.restitution);
+            const jimp = -(1+e)*velAlongNormal / (1/a.mass+1/b.mass);
+            const ix=jimp*nx, iy=jimp*ny;
+            a.vx -= ix/a.mass; a.vy -= iy/a.mass;
+            b.vx += ix/b.mass; b.vy += iy/b.mass;
+            // tangential spin transfer (approx)
+            const tx=-ny, ty=nx;
+            const rvt = rvx*tx+rvy*ty;
+            a.spinVel -= rvt*0.02; b.spinVel += rvt*0.02;
+
+            const force = Math.abs(jimp)/ (a.mass+b.mass) * 6;
+            if(force>0.35){
+              spawnSparkle((a.x+b.x)/2, (a.y+b.y)/2, Math.min(1,force/3));
+              Sound.collide([a.materialType,b.materialType], force);
+              if(a.materialType==='cap'||b.materialType==='cap'){ /* handled on exit, not here */ }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+function markExited(m){
+  m.exited = true;
+  m.inRing = false;
+  const isCap = m.materialType==='cap';
+  const isKing = m.materialType==='king';
+  if(isCap && !capRevealed){
+    capRevealed = true;
+    Sound.capClatter();
+    popText("Wait... that's a bottle cap! 🫙", 'cap');
+    m.wobble = true;
+  } else if(isKing){
+    Sound.exitPop();
+    slowMoTarget = 1;
+    setTimeout(()=>{ slowMoTarget = 0; }, 1400);
+    popText('THE KING FALLS! 👑', 'gold');
+  } else {
+    Sound.exitPop();
+  }
+  if(shotActive){
+    comboCount++;
+    if(comboCount>=2){ Sound.comboTing(comboCount-2); }
+    if(comboCount>=3){
+      slowMoTarget = 1;
+      setTimeout(()=>{ if(comboCount<5) slowMoTarget = 0; }, 1000);
+    }
+    if(comboCount===2) popText('Double!', '');
+    else if(comboCount===3) popText('Triple! 🔥', 'gold');
+    else if(comboCount>=4) popText(comboCount+'x COMBO!', 'gold');
+  }
+  animateToTrophy(m);
+}
+
+function animateToTrophy(m){
+  const slot = trophyPile.length;
+  trophyPile.push(m);
+  const targetX = 26 + (slot%8)*26;
+  const targetY = window.innerHeight - 40 - Math.floor(slot/8)*26;
+  m.exitAnim = { t:0, sx:m.x, sy:m.y, tx:targetX, ty:targetY, dur: 0.55 };
+}
+
+function spawnSparkle(x,y,intensity){
+  for(let i=0;i<Math.ceil(intensity*5);i++){
+    particles.push({
+      x, y, vx:(Math.random()-0.5)*160, vy:(Math.random()-0.5)*160-40,
+      life:1, r: 1.5+Math.random()*1.5, color: Math.random()<0.5?'#fff7e6':'#ffe6a8'
+    });
+  }
+}
+let particles = [];
+function updateParticles(dt){
+  particles.forEach(p=>{ p.vy += 260*dt; p.x+=p.vx*dt; p.y+=p.vy*dt; p.life -= dt*1.6; });
+  particles = particles.filter(p=>p.life>0);
+}
+function drawParticles(){
+  particles.forEach(p=>{
+    ctx.globalAlpha = Math.max(0,p.life);
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+}
+
+/* ============================================================
+   AIM / DRAG INPUT
+   ============================================================ */
+let aiming = false, dragStart=null, dragCur=null, pointerHistory=[];
+const MAX_DRAG = () => Math.min(window.innerWidth, window.innerHeight)*0.22;
+const POWER_SCALE = 8.5;
+
+function shooterIdle(){ return !shotActive && shooter && !shooter.exited; }
+
+canvas.addEventListener('pointerdown', e=>{
+  if(state!==STATE.PLAYING || !shooterIdle()) return;
+  aiming = true;
+  dragStart = { x:e.clientX, y:e.clientY };
+  dragCur = { x:e.clientX, y:e.clientY };
+  pointerHistory = [{x:e.clientX,y:e.clientY,t:performance.now()}];
+  prompt.classList.remove('show');
+});
+window.addEventListener('pointermove', e=>{
+  if(!aiming) return;
+  dragCur = { x:e.clientX, y:e.clientY };
+  pointerHistory.push({x:e.clientX,y:e.clientY,t:performance.now()});
+  if(pointerHistory.length>8) pointerHistory.shift();
+});
+window.addEventListener('pointerup', e=>{
+  if(!aiming) return;
+  aiming = false;
+  fireShooter();
+});
+
+function fireShooter(){
+  const dx = dragStart.x - dragCur.x;
+  const dy = dragStart.y - dragCur.y;
+  let dist = Math.hypot(dx,dy);
+  const maxD = MAX_DRAG();
+  const clamped = Math.min(dist, maxD);
+  if(clamped < 6){ return; } // too small, ignore
+  const nx = dx/dist, ny = dy/dist;
+  const power = (clamped/maxD) * POWER_SCALE * 240;
+  shooter.vx = nx*power;
+  shooter.vy = ny*power*0.62;
+
+  // spin from lateral pointer velocity at release
+  let spin = 0;
+  if(pointerHistory.length>=2){
+    const p0 = pointerHistory[0], p1 = pointerHistory[pointerHistory.length-1];
+    const vt = (p1.x-p0.x); // lateral component approx
+    spin = Math.max(-6, Math.min(6, vt*0.03));
+  }
+  shooter.spinVel = spin;
+
+  shotActive = true;
+  comboCount = 0;
+  shotsTaken++;
+  shotsValue.textContent = shotsTaken;
+  Sound.click();
+}
+
+/* ============================================================
+   UI TEXT / STATE
+   ============================================================ */
+function popText(msg, cls){
+  outcomeText.textContent = msg;
+  outcomeText.className = 'outcome-text ' + (cls||'');
+  void outcomeText.offsetWidth;
+  outcomeText.classList.add('show');
+}
+
+const STATE = { TITLE:'title', PLAYING:'playing', RESULT:'result' };
+let state = STATE.TITLE;
+let lastTime = 0;
+let ringRevealT = 0;
+
+function ringLeftCount(){ return marbles.filter(m=>!m.exited && !m.isShooter).length; }
+
+function checkRoundEnd(){
+  if(shotActive && !anyMoving()){
+    shotActive = false;
+    // shooter respawn if it left the ring
+    if(shooter && shooter.leftRing && !shooter.exited){
+      const a = shooterAnchor();
+      shooter.x=a.x; shooter.y=a.y; shooter.vx=0; shooter.vy=0; shooter.leftRing=false;
+    }
+    leftValue.textContent = ringLeftCount();
+    if(ringLeftCount() === 0){
+      setTimeout(showResult, 700);
+    } else {
+      prompt.classList.add('show');
+    }
+  }
+}
+
+function showResult(){
+  state = STATE.RESULT;
+  hud.classList.remove('show');
+  let caption, emoji;
+  if(shotsTaken<=3){ caption='Clean Sweep'; emoji='🏆'; }
+  else if(shotsTaken<=6){ caption='Sharp Shooter'; emoji='🎯'; }
+  else { caption='Ring Cleared'; emoji='🙂'; }
+  resultScore.textContent = shotsTaken + (shotsTaken===1?' shot':' shots');
+  resultCaption.textContent = caption;
+  resultEmoji.textContent = emoji;
+  resultCard.classList.remove('hidden');
+}
+
+function startRound(){
+  layoutArena();
+  buildRingJitter();
+  setupRing();
+  shotsTaken = 0; comboCount=0; shotActive=false;
+  particles = [];
+  shotsValue.textContent = '0';
+  leftValue.textContent = ringLeftCount();
+  titleScreen.classList.add('hidden');
+  resultCard.classList.add('hidden');
+  hud.classList.add('show');
+  prompt.classList.add('show');
+  ringRevealT = 0;
+  state = STATE.PLAYING;
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render(dt){
+  drawGround();
+  drawChalkRing(Math.min(1, ringRevealT));
+
+  // trophy tray marker
+  ctx.save();
+  ctx.strokeStyle='rgba(247,241,226,0.35)';
+  ctx.setLineDash([4,4]);
+  ctx.strokeRect(8, window.innerHeight-64, 240, 56);
+  ctx.setLineDash([]);
+  ctx.restore();
+
+  // work out the shooter's pulled-back draw position (if currently aiming) BEFORE drawing
+  let pulledActive = false, pulledX = shooter ? shooter.x : 0, pulledY = shooter ? shooter.y : 0;
+  let aimT = 0, aimEndX = 0, aimEndY = 0;
+  if(aiming && dragStart && dragCur && shooter){
+    const dx = dragStart.x-dragCur.x, dy=dragStart.y-dragCur.y;
+    const dist = Math.hypot(dx,dy);
+    const maxD = MAX_DRAG();
+    const clamped = Math.min(dist,maxD);
+    if(dist>0.001){
+      const nx=dx/dist, ny=dy/dist;
+      // marble physically retreats opposite the aim direction (classic slingshot pull)
+      pulledX = shooter.x - nx*clamped;
+      pulledY = shooter.y - ny*clamped*0.62;
+      // aim indicator points the OTHER way, toward where the shot will actually go
+      aimEndX = shooter.x + nx*clamped*0.9;
+      aimEndY = shooter.y + ny*clamped*0.9*0.62;
+      aimT = clamped/maxD;
+      pulledActive = true;
+    }
+  }
+
+  // marbles (draw exited-animating and in-ring together; shooter drawn separately below)
+  const sorted = marbles.slice().sort((a,b)=> a.y-b.y);
+  sorted.forEach(m=>{
+    if(m===shooter) return;
+    if(m.exited && m.exitAnim){
+      const ea = m.exitAnim;
+      ea.t += dt;
+      const p = Math.min(1, ea.t/ea.dur);
+      const ease = 1-Math.pow(1-p,3);
+      m.x = ea.sx + (ea.tx-ea.sx)*ease;
+      m.y = ea.sy + (ea.ty-ea.sy)*ease;
+      if(p>=1){ m.exitAnim=null; }
+      drawMarble(ctx, m);
+    } else if(!m.exited){
+      drawMarble(ctx, m);
+    }
+  });
+
+  // rubber-band + shooter marble (drawn pulled-back while aiming, so it visibly moves with your drag)
+  if(shooter && !shooter.exited){
+    if(pulledActive){
+      ctx.save();
+      ctx.strokeStyle = `rgba(247,241,226,${0.55+aimT*0.35})`;
+      ctx.lineWidth = 2.5+aimT*2;
+      ctx.setLineDash([6,6]);
+      ctx.beginPath();
+      ctx.moveTo(pulledX, pulledY);
+      ctx.lineTo(aimEndX, aimEndY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(aimEndX, aimEndY, 4+aimT*4, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(240,193,75,${0.5+aimT*0.5})`;
+      ctx.fill();
+      ctx.restore();
+
+      const realX = shooter.x, realY = shooter.y;
+      shooter.x = pulledX; shooter.y = pulledY;
+      drawMarble(ctx, shooter);
+      shooter.x = realX; shooter.y = realY;
+    } else {
+      drawMarble(ctx, shooter);
+    }
+  }
+
+  drawParticles();
+}
+
+/* ============================================================
+   MAIN LOOP
+   ============================================================ */
+function loop(now){
+  const rawDt = Math.min(0.033, (now-lastTime)/1000 || 0.016);
+  lastTime = now;
+
+  if(state===STATE.PLAYING){
+    if(ringRevealT<1) ringRevealT += rawDt*2.4;
+
+    slowMoT += (slowMoTarget - slowMoT) * Math.min(1, rawDt*4);
+    const timeScale = 1 - slowMoT*0.7;
+    const dt = rawDt*timeScale;
+
+    stepPhysics(dt);
+    updateParticles(rawDt);
+    checkRoundEnd();
+  }
+  render(rawDt);
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ============================================================
+   TITLE SCREEN DECOR (underline + play marble)
+   ============================================================ */
+function drawUnderline(){
+  underlineCtx.clearRect(0,0,240,16);
+  underlineCtx.strokeStyle = '#f7f1e2';
+  underlineCtx.lineWidth = 3;
+  underlineCtx.lineCap = 'round';
+  underlineCtx.beginPath();
+  underlineCtx.moveTo(4,8);
+  underlineCtx.lineTo(236,8);
+  underlineCtx.stroke();
+  underlineCtx.beginPath();
+  underlineCtx.arc(228,8,6,0,Math.PI*2);
+  const g = underlineCtx.createRadialGradient(225,5,1,228,8,7);
+  g.addColorStop(0,'#fff7e6'); g.addColorStop(1,'#c1703f');
+  underlineCtx.fillStyle = g;
+  underlineCtx.fill();
+}
+drawUnderline();
+
+function drawPlayMarble(){
+  playCtx.clearRect(0,0,140,140);
+  playCtx.save();
+  playCtx.translate(70,70);
+  const grad = playCtx.createRadialGradient(-18,-22,6,0,0,55);
+  grad.addColorStop(0,'#fff7e6'); grad.addColorStop(0.5,'#f0c14b'); grad.addColorStop(1,'#a5794a');
+  playCtx.beginPath(); playCtx.arc(0,0,52,0,Math.PI*2); playCtx.fillStyle=grad; playCtx.fill();
+  playCtx.beginPath(); playCtx.ellipse(-16,-20,16,9,-0.5,0,Math.PI*2); playCtx.fillStyle='rgba(255,255,255,0.8)'; playCtx.fill();
+  playCtx.restore();
+}
+drawPlayMarble();
+
+let introDragging = false, introStart = null;
+playMarbleWrap.style.touchAction = 'none';
+playMarbleWrap.addEventListener('pointerdown', e=>{
+  introDragging = true;
+  introStart = { x:e.clientX, y:e.clientY };
+  playMarbleCanvas.style.animation = 'none';
+  playMarbleCanvas.style.transition = 'none';
+});
+window.addEventListener('pointermove', e=>{
+  if(!introDragging) return;
+  const dx = e.clientX-introStart.x, dy = e.clientY-introStart.y;
+  const dist = Math.hypot(dx,dy);
+  const max = 44;
+  const clamped = Math.min(dist, max);
+  const ang = Math.atan2(dy,dx);
+  const ox = Math.cos(ang)*clamped, oy = Math.sin(ang)*clamped;
+  playMarbleCanvas.style.transform = `translate(${ox}px, ${oy}px) scale(${1+clamped/max*0.06})`;
+});
+window.addEventListener('pointerup', ()=>{
+  if(!introDragging) return;
+  introDragging = false;
+  playMarbleCanvas.style.transition = 'transform .3s cubic-bezier(.3,1.6,.5,1)';
+  playMarbleCanvas.style.transform = 'translate(0,0) scale(1)';
+  ac(); Sound.click(); startRound();
+});
+playMarbleWrap.addEventListener('click', ()=>{ if(!introDragging){ ac(); Sound.click(); startRound(); } });
+replayBtn.addEventListener('click', ()=>{ Sound.click(); startRound(); });
+
+})();
+</script>
+</body>
+</html>
