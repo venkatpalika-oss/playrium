@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://venkatpalika-oss.github.io/playrium/sitemap.xml
+Sitemap: https://www.playrium.fun/sitemap.xml
