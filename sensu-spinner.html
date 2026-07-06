@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensu Spinner - Playrium</title>
+<meta name="description" content="Play Sensu Spinner on Playrium, a physics-driven browser toy inspired by Japanese folding fans — free to play instantly.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Sensu Spinner - Playrium">
+<meta property="og:description" content="Play Sensu Spinner on Playrium, a physics-driven browser toy inspired by Japanese folding fans — free to play instantly.">
+<meta property="og:image" content="https://www.playrium.fun/favicon.png">
+<meta property="og:url" content="https://www.playrium.fun/sensu-spinner.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Sensu Spinner - Playrium">
+<meta name="twitter:description" content="Play Sensu Spinner on Playrium, a physics-driven browser toy inspired by Japanese folding fans — free to play instantly.">
+<meta name="twitter:image" content="https://www.playrium.fun/favicon.png">
+<link rel="canonical" href="https://www.playrium.fun/sensu-spinner.html">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#241608; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+#game { display:block; width:100%; height:100%; touch-action:none; cursor:none; }
+.panel { position:fixed; background:rgba(255,255,255,0.12); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border:1px solid rgba(255,255,255,0.25); border-radius:18px; color:#fff; box-shadow:0 8px 30px rgba(0,0,0,0.35); }
+#hud { top:16px; left:16px; padding:14px 20px; display:flex; gap:22px; align-items:center; }
+#hud .stat { text-align:center; }
+#hud .stat .num { font-size:22px; font-weight:700; display:block; }
+#hud .stat .label { font-size:10px; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
+#topRight { top:16px; right:16px; padding:10px; display:flex; gap:8px; }
+.iconBtn { width:42px; height:42px; border-radius:12px; border:none; background:rgba(255,255,255,0.15); color:#fff; font-size:18px; cursor:pointer; }
+.iconBtn:hover { background:rgba(255,255,255,0.28); }
+#titleTag { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:0.08em; text-align:center; }
+#overlay { position:fixed; inset:0; background:rgba(20,12,4,0.72); display:flex; align-items:center; justify-content:center; z-index:20; }
+#overlay.hidden { display:none; }
+.card { width:min(440px,88vw); padding:34px 30px; text-align:center; }
+.card h1 { font-size:26px; margin-bottom:6px; }
+.card p.tag { opacity:0.75; font-size:13px; margin-bottom:18px; font-style:italic; }
+.card p.desc { font-size:14px; line-height:1.6; opacity:0.88; margin-bottom:22px; }
+.bigBtn { padding:14px 30px; border:none; border-radius:14px; background:linear-gradient(135deg,#e8a23c,#c97b1f); color:#fff; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(232,162,60,0.4); }
+.bigBtn:hover { filter:brightness(1.08); }
+.toast { position:fixed; top:90px; left:50%; transform:translateX(-50%) translateY(0); padding:10px 22px; border-radius:12px; background:rgba(255,255,255,0.16); backdrop-filter:blur(10px); color:#fff; font-size:14px; font-weight:600; opacity:0; transition:opacity .3s, transform .3s; pointer-events:none; z-index:15; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(10px); }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div class="panel" id="hud">
+<div class="stat"><span class="num" id="statCaught">0</span><span class="label">Caught</span></div>
+<div class="stat"><span class="num" id="statBest">0</span><span class="label">Best Streak</span></div>
+<div class="stat"><span class="num" id="statCleared">0</span><span class="label">Perfect Flows</span></div>
+</div>
+
+<div class="panel" id="topRight">
+<button class="iconBtn" id="muteBtn" title="Mute">&#128266;</button>
+<button class="iconBtn" id="restartBtn" title="New Flow">&#8635;</button>
+</div>
+
+<div id="titleTag">PLAYRIUM - JAPAN COLLECTION<br>SENSU SPINNER</div>
+
+<div class="panel card" id="overlay">
+<h1>Sensu Spinner</h1>
+<p class="tag">"Flick. Fan. Flow."</p>
+<p class="desc" id="overlayText">Move your sensu fan through the air and flick it quickly to create wind gusts. Guide the drifting petals into the basket below. Sixteen petals fall each round — catch as many as you can without breaking your streak.</p>
+<button class="bigBtn" id="startBtn">Begin</button>
+</div>
+
+<script>
+(function(){
+var canvas = document.getElementById("game");
+var ctx = canvas.getContext("2d");
+var W, H;
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener("resize", resize);
+
+/* ---------- Audio ---------- */
+var audioCtx = null;
+var muted = false;
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function tone(freq, dur, type, vol){
+if(muted || !audioCtx) return;
+var o = audioCtx.createOscillator();
+var g = audioCtx.createGain();
+o.type = type || "sine";
+o.frequency.value = freq;
+g.gain.value = (vol!==undefined?vol:0.18);
+o.connect(g); g.connect(audioCtx.destination);
+var now = audioCtx.currentTime;
+g.gain.setValueAtTime(g.gain.value, now);
+g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+o.start(now);
+o.stop(now+dur+0.02);
+}
+function playChime(){
+var seq=[880,1108,1318,1760];
+seq.forEach(function(f,i){ setTimeout(function(){ tone(f,0.28,"sine",0.15); }, i*130); });
+}
+function whoosh(){
+tone(500,0.15,"sine",0.1);
+setTimeout(function(){ tone(700,0.12,"sine",0.08); },40);
+}
+
+/* ---------- Toast ---------- */
+function toast(msg){
+var el=document.createElement("div");
+el.className="toast";
+el.textContent=msg;
+document.body.appendChild(el);
+requestAnimationFrame(function(){ el.classList.add("show"); });
+setTimeout(function(){ el.classList.remove("show"); setTimeout(function(){ el.remove(); },300); }, 1100);
+}
+
+/* ---------- Persistence ---------- */
+var bestStreak = parseInt(localStorage.getItem("sensu_best")||"0",10);
+var perfectFlows = parseInt(localStorage.getItem("sensu_perfect")||"0",10);
+var goldenUnlocked = localStorage.getItem("sensu_golden")==="1";
+
+/* ---------- World ---------- */
+var TOTAL_PETALS = 16;
+var petals = [];
+var remainingToSpawn = TOTAL_PETALS;
+var resolvedCount = 0;
+var caught = 0;
+var currentStreak = 0;
+var state = "intro";
+var spawnTimer = 0;
+var basket = { w:130, h:60 };
+
+var fan = { x:0, y:0, angle:0 };
+var pointerActive = false;
+var pointerX=0, pointerY=0;
+var prevPX=0, prevPY=0;
+var gustCooldown = 0;
+var gusts = [];
+var PETAL_COLORS = ["#ffb7c5","#ffd9e2","#ff9fb5","#fff0c2"];
+
+function basketX(){ return W/2; }
+function basketY(){ return H-70; }
+
+function resetRound(){
+petals = [];
+remainingToSpawn = TOTAL_PETALS;
+resolvedCount = 0;
+caught = 0;
+currentStreak = 0;
+spawnTimer = 0;
+gusts = [];
+updateHUD();
+}
+
+function updateHUD(){
+document.getElementById("statCaught").textContent = caught;
+document.getElementById("statBest").textContent = bestStreak;
+document.getElementById("statCleared").textContent = perfectFlows;
+}
+
+function spawnPetal(){
+var margin = 60;
+petals.push({
+x: margin + Math.random()*(W-margin*2),
+y: -20,
+vx: (Math.random()-0.5)*0.4,
+vy: 0.6+Math.random()*0.4,
+size: 9+Math.random()*5,
+rot: Math.random()*Math.PI*2,
+vr: (Math.random()-0.5)*0.05,
+color: PETAL_COLORS[Math.floor(Math.random()*PETAL_COLORS.length)],
+windTimer:0,
+resolved:false
+});
+}
+
+/* ---------- Particles ---------- */
+var sparkles = [];
+function spawnSparkles(x,y){
+for(var i=0;i<14;i++){
+var ang = Math.random()*Math.PI*2, spd=1+Math.random()*3;
+sparkles.push({x:x,y:y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1.5,life:1,size:3+Math.random()*3});
+}
+}
+function updateParticles(dt){
+var f = dt/16.6;
+for(var j=sparkles.length-1;j>=0;j--){
+var s = sparkles[j]; s.x+=s.vx*f; s.y+=s.vy*f; s.vy+=0.08*f; s.life-=0.02*f;
+if(s.life<=0) sparkles.splice(j,1);
+}
+for(var i=gusts.length-1;i>=0;i--){
+var g = gusts[i]; g.life -= 0.05*f; g.r += 6*f;
+if(g.life<=0) gusts.splice(i,1);
+}
+}
+
+/* ---------- Input ---------- */
+function getPoint(e){
+var rect = canvas.getBoundingClientRect();
+var cx = (e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0].clientX));
+var cy = (e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0].clientY));
+var scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+return { x:(cx-rect.left)*scaleX, y:(cy-rect.top)*scaleY };
+}
+canvas.addEventListener("pointerdown", function(e){ ensureAudio(); if(audioCtx && audioCtx.state==="suspended") audioCtx.resume(); var p=getPoint(e); pointerActive=true; pointerX=p.x; pointerY=p.y; prevPX=p.x; prevPY=p.y; });
+canvas.addEventListener("pointermove", function(e){ var p=getPoint(e); pointerX=p.x; pointerY=p.y; pointerActive=true; });
+
+/* ---------- Game logic ---------- */
+var GUST_SPEED_THRESHOLD = 6;
+
+function updateFan(dt){
+var f = dt/16.6;
+prevPX = fan.x; prevPY = fan.y;
+if(pointerActive){
+fan.x += (pointerX-fan.x)*Math.min(0.35*f,1);
+fan.y += (pointerY-fan.y)*Math.min(0.35*f,1);
+}
+var dx = fan.x-prevPX, dy = fan.y-prevPY;
+var speed = Math.sqrt(dx*dx+dy*dy)/Math.max(f,0.001);
+if(speed>0.5) fan.angle = Math.atan2(dy,dx);
+if(gustCooldown>0) gustCooldown -= dt;
+
+if(speed>GUST_SPEED_THRESHOLD && gustCooldown<=0 && state==="playing"){
+gustCooldown = 260;
+gusts.push({x:fan.x,y:fan.y,r:10,life:1,angle:fan.angle});
+whoosh();
+var dirx = dx/(speed*Math.max(f,0.001)||1), diry = dy/(speed*Math.max(f,0.001)||1);
+var mag = Math.sqrt(dirx*dirx+diry*diry)||1;
+dirx/=mag; diry/=mag;
+petals.forEach(function(p){
+if(p.resolved) return;
+var pdx = p.x-fan.x, pdy = p.y-fan.y;
+var pdist = Math.sqrt(pdx*pdx+pdy*pdy);
+if(pdist<170){
+var dot = (pdx/(pdist||1))*dirx + (pdy/(pdist||1))*diry;
+if(dot>0.2){
+var force = (1-pdist/170) * Math.min(speed*0.06,3.2);
+p.vx += dirx*force;
+p.vy += diry*force*0.7;
+p.windTimer = 400;
+}
+}
+});
+}
+}
+
+function resolvePetal(p, hit){
+p.resolved = true;
+resolvedCount++;
+if(hit){
+caught++;
+currentStreak++;
+if(currentStreak>bestStreak){ bestStreak=currentStreak; localStorage.setItem("sensu_best", bestStreak); }
+spawnSparkles(p.x,p.y);
+tone(900+Math.random()*300,0.16,"sine",0.18);
+} else {
+currentStreak = 0;
+tone(200,0.12,"triangle",0.1);
+}
+updateHUD();
+if(resolvedCount>=TOTAL_PETALS){
+finishRound();
+}
+}
+
+function finishRound(){
+state = "roundover";
+var missed = TOTAL_PETALS-caught;
+if(missed===0){
+perfectFlows++;
+localStorage.setItem("sensu_perfect", perfectFlows);
+if(!goldenUnlocked){ goldenUnlocked=true; localStorage.setItem("sensu_golden","1"); }
+playChime();
+showOverlay("perfect");
+} else {
+showOverlay("done");
+}
+}
+
+var overlay, overlayText, startBtn;
+function showOverlay(kind){
+if(kind==="perfect"){
+overlayText.textContent = goldenUnlocked ? "Perfect flow! All sixteen petals caught. Golden Fan unlocked for future flows." : "Perfect flow! You guided every petal into the basket.";
+startBtn.textContent = "Next Flow";
+} else {
+overlayText.textContent = "Flow complete! You caught " + caught + " of " + TOTAL_PETALS + " petals. Best streak: " + bestStreak + ".";
+startBtn.textContent = "Try Again";
+}
+overlay.classList.remove("hidden");
+}
+
+function updatePetals(dt){
+var f = dt/16.6;
+var bx = basketX(), by = basketY();
+petals.forEach(function(p){
+if(p.resolved) return;
+if(p.windTimer>0){ p.windTimer -= dt; p.vx *= 0.985; }
+else { p.vx *= 0.96; p.vx += Math.sin(p.y*0.02)*0.01*f; }
+p.vy = Math.min(p.vy+0.002*f, 1.6);
+p.x += p.vx*f;
+p.y += p.vy*f;
+p.rot += p.vr*f;
+
+if(p.y > by-basket.h*0.3 && p.y < by+basket.h*0.6 && Math.abs(p.x-bx) < basket.w*0.5){
+resolvePetal(p, true);
+return;
+}
+if(p.y > H+30){
+resolvePetal(p, false);
+}
+});
+if(state==="playing" && remainingToSpawn>0){
+spawnTimer -= dt;
+var activeCount = petals.filter(function(p){ return !p.resolved; }).length;
+if(spawnTimer<=0 && activeCount<4){
+spawnPetal();
+remainingToSpawn--;
+spawnTimer = 500+Math.random()*400;
+}
+}
+}
+
+/* ---------- Rendering ---------- */
+function drawBackground(){
+var g = ctx.createLinearGradient(0,0,0,H);
+g.addColorStop(0,"#3a2410");
+g.addColorStop(0.5,"#5c3418");
+g.addColorStop(1,"#8a5a28");
+ctx.fillStyle = g;
+ctx.fillRect(0,0,W,H);
+ctx.save();
+ctx.globalAlpha = 0.8;
+ctx.fillStyle = "#fff3d6";
+ctx.beginPath();
+ctx.arc(W*0.82,H*0.16,44,0,Math.PI*2);
+ctx.fill();
+ctx.restore();
+}
+function drawBasket(){
+var bx = basketX(), by = basketY();
+ctx.save();
+ctx.translate(bx,by);
+ctx.fillStyle = "rgba(232,162,60,0.18)";
+ctx.beginPath();
+ctx.ellipse(0,-10,basket.w*0.55,26,0,0,Math.PI*2);
+ctx.fill();
+ctx.fillStyle = "#8a5a28";
+ctx.beginPath();
+ctx.moveTo(-basket.w*0.5,0);
+ctx.lineTo(basket.w*0.5,0);
+ctx.lineTo(basket.w*0.36,basket.h*0.55);
+ctx.lineTo(-basket.w*0.36,basket.h*0.55);
+ctx.closePath();
+ctx.fill();
+ctx.strokeStyle = "rgba(255,240,210,0.35)";
+ctx.lineWidth = 2;
+for(var i=1;i<4;i++){
+ctx.beginPath();
+ctx.moveTo(-basket.w*0.5+i*basket.w/4, 2);
+ctx.lineTo(-basket.w*0.36+i*basket.w*0.36*2/4, basket.h*0.5);
+ctx.stroke();
+}
+ctx.restore();
+}
+function drawPetal(p){
+ctx.save();
+ctx.translate(p.x,p.y);
+ctx.rotate(p.rot);
+ctx.fillStyle = p.color;
+ctx.beginPath();
+ctx.ellipse(0,0,p.size,p.size*0.55,0,0,Math.PI*2);
+ctx.fill();
+ctx.restore();
+}
+function drawSparkles(){
+sparkles.forEach(function(s){
+ctx.save();
+ctx.globalAlpha = Math.max(s.life,0);
+ctx.fillStyle = "#fff6c8";
+ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+ctx.restore();
+});
+}
+function drawGusts(){
+gusts.forEach(function(g){
+ctx.save();
+ctx.globalAlpha = Math.max(g.life,0)*0.5;
+ctx.strokeStyle = "#fff3d6";
+ctx.lineWidth = 3;
+ctx.beginPath();
+ctx.arc(g.x,g.y,g.r,g.angle-0.5,g.angle+0.5);
+ctx.stroke();
+ctx.restore();
+});
+}
+function drawFan(){
+if(state==="intro") return;
+ctx.save();
+ctx.translate(fan.x,fan.y);
+ctx.rotate(fan.angle);
+ctx.fillStyle = "#c97b1f";
+ctx.beginPath();
+ctx.moveTo(0,0);
+for(var a=-0.6;a<=0.6;a+=0.15){
+ctx.lineTo(Math.cos(a)*46, Math.sin(a)*46);
+}
+ctx.closePath();
+ctx.fill();
+ctx.fillStyle = "#fdf1de";
+ctx.beginPath();
+ctx.moveTo(0,0);
+for(var b=-0.5;b<=0.5;b+=0.12){
+ctx.lineTo(Math.cos(b)*38, Math.sin(b)*38);
+}
+ctx.closePath();
+ctx.fill();
+ctx.strokeStyle = "#8a5a28";
+ctx.lineWidth = 3;
+ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(-14,0); ctx.stroke();
+ctx.restore();
+}
+
+function render(){
+ctx.clearRect(0,0,W,H);
+drawBackground();
+drawBasket();
+petals.forEach(function(p){ if(!p.resolved) drawPetal(p); });
+drawSparkles();
+drawGusts();
+drawFan();
+}
+
+var lastTime = null;
+function loop(ts){
+if(lastTime===null) lastTime = ts;
+var delta = ts-lastTime; lastTime = ts;
+if(delta>50) delta=50;
+updateParticles(delta);
+updateFan(delta);
+if(state==="playing"){
+updatePetals(delta);
+}
+render();
+requestAnimationFrame(loop);
+}
+
+overlay = document.getElementById("overlay");
+overlayText = document.getElementById("overlayText");
+startBtn = document.getElementById("startBtn");
+
+startBtn.addEventListener("click", function(){
+ensureAudio();
+if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+overlay.classList.add("hidden");
+resetRound();
+fan.x = W/2; fan.y = H*0.3;
+state = "playing";
+});
+document.getElementById("restartBtn").addEventListener("click", function(){
+ensureAudio();
+if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+resetRound();
+fan.x = W/2; fan.y = H*0.3;
+state = "playing";
+overlay.classList.add("hidden");
+});
+document.getElementById("muteBtn").addEventListener("click", function(){
+muted = !muted;
+document.getElementById("muteBtn").innerHTML = muted ? "&#128263;" : "&#128266;";
+});
+
+updateHUD();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
