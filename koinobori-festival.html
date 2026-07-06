@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Koinobori Festival - Playrium</title>
+<meta name="description" content="Play Koinobori Festival on Playrium, a physics-driven browser toy inspired by Japan's carp windsock festival — free to play instantly.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Koinobori Festival - Playrium">
+<meta property="og:description" content="Play Koinobori Festival on Playrium, a physics-driven browser toy inspired by Japan's carp windsock festival — free to play instantly.">
+<meta property="og:image" content="https://www.playrium.fun/favicon.png">
+<meta property="og:url" content="https://www.playrium.fun/koinobori-festival.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Koinobori Festival - Playrium">
+<meta name="twitter:description" content="Play Koinobori Festival on Playrium, a physics-driven browser toy inspired by Japan's carp windsock festival — free to play instantly.">
+<meta name="twitter:image" content="https://www.playrium.fun/favicon.png">
+<link rel="canonical" href="https://www.playrium.fun/koinobori-festival.html">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0a1a2e; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+#game { display:block; width:100%; height:100%; touch-action:none; cursor:none; }
+.panel { position:fixed; background:rgba(255,255,255,0.12); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border:1px solid rgba(255,255,255,0.25); border-radius:18px; color:#fff; box-shadow:0 8px 30px rgba(0,0,0,0.35); }
+#hud { top:16px; left:16px; padding:14px 20px; display:flex; gap:22px; align-items:center; }
+#hud .stat { text-align:center; }
+#hud .stat .num { font-size:22px; font-weight:700; display:block; }
+#hud .stat .label { font-size:10px; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
+#topRight { top:16px; right:16px; padding:10px; display:flex; gap:8px; }
+.iconBtn { width:42px; height:42px; border-radius:12px; border:none; background:rgba(255,255,255,0.15); color:#fff; font-size:18px; cursor:pointer; }
+.iconBtn:hover { background:rgba(255,255,255,0.28); }
+#titleTag { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:0.08em; text-align:center; }
+#overlay { position:fixed; inset:0; background:rgba(6,12,24,0.72); display:flex; align-items:center; justify-content:center; z-index:20; }
+#overlay.hidden { display:none; }
+.card { width:min(440px,88vw); padding:34px 30px; text-align:center; }
+.card h1 { font-size:26px; margin-bottom:6px; }
+.card p.tag { opacity:0.75; font-size:13px; margin-bottom:18px; font-style:italic; }
+.card p.desc { font-size:14px; line-height:1.6; opacity:0.88; margin-bottom:22px; }
+.bigBtn { padding:14px 30px; border:none; border-radius:14px; background:linear-gradient(135deg,#2f8f86,#1f6a63); color:#fff; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 6px 18px rgba(47,143,134,0.4); }
+.bigBtn:hover { filter:brightness(1.08); }
+.toast { position:fixed; top:90px; left:50%; transform:translateX(-50%) translateY(0); padding:10px 22px; border-radius:12px; background:rgba(255,255,255,0.16); backdrop-filter:blur(10px); color:#fff; font-size:14px; font-weight:600; opacity:0; transition:opacity .3s, transform .3s; pointer-events:none; z-index:15; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(10px); }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div class="panel" id="hud">
+<div class="stat"><span class="num" id="statAlt">0</span><span class="label">Altitude</span></div>
+<div class="stat"><span class="num" id="statBest">0</span><span class="label">Best Altitude</span></div>
+<div class="stat"><span class="num" id="statCleared">0</span><span class="label">Festivals</span></div>
+</div>
+
+<div class="panel" id="topRight">
+<button class="iconBtn" id="muteBtn" title="Mute">&#128266;</button>
+<button class="iconBtn" id="restartBtn" title="New Climb">&#8635;</button>
+</div>
+
+<div id="titleTag">PLAYRIUM - JAPAN COLLECTION<br>KOINOBORI FESTIVAL</div>
+
+<div class="panel card" id="overlay">
+<h1>Koinobori Festival</h1>
+<p class="tag">"Ride the wind. Race the sky."</p>
+<p class="desc" id="overlayText">Steer your koinobori left and right to stay inside the rising wind columns. Drift out of the wind and you'll sink. Weave through the bamboo poles as you climb. Reach the top of the sky to complete the festival.</p>
+<button class="bigBtn" id="startBtn">Begin</button>
+</div>
+
+<script>
+(function(){
+var canvas = document.getElementById("game");
+var ctx = canvas.getContext("2d");
+var W, H;
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener("resize", resize);
+
+/* ---------- Audio ---------- */
+var audioCtx = null;
+var muted = false;
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function tone(freq, dur, type, vol){
+if(muted || !audioCtx) return;
+var o = audioCtx.createOscillator();
+var g = audioCtx.createGain();
+o.type = type || "sine";
+o.frequency.value = freq;
+g.gain.value = (vol!==undefined?vol:0.18);
+o.connect(g); g.connect(audioCtx.destination);
+var now = audioCtx.currentTime;
+g.gain.setValueAtTime(g.gain.value, now);
+g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+o.start(now);
+o.stop(now+dur+0.02);
+}
+function playChime(){
+var seq=[880,1108,1318,1760];
+seq.forEach(function(f,i){ setTimeout(function(){ tone(f,0.28,"sine",0.15); }, i*130); });
+}
+function thud(){ tone(120,0.3,"sawtooth",0.2); }
+
+/* ---------- Toast ---------- */
+function toast(msg){
+var el=document.createElement("div");
+el.className="toast";
+el.textContent=msg;
+document.body.appendChild(el);
+requestAnimationFrame(function(){ el.classList.add("show"); });
+setTimeout(function(){ el.classList.remove("show"); setTimeout(function(){ el.remove(); },300); }, 1100);
+}
+
+/* ---------- Persistence ---------- */
+var bestAlt = parseInt(localStorage.getItem("koi_best")||"0",10);
+var festivals = parseInt(localStorage.getItem("koi_festivals")||"0",10);
+var goldenUnlocked = localStorage.getItem("koi_golden")==="1";
+
+/* ---------- World ---------- */
+var TARGET_ALT = 420;
+var RISE_SPEED = 0.052;
+var FALL_SPEED = 0.034;
+var cameraY = 0;
+var koiScreenY;
+var koi = { x:0, vx:0 };
+var pointerActive = false, pointerX = 0;
+var windZones = [];
+var poles = [];
+var nextZoneAlt = 60;
+var nextPoleAlt = 160;
+var state = "intro";
+var shakeMag = 0;
+var invuln = 0;
+
+function layout(){ koiScreenY = H*0.62; }
+layout();
+window.addEventListener("resize", layout);
+
+function resetRun(){
+cameraY = 0;
+koi.x = W/2; koi.vx = 0;
+windZones = [];
+poles = [];
+nextZoneAlt = 60;
+nextPoleAlt = 160;
+invuln = 0;
+generateAhead();
+updateHUD();
+}
+
+function generateAhead(){
+while(nextZoneAlt < cameraY + H*1.6){
+var width = 130+Math.random()*70;
+var xStart = 30+Math.random()*(W-60-width);
+windZones.push({ alt:nextZoneAlt, xStart:xStart, width:width });
+nextZoneAlt += 120+Math.random()*40;
+}
+while(nextPoleAlt < cameraY + H*1.6){
+var gapW = 150;
+var gapX = 40+Math.random()*(W-80-gapW);
+poles.push({ alt:nextPoleAlt, gapX:gapX, gapW:gapW, resolved:false });
+nextPoleAlt += 210+Math.random()*70;
+}
+}
+
+function updateHUD(){
+document.getElementById("statAlt").textContent = Math.max(Math.floor(cameraY),0);
+document.getElementById("statBest").textContent = bestAlt;
+document.getElementById("statCleared").textContent = festivals;
+}
+
+/* ---------- Particles ---------- */
+var sparkles = [];
+function spawnSparkles(x,y,color){
+for(var i=0;i<14;i++){
+var ang = Math.random()*Math.PI*2, spd=1+Math.random()*3;
+sparkles.push({x:x,y:y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd-1.5,life:1,size:3+Math.random()*3,color:color||"#fff6c8"});
+}
+}
+function updateParticles(dt){
+var f = dt/16.6;
+for(var j=sparkles.length-1;j>=0;j--){
+var s = sparkles[j]; s.x+=s.vx*f; s.y+=s.vy*f; s.vy+=0.08*f; s.life-=0.02*f;
+if(s.life<=0) sparkles.splice(j,1);
+}
+}
+
+/* ---------- Input ---------- */
+function getPoint(e){
+var rect = canvas.getBoundingClientRect();
+var cx = (e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0].clientX));
+var scaleX = canvas.width/rect.width;
+return { x:(cx-rect.left)*scaleX };
+}
+canvas.addEventListener("pointerdown", function(e){ ensureAudio(); if(audioCtx && audioCtx.state==="suspended") audioCtx.resume(); pointerActive=true; pointerX=getPoint(e).x; });
+canvas.addEventListener("pointermove", function(e){ pointerX=getPoint(e).x; pointerActive=true; });
+
+/* ---------- Game logic ---------- */
+function inWindZone(){
+for(var i=0;i<windZones.length;i++){
+var z = windZones[i];
+if(Math.abs(z.alt-cameraY) < 55 && koi.x > z.xStart && koi.x < z.xStart+z.width){
+return z;
+}
+}
+return null;
+}
+
+function checkPoles(){
+for(var i=0;i<poles.length;i++){
+var p = poles[i];
+if(p.resolved) continue;
+if(cameraY >= p.alt-4 && cameraY <= p.alt+4){
+p.resolved = true;
+if(koi.x < p.gapX || koi.x > p.gapX+p.gapW){
+cameraY = Math.max(cameraY-70,0);
+invuln = 900;
+shakeMag = 10;
+thud();
+toast("Clipped a pole!");
+} else {
+spawnSparkles(koi.x, koiScreenY, "#ffe08a");
+tone(700,0.1,"sine",0.12);
+}
+}
+}
+}
+
+function update(dt){
+var f = dt/16.6;
+if(pointerActive){
+koi.x += (pointerX-koi.x)*Math.min(0.18*f,1);
+}
+var zone = inWindZone();
+if(invuln>0){ invuln -= dt; }
+if(zone){
+cameraY += RISE_SPEED*dt;
+} else {
+cameraY -= FALL_SPEED*dt;
+}
+if(cameraY<0) cameraY=0;
+generateAhead();
+if(invuln<=0) checkPoles();
+
+if(cameraY<=0 && state==="playing"){
+triggerFall();
+} else if(cameraY>=TARGET_ALT && state==="playing"){
+triggerWin();
+}
+shakeMag *= 0.9; if(shakeMag<0.05) shakeMag=0;
+updateHUD();
+}
+
+function triggerFall(){
+state = "lost";
+if(Math.floor(cameraY)>bestAlt){ bestAlt=Math.floor(cameraY); localStorage.setItem("koi_best", bestAlt); }
+thud();
+updateHUD();
+showOverlay("lost");
+}
+
+function triggerWin(){
+state = "won";
+festivals++;
+localStorage.setItem("koi_festivals", festivals);
+bestAlt = Math.max(bestAlt, TARGET_ALT);
+localStorage.setItem("koi_best", bestAlt);
+if(!goldenUnlocked){ goldenUnlocked=true; localStorage.setItem("koi_golden","1"); }
+playChime();
+updateHUD();
+showOverlay("won");
+}
+
+var overlay, overlayText, startBtn;
+function showOverlay(kind){
+if(kind==="won"){
+overlayText.textContent = goldenUnlocked ? "Festival complete! Your koinobori reached the top of the sky. Golden Koi unlocked for future climbs." : "Festival complete! Your koinobori rode the wind all the way to the top.";
+startBtn.textContent = "Next Festival";
+} else {
+overlayText.textContent = "You lost the wind and drifted back to earth. Best altitude: " + bestAlt + ".";
+startBtn.textContent = "Try Again";
+}
+overlay.classList.remove("hidden");
+}
+
+/* ---------- Rendering ---------- */
+function drawBackground(){
+var t = Math.min(cameraY/TARGET_ALT,1);
+var g = ctx.createLinearGradient(0,0,0,H);
+g.addColorStop(0, lerpColor("#4a6fa5","#0a1a2e",t));
+g.addColorStop(1, lerpColor("#eac98f","#1c3a5e",t));
+ctx.fillStyle = g;
+ctx.fillRect(0,0,W,H);
+}
+function lerpColor(a,b,t){
+var ca = hexToRgb(a), cb = hexToRgb(b);
+var r = Math.round(ca.r+(cb.r-ca.r)*t);
+var gg = Math.round(ca.g+(cb.g-ca.g)*t);
+var bl = Math.round(ca.b+(cb.b-ca.b)*t);
+return "rgb("+r+","+gg+","+bl+")";
+}
+function hexToRgb(h){
+h = h.replace("#","");
+return { r:parseInt(h.substring(0,2),16), g:parseInt(h.substring(2,4),16), b:parseInt(h.substring(4,6),16) };
+}
+function drawMountain(){
+ctx.fillStyle = "rgba(255,255,255,0.85)";
+ctx.beginPath();
+ctx.moveTo(W*0.1,H);
+ctx.lineTo(W*0.35,H*0.72);
+ctx.lineTo(W*0.5,H*0.86);
+ctx.lineTo(W*0.65,H*0.7);
+ctx.lineTo(W*0.9,H);
+ctx.closePath();
+ctx.fill();
+}
+function drawWindZone(z){
+var y = koiScreenY + (z.alt-cameraY);
+if(y<-80 || y>H+80) return;
+ctx.save();
+ctx.globalAlpha = 0.22;
+ctx.fillStyle = "#bff2ea";
+ctx.fillRect(z.xStart, y-60, z.width, 120);
+ctx.globalAlpha = 0.55;
+ctx.strokeStyle = "#eafffb";
+ctx.lineWidth = 2;
+var arrowPhase = (Date.now()/300)%1;
+for(var i=0;i<3;i++){
+var ay = y+40-((i+arrowPhase)*40);
+ctx.beginPath();
+ctx.moveTo(z.xStart+z.width*0.3, ay);
+ctx.lineTo(z.xStart+z.width*0.5, ay-14);
+ctx.lineTo(z.xStart+z.width*0.7, ay);
+ctx.stroke();
+}
+ctx.restore();
+}
+function drawPole(p){
+var y = koiScreenY + (p.alt-cameraY);
+if(y<-40 || y>H+40) return;
+ctx.save();
+ctx.fillStyle = "#7a5230";
+ctx.fillRect(0, y-9, p.gapX, 18);
+ctx.fillRect(p.gapX+p.gapW, y-9, W-(p.gapX+p.gapW), 18);
+ctx.restore();
+}
+function drawKoi(){
+ctx.save();
+var ox = (Math.random()-0.5)*shakeMag, oy=(Math.random()-0.5)*shakeMag;
+ctx.translate(koi.x+ox, koiScreenY+oy);
+var tilt = Math.max(Math.min((pointerX-koi.x)*0.01,0.35),-0.35);
+ctx.rotate(tilt);
+var bodyColor = goldenUnlocked ? "#ffcf3f" : "#e6432b";
+var wob = Math.sin(Date.now()/150)*6;
+ctx.fillStyle = bodyColor;
+ctx.beginPath();
+ctx.moveTo(30,0);
+ctx.quadraticCurveTo(0,-20,-40,-8+wob*0.3);
+ctx.quadraticCurveTo(-60,0,-40,8-wob*0.3);
+ctx.quadraticCurveTo(0,20,30,0);
+ctx.closePath();
+ctx.fill();
+ctx.fillStyle = "#fff6e6";
+ctx.beginPath(); ctx.arc(22,-2,7,0,Math.PI*2); ctx.fill();
+ctx.fillStyle = "#1a1a1a";
+ctx.beginPath(); ctx.arc(25,-3,2.4,0,Math.PI*2); ctx.fill();
+ctx.strokeStyle = "rgba(0,0,0,0.25)";
+ctx.lineWidth = 2;
+ctx.beginPath(); ctx.moveTo(-50,-6+wob*0.4); ctx.lineTo(-70,-14+wob*0.6); ctx.stroke();
+ctx.beginPath(); ctx.moveTo(-50,6-wob*0.4); ctx.lineTo(-70,14-wob*0.6); ctx.stroke();
+ctx.restore();
+}
+function drawSparkles(){
+sparkles.forEach(function(s){
+ctx.save();
+ctx.globalAlpha = Math.max(s.life,0);
+ctx.fillStyle = s.color;
+ctx.beginPath(); ctx.arc(s.x,s.y,s.size,0,Math.PI*2); ctx.fill();
+ctx.restore();
+});
+}
+
+function render(){
+ctx.clearRect(0,0,W,H);
+drawBackground();
+if(cameraY<80) drawMountain();
+windZones.forEach(drawWindZone);
+poles.forEach(drawPole);
+drawKoi();
+drawSparkles();
+}
+
+var lastTime = null;
+function loop(ts){
+if(lastTime===null) lastTime = ts;
+var delta = ts-lastTime; lastTime = ts;
+if(delta>50) delta=50;
+updateParticles(delta);
+if(state==="playing"){ update(delta); }
+render();
+requestAnimationFrame(loop);
+}
+
+overlay = document.getElementById("overlay");
+overlayText = document.getElementById("overlayText");
+startBtn = document.getElementById("startBtn");
+
+startBtn.addEventListener("click", function(){
+ensureAudio();
+if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+overlay.classList.add("hidden");
+resetRun();
+state = "playing";
+});
+document.getElementById("restartBtn").addEventListener("click", function(){
+ensureAudio();
+if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+resetRun();
+state = "playing";
+overlay.classList.add("hidden");
+});
+document.getElementById("muteBtn").addEventListener("click", function(){
+muted = !muted;
+document.getElementById("muteBtn").innerHTML = muted ? "&#128263;" : "&#128266;";
+});
+
+updateHUD();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
