@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeepney Jam - Playrium</title>
+<meta name="description" content="Play Jeepney Jam on Playrium, a physics-driven browser toy inspired by the colorful Filipino jeepney — free to play instantly.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jeepney Jam - Playrium">
+<meta property="og:description" content="Play Jeepney Jam on Playrium, a physics-driven browser toy inspired by the colorful Filipino jeepney — free to play instantly.">
+<meta property="og:image" content="https://www.playrium.fun/favicon.png">
+<meta property="og:url" content="https://www.playrium.fun/jeepney-jam.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jeepney Jam - Playrium">
+<meta name="twitter:description" content="Play Jeepney Jam on Playrium, a physics-driven browser toy inspired by the colorful Filipino jeepney — free to play instantly.">
+<meta name="twitter:image" content="https://www.playrium.fun/favicon.png">
+<link rel="canonical" href="https://www.playrium.fun/jeepney-jam.html">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0a1a18; font-family: "Segoe UI", system-ui, -apple-system, sans-serif; }
+#game { display:block; width:100%; height:100%; touch-action:none; cursor:pointer; }
+.panel { position:fixed; background:rgba(255,255,255,0.12); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border:1px solid rgba(255,255,255,0.25); border-radius:18px; color:#fff; box-shadow:0 8px 30px rgba(0,0,0,0.35); }
+#hud { top:16px; left:16px; padding:14px 20px; display:flex; gap:22px; align-items:center; }
+#hud .stat { text-align:center; }
+#hud .stat .num { font-size:22px; font-weight:700; display:block; }
+#hud .stat .label { font-size:10px; opacity:0.75; letter-spacing:0.05em; text-transform:uppercase; }
+#topRight { top:16px; right:16px; padding:10px; display:flex; gap:8px; }
+.iconBtn { width:42px; height:42px; border-radius:12px; border:none; background:rgba(255,255,255,0.15); color:#fff; font-size:18px; cursor:pointer; }
+.iconBtn:hover { background:rgba(255,255,255,0.28); }
+#titleTag { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); font-size:11px; color:rgba(255,255,255,0.5); letter-spacing:0.08em; text-align:center; }
+#overlay { position:fixed; inset:0; background:rgba(5,15,15,0.72); display:flex; align-items:center; justify-content:center; z-index:20; }
+#overlay.hidden { display:none; }
+.card { width:min(440px,88vw); padding:34px 30px; text-align:center; }
+.card h1 { font-size:26px; margin-bottom:6px; }
+.card p.tag { opacity:0.75; font-size:13px; margin-bottom:18px; font-style:italic; }
+.card p.desc { font-size:14px; line-height:1.6; opacity:0.88; margin-bottom:22px; }
+.bigBtn { padding:14px 30px; border:none; border-radius:14px; background:linear-gradient(135deg,#2f8f86,#FCD116); color:#0a0a0f; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(47,143,134,0.35); }
+.bigBtn:hover { filter:brightness(1.08); }
+.toast { position:fixed; top:90px; left:50%; transform:translateX(-50%) translateY(0); padding:10px 22px; border-radius:12px; background:rgba(255,255,255,0.16); backdrop-filter:blur(10px); color:#fff; font-size:14px; font-weight:600; opacity:0; transition:opacity .3s, transform .3s; pointer-events:none; z-index:15; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(10px); }
+</style>
+</head>
+
+<body>
+<canvas id="game"></canvas>
+
+<div class="panel" id="hud">
+<div class="stat"><span class="num" id="statFares">0</span><span class="label">Fares</span></div>
+<div class="stat"><span class="num" id="statBest">0</span><span class="label">Best Fares</span></div>
+<div class="stat"><span class="num" id="statCombo">0</span><span class="label">Combo</span></div>
+</div>
+
+<div class="panel" id="topRight">
+<button class="iconBtn" id="muteBtn" title="Mute">&#128266;</button>
+<button class="iconBtn" id="restartBtn" title="New Route">&#8635;</button>
+</div>
+
+<div id="titleTag">PLAYRIUM - PHILIPPINES COLLECTION<br>JEEPNEY JAM</div>
+
+<div class="panel card" id="overlay">
+<h1>Jeepney Jam</h1>
+<p class="tag">"Weave the streets. Stack the fares."</p>
+<p class="desc" id="overlayText">Steer your jeepney between three lanes. Collect passengers for fares and dodge oncoming traffic. Tap left or right side of the screen, or use arrow keys. Collect 20 fares to finish the route. Three crashes and the route ends.</p>
+<button class="bigBtn" id="startBtn">Begin</button>
+</div>
+
+<script>
+(function(){
+
+var canvas = document.getElementById("game");
+var ctx = canvas.getContext("2d");
+var W, H;
+var LANE_COUNT = 3;
+var laneX = [];
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; layoutLanes(); }
+function layoutLanes(){
+laneX = [];
+var roadLeft = W*0.2, roadRight = W*0.8;
+var step = (roadRight-roadLeft)/(LANE_COUNT-1);
+for(var i=0;i<LANE_COUNT;i++){ laneX.push(roadLeft+step*i); }
+}
+resize();
+window.addEventListener("resize", resize);
+
+/* ---------- Audio ---------- */
+var audioCtx = null;
+var muted = false;
+function ensureAudio(){ if(!audioCtx){ try{ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } }
+function tone(freq, dur, type, vol){
+if(muted || !audioCtx) return;
+var o = audioCtx.createOscillator();
+var g = audioCtx.createGain();
+o.type = type || "sine";
+o.frequency.value = freq;
+g.gain.value = (vol!==undefined?vol:0.18);
+o.connect(g); g.connect(audioCtx.destination);
+var now = audioCtx.currentTime;
+g.gain.setValueAtTime(g.gain.value, now);
+g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+o.start(now);
+o.stop(now+dur+0.02);
+}
+function playChime(){
+var seq=[880,1108,1318,1760];
+seq.forEach(function(f,i){ setTimeout(function(){ tone(f,0.28,"sine",0.15); }, i*130); });
+}
+
+/* ---------- Toast ---------- */
+function toast(msg){
+var el=document.createElement("div");
+el.className="toast";
+el.textContent=msg;
+document.body.appendChild(el);
+requestAnimationFrame(function(){ el.classList.add("show"); });
+setTimeout(function(){ el.classList.remove("show"); setTimeout(function(){ el.remove(); },300); }, 1100);
+}
+
+/* ---------- Game state ---------- */
+var state = "intro";
+var fares = 0;
+var combo = 0;
+var lives = 3;
+var LIVES_START = 3;
+var FARE_TARGET = 20;
+var bestFares = parseInt(localStorage.getItem("jeepney_best")||"0",10);
+var wins = parseInt(localStorage.getItem("jeepney_wins")||"0",10);
+var goldenUnlocked = localStorage.getItem("jeepney_golden")==="1";
+
+var laneIndex = 1;
+var jeepX = 0;
+var jeepY = 0;
+var invuln = 0;
+var entities = [];
+var spawnTimer = 0;
+var roadOffset = 0;
+
+function updateHUD(){
+document.getElementById("statFares").textContent = fares;
+document.getElementById("statBest").textContent = Math.max(bestFares, fares);
+document.getElementById("statCombo").textContent = combo;
+}
+
+function speedFor(f){ return Math.min(9.5, 3.2+f*0.22); }
+function spawnIntervalFor(f){ return Math.max(420, 900-f*20); }
+
+function resetRound(){
+fares = 0;
+combo = 0;
+lives = LIVES_START;
+laneIndex = 1;
+entities = [];
+spawnTimer = 600;
+invuln = 0;
+jeepY = H*0.78;
+jeepX = laneX[laneIndex];
+updateHUD();
+}
+
+/* ---------- Particles ---------- */
+var burstParticles = [];
+function spawnCoinBurst(x,y){
+for(var i=0;i<16;i++){
+var ang = -Math.PI/2 + (Math.random()-0.5)*1.6;
+var spd = 2+Math.random()*4;
+burstParticles.push({ type:"coin", x:x, y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd-2, life:1, size:4+Math.random()*3, gravity:0.15 });
+}
+}
+function spawnCrashBurst(x,y){
+for(var i=0;i<20;i++){
+var ang = Math.random()*Math.PI*2;
+var spd = 1.5+Math.random()*4;
+burstParticles.push({ type:"crash", x:x, y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, life:1, size:3+Math.random()*4, gravity:0.15 });
+}
+}
+function spawnFireworks(){
+var colors=["#2f8f86","#FCD116","#CE1126","#ffffff"];
+for(var b=0;b<4;b++){
+setTimeout(function(){
+var cx = W*0.25+Math.random()*W*0.5, cy = H*0.25+Math.random()*H*0.2;
+for(var i=0;i<28;i++){
+var ang = Math.random()*Math.PI*2;
+var spd = 2+Math.random()*4.5;
+burstParticles.push({ type:"fw", x:cx, y:cy, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd, life:1, size:3+Math.random()*2, gravity:0.05, color:colors[Math.floor(Math.random()*colors.length)] });
+}
+}, b*260);
+}
+}
+function updateParticles(dt){
+var f = dt/16.6;
+for(var i=burstParticles.length-1;i>=0;i--){
+var b = burstParticles[i];
+b.x += b.vx*f; b.y += b.vy*f;
+b.vy += (b.gravity||0)*f;
+b.life -= 0.02*f;
+if(b.life<=0) burstParticles.splice(i,1);
+}
+}
+
+/* ---------- Rendering ---------- */
+var shakeMag = 0;
+function triggerShake(m){ shakeMag = Math.max(shakeMag, m); }
+
+function drawBackground(){
+var g = ctx.createLinearGradient(0,0,0,H);
+g.addColorStop(0,"#0a1a18");
+g.addColorStop(1,"#123028");
+ctx.fillStyle = g;
+ctx.fillRect(0,0,W,H);
+}
+
+function drawRoad(){
+var roadLeft = laneX[0]-70, roadRight = laneX[LANE_COUNT-1]+70;
+ctx.fillStyle = "#2a2a2e";
+ctx.fillRect(roadLeft, 0, roadRight-roadLeft, H);
+ctx.strokeStyle = "rgba(255,255,255,0.35)";
+ctx.lineWidth = 4;
+ctx.setLineDash([26,22]);
+for(var i=1;i<LANE_COUNT;i++){
+var x = (laneX[i-1]+laneX[i])/2;
+ctx.beginPath();
+ctx.moveTo(x, -((roadOffset)%48));
+ctx.lineTo(x, H);
+ctx.stroke();
+}
+ctx.setLineDash([]);
+ctx.strokeStyle = "rgba(255,255,255,0.5)";
+ctx.lineWidth = 5;
+ctx.beginPath(); ctx.moveTo(roadLeft,0); ctx.lineTo(roadLeft,H); ctx.stroke();
+ctx.beginPath(); ctx.moveTo(roadRight,0); ctx.lineTo(roadRight,H); ctx.stroke();
+}
+
+function drawJeep(){
+ctx.save();
+if(invuln>0 && Math.floor(invuln/100)%2===0){ ctx.globalAlpha = 0.4; }
+ctx.translate(jeepX, jeepY);
+ctx.fillStyle = "#2f8f86";
+ctx.fillRect(-32,-54,64,108);
+ctx.fillStyle = "#FCD116";
+ctx.fillRect(-32,-54,64,14);
+ctx.fillStyle = "#CE1126";
+ctx.fillRect(-32,40,64,14);
+ctx.fillStyle = "#bfe9ff";
+ctx.fillRect(-24,-40,48,26);
+ctx.fillStyle = "#111";
+ctx.fillRect(-30,54,16,10);
+ctx.fillRect(14,54,16,10);
+ctx.restore();
+}
+
+function drawEntity(e){
+ctx.save();
+if(e.type==="obstacle"){
+ctx.translate(e.x, e.y);
+ctx.fillStyle = "#8a3030";
+ctx.fillRect(-30,-46,60,92);
+ctx.fillStyle = "#e0c060";
+ctx.fillRect(-22,-34,44,22);
+ctx.fillStyle = "#111";
+ctx.fillRect(-28,40,14,8);
+ctx.fillRect(14,40,14,8);
+} else {
+ctx.translate(e.x, e.y);
+ctx.fillStyle = "#FCD116";
+ctx.beginPath();
+ctx.arc(0,-8,12,0,Math.PI*2);
+ctx.fill();
+ctx.fillStyle = "#0038A8";
+ctx.beginPath();
+ctx.moveTo(-14,10);
+ctx.lineTo(14,10);
+ctx.lineTo(9,32);
+ctx.lineTo(-9,32);
+ctx.closePath();
+ctx.fill();
+}
+ctx.restore();
+}
+
+function drawHearts(){
+ctx.save();
+for(var i=0;i<LIVES_START;i++){
+var x = W-30-i*26, y = 78;
+ctx.fillStyle = i<lives? "#CE1126" : "rgba(255,255,255,0.15)";
+drawHeart(x,y,9);
+}
+ctx.restore();
+}
+function drawHeart(x,y,s){
+ctx.beginPath();
+ctx.moveTo(x,y+s*0.3);
+ctx.bezierCurveTo(x,y,x-s,y,x-s,y+s*0.3);
+ctx.bezierCurveTo(x-s,y+s*0.7,x,y+s,x,y+s*1.2);
+ctx.bezierCurveTo(x,y+s,x+s,y+s*0.7,x+s,y+s*0.3);
+ctx.bezierCurveTo(x+s,y,x,y,x,y+s*0.3);
+ctx.fill();
+}
+
+function drawParticles(){
+burstParticles.forEach(function(b){
+ctx.save();
+ctx.globalAlpha = Math.max(b.life,0);
+if(b.type==="coin"){ ctx.fillStyle="#FCD116"; }
+else if(b.type==="crash"){ ctx.fillStyle="#CE1126"; }
+else if(b.type==="fw"){ ctx.fillStyle=b.color||"#ffffff"; }
+ctx.beginPath();
+ctx.arc(b.x,b.y,b.size,0,Math.PI*2);
+ctx.fill();
+ctx.restore();
+});
+}
+
+function render(){
+ctx.clearRect(0,0,W,H);
+ctx.save();
+var ox=(Math.random()-0.5)*shakeMag*2, oy=(Math.random()-0.5)*shakeMag*2;
+ctx.translate(ox,oy);
+drawBackground();
+drawRoad();
+entities.forEach(function(e){ drawEntity(e); });
+drawJeep();
+drawParticles();
+drawHearts();
+ctx.restore();
+}
+
+/* ---------- Game loop / logic ---------- */
+function moveLane(dir){
+if(state!=="playing") return;
+laneIndex = Math.max(0, Math.min(LANE_COUNT-1, laneIndex+dir));
+tone(500,0.06,"triangle",0.1);
+}
+
+function onCollect(e){
+fares++; combo++;
+tone(1200,0.15,"sine",0.2);
+spawnCoinBurst(e.x, e.y);
+toast(combo>=5? "Fare Streak x"+combo+"!" : "Fare!");
+updateHUD();
+if(fares>=FARE_TARGET){ triggerWin(); }
+}
+function onCrash(e){
+combo = 0;
+lives--;
+invuln = 900;
+tone(120,0.35,"sawtooth",0.24);
+spawnCrashBurst(e.x, e.y);
+triggerShake(8);
+toast("Crash!");
+updateHUD();
+if(lives<=0){ triggerLoss(); }
+}
+
+function triggerLoss(){
+state = "lost";
+if(fares>bestFares){ bestFares=fares; localStorage.setItem("jeepney_best", bestFares); }
+updateHUD();
+showOverlay("lost");
+}
+function triggerWin(){
+state = "won";
+wins++;
+localStorage.setItem("jeepney_wins", wins);
+if(fares>bestFares){ bestFares=fares; localStorage.setItem("jeepney_best", bestFares); }
+if(!goldenUnlocked){ goldenUnlocked=true; localStorage.setItem("jeepney_golden","1"); }
+spawnFireworks();
+playChime();
+updateHUD();
+showOverlay("won");
+}
+
+var overlay, overlayText, startBtn, restartBtn, muteBtn;
+function showOverlay(kind){
+if(kind==="won"){
+overlayText.textContent = goldenUnlocked? "Route complete! Golden Jeepney paint unlocked for all future routes." : "You collected 20 fares without running out of road!";
+startBtn.textContent = "Drive Again";
+} else if(kind==="lost"){
+overlayText.textContent = "Three crashes and the route ends. You collected "+fares+" fares. Try again with sharper lane changes.";
+startBtn.textContent = "Try Again";
+}
+overlay.classList.remove("hidden");
+}
+
+function updatePhysics(dt){
+if(state!=="playing") return;
+var speed = speedFor(fares);
+roadOffset += speed*(dt/16.6)*4;
+if(invuln>0) invuln -= dt;
+
+jeepX += (laneX[laneIndex]-jeepX)*0.25;
+
+spawnTimer -= dt;
+if(spawnTimer<=0){
+spawnTimer = spawnIntervalFor(fares) + Math.random()*260;
+var lane = Math.floor(Math.random()*LANE_COUNT);
+var isObstacle = Math.random() < 0.5;
+entities.push({ type:isObstacle?"obstacle":"passenger", lane:lane, x:laneX[lane], y:-60 });
+}
+
+for(var i=entities.length-1;i>=0;i--){
+var e = entities[i];
+e.y += speed*(dt/16.6)*2.2;
+if(e.y > jeepY-60 && e.y < jeepY+60 && e.lane===laneIndex){
+if(e.type==="passenger"){
+onCollect(e);
+entities.splice(i,1);
+continue;
+} else if(invuln<=0){
+onCrash(e);
+entities.splice(i,1);
+continue;
+}
+}
+if(e.y>H+80){ entities.splice(i,1); }
+}
+}
+
+var lastTime = null;
+function loop(ts){
+if(lastTime===null) lastTime=ts;
+var delta = ts-lastTime; lastTime=ts;
+if(delta>50) delta=50;
+updateParticles(delta);
+shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
+updatePhysics(delta);
+render();
+requestAnimationFrame(loop);
+}
+
+canvas.addEventListener("pointerdown", function(e){
+var rect = canvas.getBoundingClientRect();
+var x = e.clientX - rect.left;
+if(x < rect.width/2){ moveLane(-1); } else { moveLane(1); }
+});
+window.addEventListener("keydown", function(e){
+if(e.code==="ArrowLeft"){ e.preventDefault(); moveLane(-1); }
+else if(e.code==="ArrowRight"){ e.preventDefault(); moveLane(1); }
+});
+
+overlay = document.getElementById("overlay");
+overlayText = document.getElementById("overlayText");
+startBtn = document.getElementById("startBtn");
+restartBtn = document.getElementById("restartBtn");
+muteBtn = document.getElementById("muteBtn");
+
+startBtn.addEventListener("click", function(){
+ensureAudio();
+if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+overlay.classList.add("hidden");
+resetRound();
+state = "playing";
+});
+restartBtn.addEventListener("click", function(){
+ensureAudio();
+if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
+resetRound();
+state = "playing";
+overlay.classList.add("hidden");
+});
+muteBtn.addEventListener("click", function(){
+muted = !muted;
+muteBtn.innerHTML = muted? "&#128263;" : "&#128266;";
+});
+
+resetRound();
+updateHUD();
+requestAnimationFrame(loop);
+
+})();
+</script>
+</body>
+</html>
