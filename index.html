@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Playrium — Interactive Experiences, Not Games</title>
-<meta name="description" content="Playrium is a growing universe of premium, physics-driven browser toys organized by country. Explore twelve original India-themed experiences and four Japan-themed ones, with more countries coming soon.">
+<meta name="description" content="Playrium is a growing universe of premium, physics-driven interactive experiences from India, Japan and the Philippines. Explore 20 handcrafted toys — pick one and start playing.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Playrium — Interactive Experiences, Not Games">
-<meta property="og:description" content="A growing universe of premium physics-driven toys, organized by country — pick one to begin.">
+<meta property="og:description" content="20 handcrafted interactive experiences inspired by cultures, festivals and curiosity — pick one to begin.">
 <meta property="og:image" content="https://www.playrium.fun/favicon.png">
 <meta property="og:url" content="https://www.playrium.fun/index.html">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Playrium — Interactive Experiences, Not Games">
-<meta name="twitter:description" content="A growing universe of premium physics-driven toys, organized by country — pick one to begin.">
+<meta name="twitter:description" content="20 handcrafted interactive experiences inspired by cultures, festivals and curiosity — pick one to begin.">
 <meta name="twitter:image" content="https://www.playrium.fun/favicon.png">
 <link rel="canonical" href="https://www.playrium.fun/index.html">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -53,16 +53,34 @@ body{ overflow-x:hidden; }
 @keyframes kiteFloat{ 0%,100%{ transform:translateY(0) rotate(-7deg); } 50%{ transform:translateY(14px) rotate(5deg); } }
 @keyframes sway{ 0%,100%{ transform:rotate(-9deg); } 50%{ transform:rotate(9deg); } }
 
-header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3rem; }
+header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 2.5rem; }
 .eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.3em; text-transform:uppercase; font-size:.75rem;
   font-weight:500; margin:0 0 1rem; animation:fadeUp .8s ease both; }
 .logo{ font-weight:700; color:var(--chalk); font-size:clamp(2.6rem,7vw,5.2rem); margin:0; letter-spacing:-.01em;
   text-shadow:0 4px 40px rgba(240,193,75,.15); animation:fadeUp .9s cubic-bezier(.2,.8,.2,1) .1s both; }
 .tagline{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:clamp(1rem,2.3vw,1.3rem);
-  margin:1.2rem 0 0; opacity:.85; animation:fadeUp .9s ease .35s both; }
+  margin:1.2rem auto 0; opacity:.85; max-width:640px; animation:fadeUp .9s ease .35s both; }
 @keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
-.grid{ position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:1rem 1.5rem 6rem;
-  display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.75rem; }
+
+.btn-row{ display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2.2rem;
+  animation:fadeUp .9s ease .5s both; }
+.btn-primary, .btn-secondary{ font-family:var(--font-display); font-weight:600; font-size:.95rem;
+  padding:.9rem 1.8rem; border-radius:999px; border:none; cursor:pointer; text-decoration:none;
+  display:inline-flex; align-items:center; gap:.4rem; transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease; }
+.btn-primary{ background:var(--chalk); color:var(--bg-deep); box-shadow:0 10px 30px rgba(244,240,230,.15); }
+.btn-secondary{ background:var(--ui-glass); color:var(--chalk); border:1px solid var(--ui-glass-border); }
+.btn-primary:hover, .btn-secondary:hover{ transform:translateY(-3px); }
+.btn-primary:hover{ box-shadow:0 14px 36px rgba(244,240,230,.25); }
+
+.section{ position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:2.6rem 1.5rem; }
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:1rem;
+  margin-bottom:1.4rem; flex-wrap:wrap; }
+.section-eyebrow{ font-weight:600; color:var(--chalk); font-size:1.15rem; margin:0; letter-spacing:-.01em; }
+.section-sub{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.85rem; margin:0; opacity:.75; }
+
+.grid{ position:relative; z-index:1; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.75rem; }
+.section .grid{ padding:0; max-width:none; margin:0; }
+
 .card{ position:relative; display:block; border-radius:1.4rem; overflow:hidden; text-decoration:none;
   aspect-ratio:4/3; background:#1a1a24; border:1px solid var(--ui-glass-border);
   box-shadow:0 20px 40px rgba(0,0,0,.35);
@@ -77,7 +95,7 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 .card-flag svg, .card-flag img{ width:3.4rem; height:auto; border-radius:.4rem; box-shadow:0 6px 16px rgba(0,0,0,.5); object-fit:cover; }
 .card:not(.locked):hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
 .card.locked .card-flag{ filter:grayscale(.7) brightness(.55); }
-.card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(10,10,15,.55) 70%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
+.card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 35%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
 .card::after{ content:''; position:absolute; inset:0; border-radius:1.4rem; z-index:2; pointer-events:none;
   box-shadow:inset 0 0 0 1.5px transparent; transition:box-shadow .35s ease; }
 .card:not(.locked):hover::after{ box-shadow:inset 0 0 0 1.5px var(--accent), 0 0 24px var(--accent); }
@@ -94,7 +112,44 @@ header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 3re
 .card:not(.locked):hover .card-cta{ opacity:1; transform:translateY(0); }
 .card-badge{ margin-top:.5rem; align-self:flex-start; padding:.4rem 1rem; border-radius:999px; font-size:.78rem;
   font-weight:600; color:var(--chalk-dim); background:rgba(244,240,230,.1); border:1px solid var(--ui-glass-border); }
-footer{ position:relative; z-index:1; text-align:center; padding:3rem 1.5rem 3rem; color:var(--chalk-dim); }
+.card-badge.tag-trending{ color:#f0c14b; border-color:rgba(240,193,75,.4); background:rgba(240,193,75,.1); }
+.card-badge.tag-new{ color:#b4fff0; border-color:rgba(180,255,240,.4); background:rgba(180,255,240,.1); }
+.card-badge.tag-loved{ color:#ff8fa3; border-color:rgba(255,143,163,.4); background:rgba(255,143,163,.1); }
+
+.card-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:3.6rem; z-index:1; filter:drop-shadow(0 8px 20px rgba(0,0,0,.4));
+  transition:transform .5s cubic-bezier(.2,.8,.2,1); }
+.card:not(.locked):hover .card-icon{ transform:scale(1.08) translateY(-4px); }
+
+.row-scroll{ display:flex; gap:1.4rem; overflow-x:auto; padding:.3rem .1rem 1rem; scroll-snap-type:x proximity;
+  -webkit-overflow-scrolling:touch; }
+.row-scroll::-webkit-scrollbar{ height:6px; }
+.row-scroll::-webkit-scrollbar-thumb{ background:var(--ui-glass-border); border-radius:999px; }
+.row-scroll .card{ flex:0 0 240px; scroll-snap-align:start; }
+
+.featured{ position:relative; display:grid; grid-template-columns:1.1fr 1fr; gap:0; border-radius:1.6rem;
+  overflow:hidden; background:#1a1a24; border:1px solid var(--ui-glass-border); box-shadow:0 24px 60px rgba(0,0,0,.45);
+  text-decoration:none; min-height:360px; }
+.featured .card-icon{ position:relative; font-size:6rem; }
+.featured-info{ position:relative; z-index:1; padding:2.2rem 2.4rem; display:flex; flex-direction:column;
+  justify-content:center; gap:.8rem; }
+.featured-eyebrow{ color:var(--accent); font-weight:600; letter-spacing:.15em; text-transform:uppercase; font-size:.75rem; margin:0; }
+.featured-title{ color:var(--chalk); font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; margin:0; }
+.featured-tagline{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.05rem; margin:0; }
+.featured .btn-primary{ align-self:flex-start; margin-top:.6rem; }
+@media (max-width:760px){ .featured{ grid-template-columns:1fr; } .featured .card-icon{ min-height:200px; } }
+
+.surprise-float{ position:fixed; right:1.4rem; bottom:1.4rem; z-index:5; width:3.6rem; height:3.6rem;
+  border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--chalk); color:#0a0a0f;
+  font-size:1.5rem; cursor:pointer; box-shadow:0 12px 30px rgba(0,0,0,.4); transition:transform .3s ease; }
+.surprise-float:hover{ transform:scale(1.08) rotate(-8deg); }
+.surprise-float.spin{ animation:spin .5s ease; }
+@keyframes spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+
+footer{ position:relative; z-index:1; text-align:center; padding:3rem 1.5rem 6rem; color:var(--chalk-dim); }
+footer a{ color:var(--chalk-dim); text-decoration:none; margin:0 .6rem; }
+footer a:hover{ color:var(--chalk); }
+.footer-links{ margin-bottom:1rem; }
 @media (prefers-reduced-motion:reduce){
   *{ animation-duration:.001s !important; transition-duration:.001s !important; }
 }
@@ -123,135 +178,237 @@ footer{ position:relative; z-index:1; text-align:center; padding:3rem 1.5rem 3re
 <polygon points="50,0 100,50 50,95 0,50" fill="#f0c14b"/>
 <polygon points="50,0 50,95 0,50" fill="#ff6b5e"/>
 <polygon points="50,95 100,50 50,0" fill="#e87a3c" opacity=".55"/>
-<line x1="0" y1="50" x2="100" y2="50" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<line x1="50" y1="0" x2="50" y2="95" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<path d="M50 95 Q44 112 54 124 Q44 136 54 148 Q46 160 54 172" stroke="#f4f0e6" stroke-width="2" fill="none" opacity=".5"/>
 </svg>
 <svg class="deco-kite k4" viewBox="0 0 100 190" xmlns="http://www.w3.org/2000/svg">
 <polygon points="50,0 100,50 50,95 0,50" fill="#f0c14b"/>
 <polygon points="50,0 50,95 0,50" fill="#ff6b5e"/>
 <polygon points="50,95 100,50 50,0" fill="#e87a3c" opacity=".55"/>
-<line x1="0" y1="50" x2="100" y2="50" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<line x1="50" y1="0" x2="50" y2="95" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<path d="M50 95 Q44 112 54 124 Q44 136 54 148 Q46 160 54 172" stroke="#f4f0e6" stroke-width="2" fill="none" opacity=".5"/>
 </svg>
-<svg class="deco-flower f1" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-<g fill="#ff8fa3">
-<ellipse cx="30" cy="14" rx="10" ry="16"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(72 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(144 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(216 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(288 30 30)"/>
-</g>
-<circle cx="30" cy="30" r="7" fill="#f0c14b"/>
-</svg>
-<svg class="deco-flower f2" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-<g fill="#f4f0e6">
-<ellipse cx="30" cy="14" rx="10" ry="16"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(72 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(144 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(216 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(288 30 30)"/>
-</g>
-<circle cx="30" cy="30" r="7" fill="#ff6b5e"/>
-</svg>
-<svg class="deco-flower f3" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-<g fill="#b4fff0">
-<ellipse cx="30" cy="14" rx="10" ry="16"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(72 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(144 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(216 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(288 30 30)"/>
-</g>
-<circle cx="30" cy="30" r="7" fill="#f0c14b"/>
-</svg>
-<svg class="deco-flower f4" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-<g fill="#ff8fa3">
-<ellipse cx="30" cy="14" rx="10" ry="16"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(72 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(144 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(216 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(288 30 30)"/>
-</g>
-<circle cx="30" cy="30" r="7" fill="#f4f0e6"/>
-</svg>
-<svg class="deco-flower f5" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
-<g fill="#f0c14b">
-<ellipse cx="30" cy="14" rx="10" ry="16"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(72 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(144 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(216 30 30)"/>
-<ellipse cx="30" cy="14" rx="10" ry="16" transform="rotate(288 30 30)"/>
-</g>
-<circle cx="30" cy="30" r="7" fill="#e87a3c"/>
-</svg>
+<svg class="deco-flower f1" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#ff8fa3"/><circle cx="30" cy="40" r="10" fill="#ff8fa3"/><circle cx="20" cy="30" r="10" fill="#ff8fa3"/><circle cx="40" cy="30" r="10" fill="#ff8fa3"/><circle cx="30" cy="30" r="7" fill="#f0c14b"/></svg>
+<svg class="deco-flower f2" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#b4fff0"/><circle cx="30" cy="40" r="10" fill="#b4fff0"/><circle cx="20" cy="30" r="10" fill="#b4fff0"/><circle cx="40" cy="30" r="10" fill="#b4fff0"/><circle cx="30" cy="30" r="7" fill="#f4f0e6"/></svg>
+<svg class="deco-flower f3" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#ff8fa3"/><circle cx="30" cy="40" r="10" fill="#ff8fa3"/><circle cx="20" cy="30" r="10" fill="#ff8fa3"/><circle cx="40" cy="30" r="10" fill="#ff8fa3"/><circle cx="30" cy="30" r="7" fill="#f0c14b"/></svg>
+<svg class="deco-flower f4" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#b4fff0"/><circle cx="30" cy="40" r="10" fill="#b4fff0"/><circle cx="20" cy="30" r="10" fill="#b4fff0"/><circle cx="40" cy="30" r="10" fill="#b4fff0"/><circle cx="30" cy="30" r="7" fill="#f4f0e6"/></svg>
+<svg class="deco-flower f5" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#ff8fa3"/><circle cx="30" cy="40" r="10" fill="#ff8fa3"/><circle cx="20" cy="30" r="10" fill="#ff8fa3"/><circle cx="40" cy="30" r="10" fill="#ff8fa3"/><circle cx="30" cy="30" r="7" fill="#f0c14b"/></svg>
 </div>
 <header>
-  <p class="eyebrow">Playrium</p>
-  <h1 class="logo">Interactive Experiences.<br>Not Games.</h1>
-  <p class="tagline">A growing universe of premium physics-driven toys, organized by country — pick one to begin.</p>
+<p class="eyebrow">Playrium</p>
+<h1 class="logo">Discover Interactive<br>Experiences.</h1>
+<p class="tagline">Explore handcrafted interactive worlds inspired by cultures, creativity and curiosity — pick one and start playing.</p>
+<div class="btn-row">
+<a href="#trending" class="btn-primary">Explore Experiences</a>
+<button class="btn-secondary" id="surpriseHero" type="button">🎲 Surprise Me</button>
+</div>
 </header>
-<div class="grid" id="grid"></div>
-<footer><p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p></footer>
+
+<section class="section" id="featured-wrap">
+<div class="section-head"><p class="section-eyebrow">Featured Experience</p></div>
+<a class="featured" id="featuredCard" href="#"></a>
+</section>
+
+<section class="section" id="trending">
+<div class="section-head"><p class="section-eyebrow">🔥 Trending</p></div>
+<div class="grid" id="trendingGrid"></div>
+</section>
+
+<section class="section" id="new">
+<div class="section-head"><p class="section-eyebrow">🆕 New This Week</p></div>
+<div class="row-scroll" id="newRow"></div>
+</section>
+
+<section class="section" id="loved">
+<div class="section-head"><p class="section-eyebrow">⭐ Most Loved</p></div>
+<div class="row-scroll" id="lovedRow"></div>
+</section>
+
+<section class="section" id="countries">
+<div class="section-head"><p class="section-eyebrow">🌍 Browse by Country</p></div>
+<div class="grid" id="countryGrid"></div>
+</section>
+
+<section class="section" id="categories">
+<div class="section-head"><p class="section-eyebrow">Browse by Category</p></div>
+<div id="categoryRows"></div>
+</section>
+
+<section class="section" id="all">
+<div class="section-head"><p class="section-eyebrow">All Experiences</p><p class="section-sub" id="allCount"></p></div>
+<div class="grid" id="allGrid"></div>
+</section>
+
+<footer>
+<div class="footer-links">
+<a href="#trending">Experiences</a>
+<a href="#countries">Countries</a>
+<a href="#categories">Categories</a>
+<a href="#" id="footerRandom">Random Experience</a>
+</div>
+<p>Playrium &middot; built with vanilla HTML, CSS &amp; JavaScript &middot; no frameworks, no backend</p>
+</footer>
+
+<button class="surprise-float" id="surpriseFloat" type="button" aria-label="Surprise Me">🎲</button>
+
 <script>
 const INDIA_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FF9933"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#138808"/><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="5"/><circle cx="450" cy="300" r="6" fill="#000080"/></svg>';
 const JAPAN_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#FFFFFF"/><circle cx="450" cy="300" r="120" fill="#BC002D"/></svg>';
 function flagImg(code){
   return '<img src="https://flagcdn.com/' + code.toLowerCase() + '.svg" alt="' + code + ' flag" loading="lazy">';
 }
+
 const COUNTRIES = [
-  { title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG, live:true },
-  { title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:JAPAN_FLAG, live:true },
-  { title:'China', tagline:'Coming soon.', code:'CN', accent:'#DE2910', live:false },
-  { title:'South Korea', tagline:'Coming soon.', code:'KR', accent:'#0047A0', live:false },
-  { title:'Thailand', tagline:'Coming soon.', code:'TH', accent:'#A51931', live:false },
-  { title:'Vietnam', tagline:'Coming soon.', code:'VN', accent:'#DA251D', live:false },
-  { title:'Indonesia', tagline:'Coming soon.', code:'ID', accent:'#CE1126', live:false },
-  { title:'Philippines', tagline:'Toys inspired by Filipino games and island life.', count:'4 experiences', href:'philippines.html', code:'PH', accent:'#0038A8', live:true },
-  { title:'Malaysia', tagline:'Coming soon.', code:'MY', accent:'#010066', live:false },
-  { title:'Singapore', tagline:'Coming soon.', code:'SG', accent:'#EF3340', live:false },
-  { title:'Nepal', tagline:'Coming soon.', code:'NP', accent:'#DC143C', live:false },
-  { title:'Bhutan', tagline:'Coming soon.', code:'BT', accent:'#FFA500', live:false },
-  { title:'Mongolia', tagline:'Coming soon.', code:'MN', accent:'#C4272F', live:false },
-  { title:'Australia', tagline:'Coming soon.', code:'AU', accent:'#00247D', live:false },
-  { title:'New Zealand', tagline:'Coming soon.', code:'NZ', accent:'#00247D', live:false },
-  { title:'Ghana', tagline:'Coming soon.', code:'GH', accent:'#FCD116', live:false },
-  { title:'South Africa', tagline:'Coming soon.', code:'ZA', accent:'#007A4D', live:false },
-  { title:'Kenya', tagline:'Coming soon.', code:'KE', accent:'#BB0000', live:false },
-  { title:'Nigeria', tagline:'Coming soon.', code:'NG', accent:'#008751', live:false },
-  { title:'Morocco', tagline:'Coming soon.', code:'MA', accent:'#C1272D', live:false },
-  { title:'Egypt', tagline:'Coming soon.', code:'EG', accent:'#C09300', live:false },
-  { title:'Türkiye', tagline:'Coming soon.', code:'TR', accent:'#E30A17', live:false },
-  { title:'Greece', tagline:'Coming soon.', code:'GR', accent:'#0D5EAF', live:false },
-  { title:'Italy', tagline:'Coming soon.', code:'IT', accent:'#008C45', live:false },
-  { title:'France', tagline:'Coming soon.', code:'FR', accent:'#0055A4', live:false },
-  { title:'Spain', tagline:'Coming soon.', code:'ES', accent:'#AA151B', live:false },
-  { title:'United Kingdom', tagline:'Coming soon.', code:'GB', accent:'#012169', live:false },
-  { title:'Ireland', tagline:'Coming soon.', code:'IE', accent:'#169B62', live:false },
-  { title:'Germany', tagline:'Coming soon.', code:'DE', accent:'#FFCE00', live:false },
-  { title:'Mexico', tagline:'Coming soon.', code:'MX', accent:'#006847', live:false },
-  { title:'Brazil', tagline:'Coming soon.', code:'BR', accent:'#009C3B', live:false },
-  { title:'USA', tagline:'Coming soon.', code:'US', accent:'#3C3B6E', live:false },
-  { title:'Canada', tagline:'Coming soon.', code:'CA', accent:'#FF0000', live:false },
+  { title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG },
+  { title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:JAPAN_FLAG },
+  { title:'Philippines', tagline:'Toys inspired by Filipino games and island life.', count:'4 experiences', href:'philippines.html', accent:'#0038A8', flag:flagImg('PH') },
 ];
-const grid = document.getElementById('grid');
-COUNTRIES.forEach((c, i) => {
-  const el = document.createElement(c.live ? 'a' : 'div');
-  el.className = 'card' + (c.live ? '' : ' locked');
-  if (c.live) el.href = c.href;
-  el.style.setProperty('--accent', c.accent);
-  el.style.animationDelay = (i * 0.03) + 's';
-  const icon = c.flag || flagImg(c.code);
-  el.innerHTML = `
-    <div class="card-flag">${icon}</div>
-    <div class="card-content">
-      <p class="card-title"><span class="accent-dot"></span>${c.title}</p>
-      <p class="card-tagline">${c.tagline}</p>
-      ${c.live ? '<p class="card-count">' + c.count + '</p><span class="card-cta">Explore &rarr;</span>' : '<span class="card-badge">Coming Soon</span>'}
-    </div>
-  `;
-  grid.appendChild(el);
+const EXPERIENCES = [
+  { title:'Gully Cricket™', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', flag:INDIA_FLAG, accent:'#f0c14b', icon:'🏏', tags:['traditional','skill','multiplayer'] },
+  { title:'Matka Mania™', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', flag:INDIA_FLAG, accent:'#4fd6c4', icon:'🏺', tags:['physics','skill'] },
+  { title:'Kancha Kings™', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', flag:INDIA_FLAG, accent:'#e8a13c', icon:'🔮', tags:['traditional','skill'] },
+  { title:'Balloon Bazaar™', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', flag:INDIA_FLAG, accent:'#ff6b5e', icon:'🎈', tags:['funny','kids'] },
+  { title:'Spend ₹10,000 Crore™', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', flag:INDIA_FLAG, accent:'#f0c14b', icon:'💰', tags:['strategy','educational'] },
+  { title:'Hydraulic Press Lab™', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', flag:INDIA_FLAG, accent:'#9a97a8', icon:'⚙️', tags:['physics','funny'] },
+  { title:'World Size Explorer™', tagline:"The World Isn't What It Looks Like.", href:'world-size-explorer.html', country:'India', flag:INDIA_FLAG, accent:'#b4fff0', icon:'🌍', tags:['educational','puzzle','nature'] },
+  { title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', flag:INDIA_FLAG, accent:'#138808', icon:'🐍', tags:['traditional','strategy'] },
+  { title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', flag:INDIA_FLAG, accent:'#e87a3c', icon:'🥧', tags:['skill','puzzle'] },
+  { title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', flag:INDIA_FLAG, accent:'#9a97a8', icon:'🪨', tags:['traditional','multiplayer'] },
+  { title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', flag:INDIA_FLAG, accent:'#ff8fa3', icon:'🔲', tags:['traditional','kids'] },
+  { title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', flag:INDIA_FLAG, accent:'#ff8fa3', icon:'🎨', tags:['festival','puzzle'] },
+  { title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', flag:JAPAN_FLAG, accent:'#BC002D', icon:'🎮', tags:['skill','physics'] },
+  { title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', flag:JAPAN_FLAG, accent:'#4fa8ff', icon:'🐟', tags:['festival','skill','nature'] },
+  { title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', flag:JAPAN_FLAG, accent:'#ff8fa3', icon:'🪭', tags:['physics','kids'] },
+  { title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', flag:JAPAN_FLAG, accent:'#4fd6c4', icon:'🎏', tags:['festival','physics','nature'] },
+  { title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', flag:flagImg('PH'), accent:'#0038A8', icon:'🐚', tags:['traditional','strategy'] },
+  { title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'🎋', tags:['traditional','skill'] },
+  { title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'⭐', tags:['festival','kids'] },
+  { title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', flag:flagImg('PH'), accent:'#ff6b5e', icon:'🚌', tags:['skill','strategy'] },
+];
+
+const CATEGORY_LABELS = {
+  traditional:'🧩 Traditional Games', physics:'⚙️ Physics Toys', skill:'🎯 Skill',
+  strategy:'♟️ Strategy', puzzle:'🧠 Puzzle', kids:'👨‍👩‍👧 Family', festival:'🎉 Festival Games', nature:'🌿 Nature'
+};
+function playCount(href){
+  try{ return parseInt(localStorage.getItem('play_'+href) || '0', 10); }catch(e){ return 0; }
+}
+function bumpPlayCount(href){
+  try{ localStorage.setItem('play_'+href, String(playCount(href)+1)); }catch(e){}
+}
+
+function makeCard(exp, opts){
+  opts = opts || {};
+  const el = document.createElement('a');
+  el.className = 'card';
+  el.href = exp.href;
+  el.style.setProperty('--accent', exp.accent);
+  el.style.animationDelay = (opts.delay || 0) + 's';
+  el.addEventListener('click', () => bumpPlayCount(exp.href));
+  const count = playCount(exp.href);
+  const countHtml = count > 0 ? '<p class="card-count">Played ' + count + ' time' + (count===1?'':'s') + '</p>' : '';
+  const badgeHtml = opts.badge ? '<span class="card-badge ' + (opts.badgeClass||'') + '">' + opts.badge + '</span>' : '';
+  el.innerHTML =
+    '<div class="card-icon">' + exp.icon + '</div>' +
+    '<div class="card-flag">' + exp.flag + '</div>' +
+    '<div class="card-content">' +
+      '<p class="card-title"><span class="accent-dot"></span>' + exp.title + '</p>' +
+      '<p class="card-tagline">' + exp.tagline + '</p>' +
+      countHtml + badgeHtml +
+      '<span class="card-cta">Play &rarr;</span>' +
+    '</div>';
+  return el;
+}
+
+function renderFeatured(exp){
+  const el = document.getElementById('featuredCard');
+  el.href = exp.href;
+  el.style.setProperty('--accent', exp.accent);
+  el.onclick = () => bumpPlayCount(exp.href);
+  el.innerHTML =
+    '<div class="card-icon">' + exp.icon + '</div>' +
+    '<div class="featured-info">' +
+      '<p class="featured-eyebrow">Featured &middot; ' + exp.country + '</p>' +
+      '<h2 class="featured-title">' + exp.title + '</h2>' +
+      '<p class="featured-tagline">' + exp.tagline + '</p>' +
+      '<span class="btn-primary">Play Now &rarr;</span>' +
+    '</div>';
+}
+// Featured: rotate deterministically by day so it feels alive without fake data
+const dayIndex = Math.floor(Date.now() / 86400000) % EXPERIENCES.length;
+renderFeatured(EXPERIENCES[dayIndex]);
+
+// Trending: curated real cross-section (one from a mix of tags/countries)
+const trendingPicks = ['gully-cricket.html','kancha-kings.html','daruma-drop.html','sungka-streak.html','hydraulic-press-lab.html','tinikling-tempo.html'];
+const trendingGrid = document.getElementById('trendingGrid');
+trendingPicks.forEach((href, i) => {
+  const exp = EXPERIENCES.find(e => e.href === href);
+  if (exp) trendingGrid.appendChild(makeCard(exp, { delay:i*0.05, badge:'Trending', badgeClass:'tag-trending' }));
 });
+
+// New This Week
+const newPicks = ['sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html'];
+const newRow = document.getElementById('newRow');
+newPicks.forEach((href, i) => {
+  const exp = EXPERIENCES.find(e => e.href === href);
+  if (exp) newRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'New', badgeClass:'tag-new' }));
+});
+
+// Most Loved: real localStorage counts if present, else curated fallback
+const lovedRow = document.getElementById('lovedRow');
+const withCounts = EXPERIENCES.map(e => ({ e, c:playCount(e.href) })).filter(x => x.c > 0).sort((a,b)=>b.c-a.c);
+const lovedList = withCounts.length >= 4 ? withCounts.slice(0,4).map(x=>x.e) :
+  ['moksha-patam.html','rangoli-maker.html','balloon-bazaar.html','pie-break.html'].map(h => EXPERIENCES.find(e=>e.href===h));
+lovedList.forEach((exp, i) => { if (exp) lovedRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'Most Loved', badgeClass:'tag-loved' })); });
+
+// Browse by Country
+const countryGrid = document.getElementById('countryGrid');
+COUNTRIES.forEach((c, i) => {
+  const el = document.createElement('a');
+  el.className = 'card';
+  el.href = c.href;
+  el.style.setProperty('--accent', c.accent);
+  el.style.animationDelay = (i * 0.05) + 's';
+  el.innerHTML =
+    '<div class="card-flag">' + c.flag + '</div>' +
+    '<div class="card-content">' +
+      '<p class="card-title"><span class="accent-dot"></span>' + c.title + '</p>' +
+      '<p class="card-tagline">' + c.tagline + '</p>' +
+      '<p class="card-count">' + c.count + '</p>' +
+      '<span class="card-cta">Browse &rarr;</span>' +
+    '</div>';
+  countryGrid.appendChild(el);
+});
+// Category rows (auto-hide if fewer than 3 real matches)
+const categoryRoot = document.getElementById('categoryRows');
+Object.keys(CATEGORY_LABELS).forEach(tag => {
+  const matches = EXPERIENCES.filter(e => e.tags.includes(tag));
+  if (matches.length < 3) return;
+  const wrap = document.createElement('div');
+  wrap.style.marginBottom = '2.2rem';
+  const head = document.createElement('div');
+  head.className = 'section-head';
+  head.innerHTML = '<p class="section-eyebrow">' + CATEGORY_LABELS[tag] + '</p>';
+  const row = document.createElement('div');
+  row.className = 'row-scroll';
+  matches.forEach((exp, i) => row.appendChild(makeCard(exp, { delay:i*0.05 })));
+  wrap.appendChild(head);
+  wrap.appendChild(row);
+  categoryRoot.appendChild(wrap);
+});
+
+// All Experiences (full catalogue, alphabetical by title for predictable browsing)
+const allGrid = document.getElementById('allGrid');
+const sorted = [...EXPERIENCES].sort((a,b) => a.title.localeCompare(b.title));
+sorted.forEach((exp, i) => allGrid.appendChild(makeCard(exp, { delay:i*0.02 })));
+document.getElementById('allCount').textContent = EXPERIENCES.length + ' experiences';
+
+// Surprise Me: pick a random experience, re-render Featured, scroll to it
+function surpriseMe(btn){
+  if (btn) { btn.classList.add('spin'); setTimeout(() => btn.classList.remove('spin'), 500); }
+  const pick = EXPERIENCES[Math.floor(Math.random() * EXPERIENCES.length)];
+  renderFeatured(pick);
+  document.getElementById('featured-wrap').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+document.getElementById('surpriseHero').addEventListener('click', () => surpriseMe(document.getElementById('surpriseFloat')));
+document.getElementById('surpriseFloat').addEventListener('click', function(){ surpriseMe(this); });
+document.getElementById('footerRandom').addEventListener('click', (e) => { e.preventDefault(); surpriseMe(document.getElementById('surpriseFloat')); });
 </script>
 </body>
 </html>
