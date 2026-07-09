@@ -280,6 +280,7 @@ const EXPERIENCES = [
   { title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'🎋', tags:['traditional','skill'] },
   { title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'⭐', tags:['festival','kids'] },
   { title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', flag:flagImg('PH'), accent:'#ff6b5e', icon:'🚌', tags:['skill','strategy'] },
+  { title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', flag:'', accent:'#4fd6c4', icon:'🌊', tags:['physics','nature'] },
 ];
 
 const CATEGORY_LABELS = {
@@ -343,7 +344,7 @@ trendingPicks.forEach((href, i) => {
 });
 
 // New This Week
-const newPicks = ['sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html'];
+const newPicks = ['zen-ripple.html','sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html'];
 const newRow = document.getElementById('newRow');
 newPicks.forEach((href, i) => {
   const exp = EXPERIENCES.find(e => e.href === href);
