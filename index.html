@@ -470,24 +470,24 @@ el.innerHTML =
 '</div>';
 }
 
-const dayIndex = Math.floor(Date.now() / 86400000) % EXPERIENCES.length;
+const dayIndex = Math.floor(Date.now() / 86400000) % EXPERIENCES.length; function rotateArr(arr, seed){ const n = arr.length; const s = ((seed % n) + n) % n; return arr.slice(s).concat(arr.slice(0, s)); }
 const featuredExp = EXPERIENCES[dayIndex];
 renderFeatured(featuredExp);
 visibleExperiences.add(featuredExp.href);
 
-const trendingPicks = ['gully-cricket.html','kancha-kings.html','daruma-drop.html','sungka-streak.html','hydraulic-press-lab.html','tinikling-tempo.html','matka-mania.html','balloon-bazaar.html','jeepney-jam.html','goldfish-scoop.html'];
+const trendingPicks = rotateArr(['gully-cricket.html','kancha-kings.html','daruma-drop.html','sungka-streak.html','hydraulic-press-lab.html','tinikling-tempo.html','matka-mania.html','balloon-bazaar.html','jeepney-jam.html','goldfish-scoop.html'], dayIndex);
 const trendingGrid = document.getElementById('trendingGrid');
 const trendingChosen = trendingPicks.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,6);
 trendingChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); trendingGrid.appendChild(makeCard(exp, { delay:i*0.05, badge:'Trending', badgeClass:'tag-trending' })); });
 
-const newPicks = ['gravity-playground.html','cloud-painter.html','zen-ripple.html','sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html','parol-glow.html','rangoli-maker.html'];
+const newPicks = rotateArr(['gravity-playground.html','cloud-painter.html','zen-ripple.html','sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html','parol-glow.html','rangoli-maker.html'], dayIndex + 3);
 const newRow = document.getElementById('newRow');
 const newChosen = newPicks.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,4);
 newChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); newRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'New', badgeClass:'tag-new' })); });
 
 const lovedRow = document.getElementById('lovedRow');
 const withCounts = EXPERIENCES.map(e => ({ e, c:playCount(e.href) })).filter(x => x.c > 0 && !visibleExperiences.has(x.e.href)).sort((a,b)=>b.c-a.c);
-const lovedFallback = ['moksha-patam.html','rangoli-maker.html','balloon-bazaar.html','pie-break.html','seven-stones.html','stapu.html'];
+const lovedFallback = rotateArr(['moksha-patam.html','rangoli-maker.html','balloon-bazaar.html','pie-break.html','seven-stones.html','stapu.html'], dayIndex + 6);
 let lovedChosen = withCounts.length >= 4 ? withCounts.slice(0,4).map(x=>x.e) :
 lovedFallback.map(h => EXPERIENCES.find(e=>e.href===h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,4);
 lovedChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); lovedRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'Most Loved', badgeClass:'tag-loved' })); });
