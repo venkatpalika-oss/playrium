@@ -417,6 +417,7 @@ return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate();
 }
 
 const visibleExperiences = new Set();
+const HOMEPAGE_HIDDEN_RESERVE = 4; // keep a few experiences unseen on the homepage so Surprise Me can always discover something new
 
 function makeCard(exp, opts){
 opts = opts || {};
@@ -498,7 +499,9 @@ countryGrid.appendChild(el);
 
 const collectionRoot = document.getElementById('collectionRows');
 COLLECTIONS.forEach(col => {
-const matches = col.candidates.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href));
+const collectionBudget = EXPERIENCES.length - visibleExperiences.size - HOMEPAGE_HIDDEN_RESERVE;
+if (collectionBudget <= 0) return;
+const matches = col.candidates.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0, collectionBudget);
 if (matches.length === 0) return;
 matches.forEach(e => visibleExperiences.add(e.href));
 const wrap = document.createElement('div');
@@ -518,10 +521,12 @@ const playedEntries = EXPERIENCES
 .map(e => ({ e, c:playCount(e.href), t:lastPlayed(e.href) }))
 .filter(x => x.c > 0 && !visibleExperiences.has(x.e.href))
 .sort((a,b) => b.t - a.t);
-if (playedEntries.length > 0){
+const continueBudget = Math.max(0, EXPERIENCES.length - visibleExperiences.size - HOMEPAGE_HIDDEN_RESERVE);
+const continueChosen = playedEntries.slice(0, Math.min(4, continueBudget));
+if (continueChosen.length > 0){
 const continueSection = document.getElementById('continue-playing');
 const continueRow = document.getElementById('continueRow');
-playedEntries.slice(0,4).forEach((x, i) => {
+continueChosen.forEach((x, i) => {
 visibleExperiences.add(x.e.href);
 continueRow.appendChild(makeCard(x.e, { delay:i*0.05 }));
 });
