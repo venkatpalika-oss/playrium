@@ -366,13 +366,15 @@ const EXPERIENCES = [
 { title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'⭐', tags:['festival','kids'] },
 { title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', flag:flagImg('PH'), accent:'#ff6b5e', icon:'🚌', tags:['skill','strategy'] },
 { title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', flag:'', accent:'#4fd6c4', icon:'🌊', tags:['physics','nature'] },
+{ title:'Gravity Playground™', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:'Original', flag:'', accent:'#f0c14b', icon:'🌪️', tags:['physics','sandbox','relaxing'] },
+{ title:'Cloud Painter™', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:'Original', flag:'', accent:'#7fd8ff', icon:'☁️', tags:['relaxing','creative','nature'] },
 ];
 
 const COLLECTIONS = [
 { label:'🏘️ Village Life', candidates:['gully-cricket.html','kancha-kings.html','seven-stones.html','sungka-streak.html','tinikling-tempo.html','jeepney-jam.html'] },
 { label:'🎉 Festival Collection', candidates:['goldfish-scoop.html','koinobori-festival.html','parol-glow.html','rangoli-maker.html'] },
-{ label:'⚙️ Physics Playground', candidates:['matka-mania.html','hydraulic-press-lab.html','sensu-spinner.html','daruma-drop.html','zen-ripple.html'] },
-{ label:'🌊 Relaxing Toys', candidates:['zen-ripple.html','world-size-explorer.html','goldfish-scoop.html','sensu-spinner.html'] },
+{ label:'⚙️ Physics Playground', candidates:['matka-mania.html','hydraulic-press-lab.html','sensu-spinner.html','daruma-drop.html','zen-ripple.html','gravity-playground.html'] },
+{ label:'🌊 Relaxing Toys', candidates:['zen-ripple.html','world-size-explorer.html','goldfish-scoop.html','sensu-spinner.html','cloud-painter.html'] },
 { label:'🎨 Creative Studio', candidates:['rangoli-maker.html','parol-glow.html'] },
 { label:'🧠 Mind Challenges', candidates:['pie-break.html','moksha-patam.html','spend-crore.html','world-size-explorer.html','sungka-streak.html'] },
 { label:'👨‍👩‍👧 Family Favorites', candidates:['balloon-bazaar.html','stapu.html','parol-glow.html','sensu-spinner.html','seven-stones.html'] },
@@ -467,7 +469,7 @@ const trendingGrid = document.getElementById('trendingGrid');
 const trendingChosen = trendingPicks.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,6);
 trendingChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); trendingGrid.appendChild(makeCard(exp, { delay:i*0.05, badge:'Trending', badgeClass:'tag-trending' })); });
 
-const newPicks = ['zen-ripple.html','sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html','parol-glow.html','rangoli-maker.html'];
+const newPicks = ['gravity-playground.html','cloud-painter.html','zen-ripple.html','sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html','parol-glow.html','rangoli-maker.html'];
 const newRow = document.getElementById('newRow');
 const newChosen = newPicks.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,4);
 newChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); newRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'New', badgeClass:'tag-new' })); });
