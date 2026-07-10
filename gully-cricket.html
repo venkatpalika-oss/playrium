@@ -51,8 +51,8 @@
 
 *{box-sizing:border-box;}
 html,body{
-  margin:0; padding:0; width:100%; height:100%;
-  overflow:hidden; background:var(--ui-charcoal);
+  margin:0; padding:0; width:100%; min-height:100%;
+  overflow-x:hidden; background:var(--ui-charcoal);
   font-family:var(--font-display);
   -webkit-tap-highlight-color: transparent;
   user-select:none;
@@ -365,9 +365,12 @@ html,body{
 @media (prefers-reduced-motion: reduce){
   *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
 }
+#hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
+#pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 </head>
 <body>
+<div id="hero">
 <div id="app">
 
   <div id="scene">
@@ -490,6 +493,12 @@ html,body{
 
 </div>
 
+</div>
+<section id="pr-explore">
+<div id="pr-breadcrumb"></div>
+<div id="pr-related"></div>
+<div id="pr-continue-exploring"></div>
+</section>
 <script>
 (function(){
 "use strict";
@@ -995,5 +1004,11 @@ replayBtn.addEventListener('click', ()=>{ Sound.click(); startGame(); });
 
 })();
 </script>
+<script>window.PAGE_META = { slug: 'gully-cricket' };</script>
+<script src="components/experiences-data.js"></script>
+<script src="components/breadcrumb.js"></script>
+<script src="components/related.js"></script>
+<script src="components/navigation.js"></script>
+<script src="components/schema.js"></script>
 </body>
 </html>
