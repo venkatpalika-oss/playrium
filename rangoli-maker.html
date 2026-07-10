@@ -26,7 +26,7 @@
     --cream: #F6EEDD;
   }
   *{ box-sizing:border-box; }
-  html,body{ height:100%; margin:0; }
+  html,body{ min-height:100%; margin:0; }
   body{
     background: radial-gradient(circle at 50% 35%, var(--night-light), var(--night) 70%);
     color: var(--cream);
@@ -111,9 +111,12 @@
     border:none; border-radius:16px;
     padding:12px 28px; cursor:pointer;
   }
+#hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
+#pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 </head>
 <body>
+<div id="hero">
 
 <div class="wrap">
   <div class="title-bar">Rangoli Maker</div>
@@ -144,6 +147,12 @@
   </div>
 </div>
 
+</div>
+<section id="pr-explore">
+<div id="pr-breadcrumb"></div>
+<div id="pr-related"></div>
+<div id="pr-continue-exploring"></div>
+</section>
 <script>
 (function(){
   "use strict";
@@ -440,5 +449,11 @@
 
 })();
 </script>
+<script>window.PAGE_META = { slug: 'rangoli-maker' };</script>
+<script src="components/experiences-data.js"></script>
+<script src="components/breadcrumb.js"></script>
+<script src="components/related.js"></script>
+<script src="components/navigation.js"></script>
+<script src="components/schema.js"></script>
 </body>
 </html>
