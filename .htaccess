@@ -1,0 +1,17 @@
+# ============================================
+# Playrium — Production .htaccess (LiteSpeed)
+# 1) Force HTTPS
+# 2) Redirect non-www -> www (301)
+# 3) Preserve query strings (QSA)
+# 4) Rules ordered to avoid redirect loops
+# ============================================
+
+RewriteEngine On
+
+# Step 1: Force HTTPS on any non-secure request
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,QSA]
+
+# Step 2: Redirect the bare (non-www) domain to www (runs only once already on HTTPS)
+RewriteCond %{HTTP_HOST} ^playrium\.fun$ [NC]
+RewriteRule ^(.*)$ https://www.playrium.fun/$1 [L,R=301,QSA]

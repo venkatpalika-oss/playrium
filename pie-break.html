@@ -26,7 +26,7 @@
     --accent: #FFC857;
   }
   *{ box-sizing:border-box; }
-  html,body{ height:100%; margin:0; }
+  html,body{ min-height:100%; margin:0; }
   body{
     background: var(--wood);
     background-image: radial-gradient(circle at 50% 30%, var(--wood-light), var(--wood) 75%);
@@ -120,9 +120,12 @@
     padding:8px 16px; cursor:pointer;
   }
   .sound-toggle:hover{ background: rgba(0,0,0,0.45); }
+#hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
+#pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 </head>
 <body>
+<div id="hero">
 
 <div class="wrap">
   <div class="title-bar">Pie Break</div>
@@ -152,6 +155,12 @@
   </div>
 </div>
 
+</div>
+<section id="pr-explore">
+<div id="pr-breadcrumb"></div>
+<div id="pr-related"></div>
+<div id="pr-continue-exploring"></div>
+</section>
 <script>
 (function(){
   "use strict";
@@ -503,5 +512,11 @@
 
 })();
 </script>
+<script>window.PAGE_META = { slug: 'pie-break' };</script>
+<script src="components/experiences-data.js"></script>
+<script src="components/breadcrumb.js"></script>
+<script src="components/related.js"></script>
+<script src="components/navigation.js"></script>
+<script src="components/schema.js"></script>
 </body>
 </html>
