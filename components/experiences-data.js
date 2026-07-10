@@ -303,6 +303,36 @@
       "physics",
       "nature"
     ]
+  },
+  {
+    "slug": "gravity-playground",
+    "title": "Gravity Playground™",
+    "tagline": "Change Gravity. Change Reality.",
+    "href": "gravity-playground.html",
+    "country": "Original",
+    "flag": "",
+    "accent": "#f0c14b",
+    "icon": "🌪️",
+    "tags": [
+      "physics",
+      "sandbox",
+      "relaxing"
+    ]
+  },
+  {
+    "slug": "cloud-painter",
+    "title": "Cloud Painter™",
+    "tagline": "Draw The Sky. Watch Nature Paint The Rest.",
+    "href": "cloud-painter.html",
+    "country": "Original",
+    "flag": "",
+    "accent": "#7fd8ff",
+    "icon": "☁️",
+    "tags": [
+      "relaxing",
+      "creative",
+      "nature"
+    ]
   }
 ];
 
