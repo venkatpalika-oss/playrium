@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Playrium — Interactive Experiences, Not Games</title>
-<meta name="description" content="Playrium is a growing universe of premium, physics-driven interactive experiences from India, Japan and the Philippines. Explore 20 handcrafted toys — pick one and start playing.">
+<title>Playrium — An Interactive Museum of the World</title>
+<meta name="description" content="Playrium is an interactive museum of handcrafted experiences inspired by cultures around the world. Spin the globe, pick a country, and discover something to play.">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Playrium — Interactive Experiences, Not Games">
-<meta property="og:description" content="20 handcrafted interactive experiences inspired by cultures, festivals and curiosity — pick one to begin.">
+<meta property="og:title" content="Playrium — An Interactive Museum of the World">
+<meta property="og:description" content="Spin the globe. Pick a country. Discover a handcrafted interactive experience.">
 <meta property="og:image" content="https://www.playrium.fun/favicon.png">
 <meta property="og:url" content="https://www.playrium.fun/index.html">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Playrium — Interactive Experiences, Not Games">
-<meta name="twitter:description" content="20 handcrafted interactive experiences inspired by cultures, festivals and curiosity — pick one to begin.">
+<meta name="twitter:title" content="Playrium — An Interactive Museum of the World">
+<meta name="twitter:description" content="Spin the globe. Pick a country. Discover a handcrafted interactive experience.">
 <meta name="twitter:image" content="https://www.playrium.fun/favicon.png">
 <link rel="canonical" href="https://www.playrium.fun/index.html">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -21,46 +21,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
---bg-deep:#0a0a0f; --bg-mid:#141420;
+--bg-deep:#05050a; --bg-mid:#12121c;
 --chalk:#f4f0e6; --chalk-dim:#9a97a8;
---ui-glass:rgba(244,240,230,.06); --ui-glass-border:rgba(244,240,230,.14);
+--ui-glass:rgba(244,240,230,.07); --ui-glass-border:rgba(244,240,230,.14);
+--ui-glass-strong:rgba(20,20,28,.55);
 --font-display:'Fredoka', system-ui, sans-serif; --font-chalk:'Kalam', cursive;
 }
 *{box-sizing:border-box;}
 html,body{ margin:0; padding:0; width:100%; min-height:100%; background:var(--bg-deep);
 font-family:var(--font-display); -webkit-tap-highlight-color:transparent; }
 body{ overflow-x:hidden; }
-.bg-glow{ position:fixed; inset:0; z-index:0; pointer-events:none;
-background:
-radial-gradient(circle at 20% 20%, rgba(240,193,75,.10), transparent 40%),
-radial-gradient(circle at 80% 10%, rgba(180,255,240,.06), transparent 45%),
-radial-gradient(circle at 50% 90%, rgba(232,122,60,.05), transparent 50%);
-}
-.bg-decor{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-.bg-decor svg{ position:absolute; filter:drop-shadow(0 6px 12px rgba(0,0,0,.35)); }
-.deco-kite{ opacity:.16; }
-.deco-flower{ opacity:.22; }
-.k1{ top:7%; left:5%; width:64px; animation:kiteFloat 7.5s ease-in-out infinite; }
-.k2{ top:13%; right:7%; width:50px; animation:kiteFloat 9s ease-in-out infinite 1.1s; }
-.k3{ top:47%; left:3.5%; width:38px; opacity:.12; animation:kiteFloat 8.2s ease-in-out infinite .6s; }
-.k4{ top:62%; right:5%; width:46px; animation:kiteFloat 8.8s ease-in-out infinite .3s; }
-.f1{ top:23%; left:15%; width:30px; animation:sway 6.4s ease-in-out infinite; }
-.f2{ top:9%; right:21%; width:24px; animation:sway 7.1s ease-in-out infinite 1.3s; }
-.f3{ top:39%; right:16%; width:34px; animation:sway 7.8s ease-in-out infinite .8s; }
-.f4{ top:66%; left:11%; width:26px; animation:sway 6.7s ease-in-out infinite .4s; }
-.f5{ top:81%; right:10%; width:30px; animation:sway 7.4s ease-in-out infinite 1s; }
-@keyframes kiteFloat{ 0%,100%{ transform:translateY(0) rotate(-7deg); } 50%{ transform:translateY(14px) rotate(5deg); } }
-@keyframes sway{ 0%,100%{ transform:rotate(-9deg); } 50%{ transform:rotate(9deg); } }
-header{ position:relative; z-index:1; text-align:center; padding:5rem 1.5rem 2.5rem; }
-.eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.3em; text-transform:uppercase; font-size:.75rem;
-font-weight:500; margin:0 0 1rem; animation:fadeUp .8s ease both; }
-.logo{ font-weight:700; color:var(--chalk); font-size:clamp(2.6rem,7vw,5.2rem); margin:0; letter-spacing:-.01em;
-text-shadow:0 4px 40px rgba(240,193,75,.15); animation:fadeUp .9s cubic-bezier(.2,.8,.2,1) .1s both; }
-.tagline{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:clamp(1rem,2.3vw,1.3rem);
-margin:1.2rem auto 0; opacity:.85; max-width:640px; animation:fadeUp .9s ease .35s both; }
-@keyframes fadeUp{ from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);} }
-.btn-row{ display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:2.2rem;
-animation:fadeUp .9s ease .5s both; }
+a{ -webkit-tap-highlight-color:transparent; }
 .btn-primary, .btn-secondary{ font-family:var(--font-display); font-weight:600; font-size:.95rem;
 padding:.9rem 1.8rem; border-radius:999px; border:none; cursor:pointer; text-decoration:none;
 display:inline-flex; align-items:center; gap:.4rem; transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease; }
@@ -68,342 +39,338 @@ display:inline-flex; align-items:center; gap:.4rem; transition:transform .3s cub
 .btn-secondary{ background:var(--ui-glass); color:var(--chalk); border:1px solid var(--ui-glass-border); }
 .btn-primary:hover, .btn-secondary:hover{ transform:translateY(-3px); }
 .btn-primary:hover{ box-shadow:0 14px 36px rgba(244,240,230,.25); }
-.btn-primary:focus-visible, .btn-secondary:focus-visible, .card:focus-visible, .vote-btn:focus-visible{
+.btn-primary:focus-visible, .btn-secondary:focus-visible, .exp-row:focus-visible, .country-hidden-link:focus-visible{
 outline:2px solid #b4fff0; outline-offset:3px; }
+
+/* ---------- NAV ---------- */
+.nav{ position:fixed; top:0; left:0; right:0; z-index:40; display:flex; align-items:center;
+justify-content:space-between; padding:1.1rem 1.6rem; transition:background .4s ease, backdrop-filter .4s ease, border-color .4s ease;
+border-bottom:1px solid transparent; }
+.nav.scrolled{ background:rgba(10,10,15,.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+border-bottom-color:var(--ui-glass-border); }
+.nav-logo{ color:var(--chalk); font-weight:700; font-size:1.2rem; text-decoration:none; letter-spacing:-.01em; }
+.nav-links{ display:flex; align-items:center; gap:1.6rem; }
+.nav-links a{ color:var(--chalk-dim); text-decoration:none; font-size:.9rem; font-weight:500; transition:color .25s ease; }
+.nav-links a:hover{ color:var(--chalk); }
+.mute-toggle{ width:2.3rem; height:2.3rem; border-radius:50%; border:1px solid var(--ui-glass-border);
+background:var(--ui-glass); color:var(--chalk); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; }
+/* ---------- HERO ---------- */
+.hero{ position:relative; min-height:100vh; display:flex; align-items:stretch; padding:6.5rem 3rem 3rem;
+gap:2rem; overflow:hidden; }
+.hero-bg{ position:absolute; inset:0; z-index:0; pointer-events:none;
+background:
+radial-gradient(circle at 30% 25%, rgba(240,193,75,.10), transparent 45%),
+radial-gradient(circle at 75% 70%, rgba(180,255,240,.07), transparent 50%),
+linear-gradient(180deg, #05050a 0%, #0b0b14 60%, #0a0a12 100%);
+animation:bgDrift 40s ease-in-out infinite alternate; }
+@keyframes bgDrift{ from{ background-position:0 0,0 0,0 0; } to{ background-position:2% 3%, -3% -2%, 0 0; } }
+.hero-left{ position:relative; flex:1 1 64%; display:flex; flex-direction:column; align-items:center; justify-content:center; min-width:0; }
+.hero-copy{ position:relative; z-index:2; text-align:center; margin-bottom:.5rem; }
+.eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.3em; text-transform:uppercase; font-size:.75rem;
+font-weight:500; margin:0 0 .8rem; }
+.hero-title{ font-weight:700; color:var(--chalk); font-size:clamp(1.7rem,3.4vw,2.6rem); margin:0; letter-spacing:-.01em;
+text-shadow:0 4px 40px rgba(240,193,75,.15); }
+.hero-sub{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:clamp(.95rem,1.6vw,1.15rem);
+margin:.7rem auto 0; opacity:.85; max-width:480px; }
+.globe-stage{ position:relative; width:min(560px,90vw); height:min(560px,50vh); margin-top:.5rem; }
+.globe-stage canvas{ display:block; width:100% !important; height:100% !important; cursor:grab; touch-action:none; }
+.globe-stage canvas:active{ cursor:grabbing; }
+.globe-fallback{ position:absolute; inset:0; border-radius:50%; display:none; align-items:center; justify-content:center;
+font-size:9rem; background:radial-gradient(circle at 35% 30%, #2c5a7c, #0d1b2a 70%); box-shadow:0 0 90px rgba(79,168,255,.25) inset; }
+.globe-stage.fallback .globe-fallback{ display:flex; }
+.globe-stage.fallback canvas{ display:none; }
+.globe-hint{ text-align:center; color:var(--chalk-dim); font-family:var(--font-chalk); font-size:.85rem; opacity:.65; margin-top:.6rem; }
+.country-hidden-nav{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.country-hidden-nav.show-focus a:focus{ position:fixed; width:auto; height:auto; clip:auto; top:1rem; left:1rem; z-index:100; background:var(--chalk); color:var(--bg-deep); padding:.6rem 1rem; border-radius:.6rem; }
+
+/* ---------- SURPRISE PANEL ---------- */
+.hero-right{ position:relative; z-index:2; flex:0 0 32%; display:flex; align-items:center; justify-content:center; min-width:260px; }
+.surprise-panel{ width:100%; max-width:320px; border-radius:1.6rem; padding:2.2rem 1.8rem; text-align:center;
+background:var(--ui-glass-strong); border:1px solid var(--ui-glass-border); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+box-shadow:0 30px 70px rgba(0,0,0,.45); }
+.surprise-die{ font-size:2.8rem; display:inline-block; animation:diePulse 3.2s ease-in-out infinite; }
+@keyframes diePulse{ 0%,100%{ transform:scale(1) rotate(0deg);} 50%{ transform:scale(1.08) rotate(-6deg);} }
+.surprise-title{ color:var(--chalk); font-weight:700; font-size:1.25rem; margin:.9rem 0 .5rem; letter-spacing:.02em; }
+.surprise-copy{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.92rem; margin:0 0 1.4rem; line-height:1.5; }
+.surprise-open-btn{ width:100%; justify-content:center; }
+/* ---------- COUNTRY PANEL ---------- */
+.country-panel{ position:fixed; top:0; right:0; height:100%; width:min(400px,90vw); z-index:50;
+background:var(--ui-glass-strong); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+border-left:1px solid var(--ui-glass-border); box-shadow:-20px 0 60px rgba(0,0,0,.5);
+transform:translateX(100%); transition:transform .5s cubic-bezier(.2,.8,.2,1); padding:2rem 1.6rem; overflow-y:auto; }
+.country-panel.open{ transform:translateX(0); }
+.country-panel-close{ background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; float:right; }
+.country-panel-flag{ font-size:3rem; line-height:1; }
+.country-panel-name{ color:var(--chalk); font-weight:700; font-size:1.5rem; margin:.6rem 0 .2rem; clear:both; }
+.country-panel-count{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.9rem; margin:0 0 1rem; }
+.country-panel-divider{ height:1px; background:var(--ui-glass-border); margin:1rem 0; }
+.exp-row{ display:flex; align-items:center; gap:.8rem; padding:.7rem .5rem; border-radius:.9rem; text-decoration:none;
+color:var(--chalk); transition:background .25s ease; }
+.exp-row:hover{ background:var(--ui-glass); }
+.exp-row-icon{ font-size:1.4rem; flex:0 0 auto; }
+.exp-row-text{ display:flex; flex-direction:column; }
+.exp-row-title{ font-weight:600; font-size:.95rem; }
+.exp-row-tag{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.78rem; }
+.country-panel-cta{ display:block; text-align:center; margin-top:1.4rem; }
+/* ---------- SURPRISE OVERLAY ---------- */
+.surprise-overlay{ position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+background:rgba(5,5,10,.94); opacity:0; pointer-events:none; transition:opacity .4s ease; }
+.surprise-overlay.active{ opacity:1; pointer-events:auto; }
+.surprise-stage{ text-align:center; color:var(--chalk); padding:2rem; max-width:440px; position:relative; }
+.surprise-close{ position:absolute; top:-1rem; right:-1rem; background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; }
+.surprise-logo{ font-weight:700; font-size:1.4rem; opacity:0; transition:opacity .5s ease; }
+.surprise-logo.show{ opacity:1; }
+.surprise-step{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.05rem; margin-top:1.1rem; min-height:1.6rem; }
+.surprise-country-reveal{ margin-top:1.2rem; display:none; }
+.surprise-country-reveal.show{ display:block; animation:popIn .5s cubic-bezier(.2,.8,.2,1); }
+.surprise-country-flag{ font-size:3rem; line-height:1; }
+.surprise-country-name{ font-family:var(--font-chalk); color:var(--chalk); font-size:1.2rem; font-weight:700; margin:.5rem 0 0; }
+.surprise-result-card{ margin-top:1.3rem; background:#14141e; border:1px solid var(--ui-glass-border); border-radius:1.2rem;
+padding:1.7rem; display:none; transform:perspective(800px) rotateY(90deg); opacity:0; }
+.surprise-result-card.show{ display:block; animation:flipIn .6s cubic-bezier(.2,.8,.2,1) forwards; }
+@keyframes flipIn{ to{ transform:perspective(800px) rotateY(0deg); opacity:1; } }
+@keyframes popIn{ from{ transform:scale(.85); opacity:0; } to{ transform:scale(1); opacity:1; } }
+.surprise-result-icon{ font-size:3rem; }
+.surprise-result-title{ font-weight:700; font-size:1.3rem; margin:.6rem 0 .2rem; }
+.surprise-result-tag{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.95rem; margin:0 0 1.2rem; }
+.surprise-particles{ position:absolute; inset:0; pointer-events:none; overflow:visible; }
+.surprise-particles span{ position:absolute; width:6px; height:6px; border-radius:50%; background:#f0c14b;
+box-shadow:0 0 10px #f0c14b; opacity:0; }
+.surprise-particles span.go{ animation:particleBurst 1s ease-out forwards; }
+@keyframes particleBurst{ 0%{ opacity:1; transform:translate(0,0) scale(1);} 100%{ opacity:0; transform:translate(var(--px),var(--py)) scale(.2);} }
+
+/* ---------- FEATURED / CHALLENGE / CONTINUE ---------- */
 .section{ position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:2.6rem 1.5rem; }
-.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:1rem;
-margin-bottom:1.4rem; flex-wrap:wrap; }
-  .search-box{ margin:0 0 1.5rem; }
-  .search-box input{ width:100%; box-sizing:border-box; padding:.9rem 1.2rem; border-radius:1rem; border:1px solid var(--ui-glass-border); background:var(--ui-glass); color:var(--chalk); font-family:var(--font-display); font-size:1rem; outline:none; transition:border-color .2s ease, background .2s ease; }
-  .search-box input:focus{ border-color:var(--chalk-dim); background:rgba(244,240,230,.1); }
-  .search-box input::placeholder{ color:var(--chalk-dim); }
-  .search-empty{ color:var(--chalk-dim); font-family:var(--font-chalk); }
-.section-eyebrow{ font-weight:600; color:var(--chalk); font-size:1.15rem; margin:0; letter-spacing:-.01em; }
-.section-sub{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.85rem; margin:0; opacity:.75; }
-.grid{ position:relative; z-index:1; display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:1.75rem; }
-.section .grid{ padding:0; max-width:none; margin:0; }
-.card{ position:relative; display:block; border-radius:1.4rem; overflow:hidden; text-decoration:none;
-aspect-ratio:4/3; background:#1a1a24; border:1px solid var(--ui-glass-border);
-box-shadow:0 20px 40px rgba(0,0,0,.35);
-opacity:0; transform:translateY(20px); animation:cardIn .7s cubic-bezier(.2,.8,.2,1) forwards;
-transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease; }
-@keyframes cardIn{ to{ opacity:1; transform:translateY(0); } }
-.card:hover{ transform:translateY(-6px) scale(1.015); box-shadow:0 28px 60px rgba(0,0,0,.55); }
-.card.locked{ cursor:default; }
-.card.locked:hover{ transform:none; box-shadow:0 20px 40px rgba(0,0,0,.35); }
-.card-flag{ position:absolute; right:1.1rem; bottom:1.1rem; left:auto; top:auto; width:auto; height:auto; display:flex; align-items:center; justify-content:center; z-index:2;
-transition:transform .6s cubic-bezier(.2,.8,.2,1), filter .4s ease; filter:saturate(1.02) brightness(.94); opacity:.9; }
-.card-flag svg, .card-flag img{ width:3.4rem; height:auto; border-radius:.4rem; box-shadow:0 6px 16px rgba(0,0,0,.5); object-fit:cover; }
-.card:not(.locked):hover .card-flag{ transform:scale(1.06); filter:saturate(1.1) brightness(1); }
-.card.locked .card-flag{ filter:grayscale(.7) brightness(.55); }
-.card::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, transparent 35%, rgba(10,10,15,.92) 100%); z-index:1; pointer-events:none; }
-.card::after{ content:''; position:absolute; inset:0; border-radius:1.4rem; z-index:2; pointer-events:none;
-box-shadow:inset 0 0 0 1.5px transparent; transition:box-shadow .35s ease; }
-.card:not(.locked):hover::after{ box-shadow:inset 0 0 0 1.5px var(--accent), 0 0 24px var(--accent); }
-.card-content{ position:absolute; left:0; right:0; bottom:0; z-index:3; padding:1.3rem 1.4rem 1.2rem;
-display:flex; flex-direction:column; gap:.35rem; }
-.accent-dot{ width:9px; height:9px; border-radius:50%; background:var(--accent); display:inline-block;
-margin-right:.5rem; box-shadow:0 0 12px var(--accent); }
-.card-title{ color:var(--chalk); font-weight:600; font-size:1.35rem; margin:0; display:flex; align-items:center; }
-.card-tagline{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.88rem; margin:0; }
-.card-count{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.78rem; margin:.1rem 0 0; opacity:.7; }
-.card-cta{ margin-top:.5rem; align-self:flex-start; padding:.4rem 1rem; border-radius:999px; font-size:.78rem;
-font-weight:600; color:#0a0a0f; background:var(--chalk); opacity:0; transform:translateY(6px);
-transition:all .35s cubic-bezier(.2,.8,.2,1); }
-.card:not(.locked):hover .card-cta{ opacity:1; transform:translateY(0); }
-.card-badge{ margin-top:.5rem; align-self:flex-start; padding:.4rem 1rem; border-radius:999px; font-size:.78rem;
-font-weight:600; color:var(--chalk-dim); background:rgba(244,240,230,.1); border:1px solid var(--ui-glass-border); }
-.card-badge.tag-trending{ color:#f0c14b; border-color:rgba(240,193,75,.4); background:rgba(240,193,75,.1); }
-.card-badge.tag-new{ color:#b4fff0; border-color:rgba(180,255,240,.4); background:rgba(180,255,240,.1); }
-.card-badge.tag-loved{ color:#ff8fa3; border-color:rgba(255,143,163,.4); background:rgba(255,143,163,.1); }
-.card-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-font-size:3.6rem; z-index:1; filter:drop-shadow(0 8px 20px rgba(0,0,0,.4));
-transition:transform .5s cubic-bezier(.2,.8,.2,1); }
-.card:not(.locked):hover .card-icon{ transform:scale(1.08) translateY(-4px); }
-.row-scroll{ display:flex; gap:1.4rem; overflow-x:auto; padding:.3rem .1rem 1rem; scroll-snap-type:x proximity;
--webkit-overflow-scrolling:touch; }
-.row-scroll::-webkit-scrollbar{ height:6px; }
-.row-scroll::-webkit-scrollbar-thumb{ background:var(--ui-glass-border); border-radius:999px; }
-.row-scroll .card{ flex:0 0 240px; scroll-snap-align:start; }
+.section-eyebrow{ font-weight:600; color:var(--chalk); font-size:1.1rem; margin:0 0 1.2rem; letter-spacing:-.01em; }
 .featured{ position:relative; display:grid; grid-template-columns:1.1fr 1fr; gap:0; border-radius:1.6rem;
-overflow:hidden; background:#1a1a24; border:1px solid var(--ui-glass-border); box-shadow:0 24px 60px rgba(0,0,0,.45);
-text-decoration:none; min-height:360px; }
-.featured .card-icon{ position:relative; font-size:6rem; }
+overflow:hidden; background:#14141e; border:1px solid var(--ui-glass-border); box-shadow:0 24px 60px rgba(0,0,0,.45);
+text-decoration:none; min-height:340px; }
+.featured-icon{ position:relative; font-size:6rem; display:flex; align-items:center; justify-content:center; min-height:220px; }
 .featured-info{ position:relative; z-index:1; padding:2.2rem 2.4rem; display:flex; flex-direction:column;
 justify-content:center; gap:.8rem; }
 .featured-eyebrow{ color:var(--accent); font-weight:600; letter-spacing:.15em; text-transform:uppercase; font-size:.75rem; margin:0; }
-.featured-title{ color:var(--chalk); font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; margin:0; }
-.featured-tagline{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.05rem; margin:0; }
-.featured .btn-primary{ align-self:flex-start; margin-top:.6rem; }
-@media (max-width:760px){ .featured{ grid-template-columns:1fr; } .featured .card-icon{ min-height:200px; } }
-.surprise-float{ position:fixed; right:1.4rem; bottom:1.4rem; z-index:5; width:3.6rem; height:3.6rem;
-border-radius:50%; border:1px solid var(--ui-glass-border); background:var(--chalk); color:#0a0a0f;
-font-size:1.5rem; cursor:pointer; box-shadow:0 12px 30px rgba(0,0,0,.4); transition:transform .3s ease; }
-.surprise-float:hover{ transform:scale(1.08) rotate(-8deg); }
-.surprise-float.spin{ animation:spin .5s ease; }
-@keyframes spin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
-footer{ position:relative; z-index:1; text-align:center; padding:3rem 1.5rem 6rem; color:var(--chalk-dim); }
-footer a{ color:var(--chalk-dim); text-decoration:none; margin:0 .6rem; }
+.featured-title{ color:var(--chalk); font-size:clamp(1.5rem,2.6vw,2.2rem); font-weight:700; margin:0; }
+.featured-tagline{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.02rem; margin:0; }
+.featured .btn-primary{ align-self:flex-start; margin-top:.4rem; }
+@media (max-width:760px){ .featured{ grid-template-columns:1fr; } .featured-icon{ min-height:180px; } }
+.challenge-banner{ position:relative; display:flex; align-items:center; gap:1.6rem; flex-wrap:wrap;
+border-radius:1.6rem; padding:1.6rem 2rem; background:linear-gradient(135deg, rgba(240,193,75,.12), rgba(180,255,240,.08));
+border:1px solid var(--ui-glass-border); }
+.challenge-icon{ font-size:2.6rem; flex:0 0 auto; }
+.challenge-info{ flex:1 1 260px; }
+.challenge-title{ color:var(--chalk); font-weight:700; font-size:1.1rem; margin:0 0 .3rem; }
+.challenge-target{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.9rem; margin:0; }
+.challenge-badge{ font-size:.82rem; font-weight:600; color:#f0c14b; margin-top:.4rem; display:inline-block; }
+.challenge-banner.done{ opacity:.8; }
+.row-scroll{ display:flex; gap:1.4rem; overflow-x:auto; padding:.3rem .1rem 1rem; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; }
+.row-scroll::-webkit-scrollbar{ height:6px; }
+.row-scroll::-webkit-scrollbar-thumb{ background:var(--ui-glass-border); border-radius:999px; }
+.mini-card{ flex:0 0 200px; scroll-snap-align:start; position:relative; display:block; border-radius:1.2rem; overflow:hidden;
+text-decoration:none; aspect-ratio:4/3; background:#14141e; border:1px solid var(--ui-glass-border);
+box-shadow:0 14px 30px rgba(0,0,0,.35); }
+.mini-card-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:2.6rem; }
+.mini-card-content{ position:absolute; left:0; right:0; bottom:0; padding:.9rem 1rem; background:linear-gradient(180deg,transparent,rgba(5,5,10,.92) 70%); }
+.mini-card-title{ color:var(--chalk); font-weight:600; font-size:.9rem; margin:0; }
+footer{ position:relative; z-index:1; text-align:center; padding:3rem 1.5rem 4rem; color:var(--chalk-dim); }
+footer a{ color:var(--chalk-dim); text-decoration:none; margin:0 .6rem; font-size:.9rem; }
 footer a:hover{ color:var(--chalk); }
 .footer-links{ margin-bottom:1rem; }
-#collectionRows .collection-block{ margin-bottom:2.2rem; }
-#collectionRows .collection-label{ font-weight:600; color:var(--chalk); font-size:1rem; margin:0 0 .8rem; }
-.challenge-banner{ position:relative; display:flex; align-items:center; gap:1.6rem; flex-wrap:wrap;
-border-radius:1.6rem; padding:1.8rem 2rem; background:linear-gradient(135deg, rgba(240,193,75,.12), rgba(180,255,240,.08));
-border:1px solid var(--ui-glass-border); }
-.challenge-icon{ font-size:3rem; flex:0 0 auto; }
-.challenge-info{ flex:1 1 260px; }
-.challenge-title{ color:var(--chalk); font-weight:700; font-size:1.2rem; margin:0 0 .3rem; }
-.challenge-target{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.95rem; margin:0; }
-.challenge-badge{ font-size:.85rem; font-weight:600; color:#f0c14b; margin-top:.5rem; display:inline-block; }
-.challenge-banner.done{ opacity:.8; }
-.coming-eta{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.75rem; opacity:.7; margin-top:.2rem; }
-.vote-panel{ display:flex; flex-direction:column; gap:.8rem; max-width:560px; }
-.vote-row{ display:flex; align-items:center; gap:.8rem; }
-.vote-country{ flex:0 0 90px; color:var(--chalk); font-weight:600; font-size:.9rem; }
-.vote-btn{ flex:0 0 auto; padding:.5rem 1rem; border-radius:999px; border:1px solid var(--ui-glass-border);
-background:var(--ui-glass); color:var(--chalk); font-family:var(--font-display); font-weight:600; cursor:pointer; font-size:.8rem;
-transition:transform .25s ease, background .25s ease; }
-.vote-btn:hover{ transform:translateY(-2px); background:rgba(244,240,230,.12); }
-.vote-btn:disabled{ cursor:default; opacity:.45; }
-.vote-bar-track{ flex:1 1 auto; height:.6rem; border-radius:999px; background:rgba(244,240,230,.08); overflow:hidden; }
-.vote-bar-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,#f0c14b,#ff8fa3); transition:width .6s ease; width:0%; }
-.vote-pct{ flex:0 0 44px; text-align:right; font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.85rem; }
-.stats-strip{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1.6rem; text-align:center; padding:1rem 0; }
-.stat-num{ font-weight:700; font-size:clamp(1.8rem,4vw,2.6rem); color:var(--chalk); margin:0; }
-.stat-label{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.85rem; margin:.3rem 0 0; }
-.newsletter-box{ text-align:center; max-width:480px; margin:0 auto; }
-.newsletter-title{ color:var(--chalk); font-weight:600; font-size:1.1rem; margin:0 0 1rem; }
-.newsletter-form{ display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
-.newsletter-form input{ flex:1 1 220px; padding:.8rem 1.1rem; border-radius:999px; border:1px solid var(--ui-glass-border);
-background:var(--ui-glass); color:var(--chalk); font-family:var(--font-display); font-size:.9rem; }
-.newsletter-form input::placeholder{ color:var(--chalk-dim); }
-.newsletter-note{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.85rem; margin-top:.8rem; min-height:1.2rem; }
-.surprise-overlay{ position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center;
-background:rgba(10,10,15,.94); opacity:0; pointer-events:none; transition:opacity .35s ease; }
-.surprise-overlay.active{ opacity:1; pointer-events:auto; }
-.surprise-stage{ text-align:center; color:var(--chalk); padding:2rem; max-width:420px; }
-.surprise-globe{ font-size:5rem; display:inline-block; animation:globeSpin 1.1s linear infinite; }
-@keyframes globeSpin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
-.surprise-step{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.1rem; margin-top:1rem; min-height:1.6rem; }
-.surprise-result-card{ margin-top:1.2rem; background:#1a1a24; border:1px solid var(--ui-glass-border); border-radius:1.2rem; padding:1.6rem; }
-.surprise-result-icon{ font-size:3rem; }
-.surprise-result-title{ font-weight:700; font-size:1.3rem; margin:.6rem 0 .2rem; }
-.surprise-result-tag{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.95rem; margin:0 0 1rem; }
-.surprise-country-reveal{ margin-top:1.2rem; } .surprise-country-flag{ font-size:3rem; line-height:1; } .surprise-country-name{ font-family:var(--font-chalk); color:var(--chalk); font-size:1.2rem; font-weight:700; margin:.6rem 0 0; } .surprise-close{ position:absolute; top:1.4rem; right:1.6rem; background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; }
-#countryGrid .card:hover, #comingSoonRow .card:hover{ transform:translateY(-6px) rotate(-.6deg) scale(1.015); }
+/* ---------- MOBILE ---------- */
+@media (max-width:900px){
+.hero{ flex-direction:column; padding:6rem 1.2rem 2rem; min-height:auto; }
+.hero-left{ flex:none; }
+.hero-right{ flex:none; margin-top:1.5rem; }
+.globe-stage{ width:min(420px,86vw); height:min(420px,60vw); }
+.country-panel{ width:100%; top:auto; bottom:0; height:80vh; border-left:none; border-top:1px solid var(--ui-glass-border);
+border-radius:1.6rem 1.6rem 0 0; transform:translateY(100%); }
+.country-panel.open{ transform:translateY(0); }
+.nav-links a:not(.mute-toggle-wrap){ display:none; }
+}
 @media (prefers-reduced-motion:reduce){
 *{ animation-duration:.001s !important; transition-duration:.001s !important; }
-.surprise-globe{ animation:none; }
 }
 </style>
 </head>
+
 <body>
-<div class="bg-glow"></div>
-<div class="bg-decor" aria-hidden="true">
-<svg class="deco-kite k1" viewBox="0 0 100 190" xmlns="http://www.w3.org/2000/svg">
-<polygon points="50,0 100,50 50,95 0,50" fill="#f0c14b"/>
-<polygon points="50,0 50,95 0,50" fill="#ff6b5e"/>
-<polygon points="50,95 100,50 50,0" fill="#e87a3c" opacity=".55"/>
-<line x1="0" y1="50" x2="100" y2="50" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<line x1="50" y1="0" x2="50" y2="95" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<path d="M50 95 Q44 112 54 124 Q44 136 54 148 Q46 160 54 172" stroke="#f4f0e6" stroke-width="2" fill="none" opacity=".5"/>
-</svg>
-<svg class="deco-kite k2" viewBox="0 0 100 190" xmlns="http://www.w3.org/2000/svg">
-<polygon points="50,0 100,50 50,95 0,50" fill="#f0c14b"/>
-<polygon points="50,0 50,95 0,50" fill="#ff6b5e"/>
-<polygon points="50,95 100,50 50,0" fill="#e87a3c" opacity=".55"/>
-<line x1="0" y1="50" x2="100" y2="50" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<line x1="50" y1="0" x2="50" y2="95" stroke="#0a0a0f" stroke-width="1.5" opacity=".35"/>
-<path d="M50 95 Q44 112 54 124 Q44 136 54 148 Q46 160 54 172" stroke="#f4f0e6" stroke-width="2" fill="none" opacity=".5"/>
-</svg>
-<svg class="deco-kite k3" viewBox="0 0 100 190" xmlns="http://www.w3.org/2000/svg">
-<polygon points="50,0 100,50 50,95 0,50" fill="#f0c14b"/>
-<polygon points="50,0 50,95 0,50" fill="#ff6b5e"/>
-<polygon points="50,95 100,50 50,0" fill="#e87a3c" opacity=".55"/>
-</svg>
-<svg class="deco-kite k4" viewBox="0 0 100 190" xmlns="http://www.w3.org/2000/svg">
-<polygon points="50,0 100,50 50,95 0,50" fill="#f0c14b"/>
-<polygon points="50,0 50,95 0,50" fill="#ff6b5e"/>
-<polygon points="50,95 100,50 50,0" fill="#e87a3c" opacity=".55"/>
-</svg>
-<svg class="deco-flower f1" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#ff8fa3"/><circle cx="30" cy="40" r="10" fill="#ff8fa3"/><circle cx="20" cy="30" r="10" fill="#ff8fa3"/><circle cx="40" cy="30" r="10" fill="#ff8fa3"/><circle cx="30" cy="30" r="7" fill="#f0c14b"/></svg>
-<svg class="deco-flower f2" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#b4fff0"/><circle cx="30" cy="40" r="10" fill="#b4fff0"/><circle cx="20" cy="30" r="10" fill="#b4fff0"/><circle cx="40" cy="30" r="10" fill="#b4fff0"/><circle cx="30" cy="30" r="7" fill="#f4f0e6"/></svg>
-<svg class="deco-flower f3" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#ff8fa3"/><circle cx="30" cy="40" r="10" fill="#ff8fa3"/><circle cx="20" cy="30" r="10" fill="#ff8fa3"/><circle cx="40" cy="30" r="10" fill="#ff8fa3"/><circle cx="30" cy="30" r="7" fill="#f0c14b"/></svg>
-<svg class="deco-flower f4" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#b4fff0"/><circle cx="30" cy="40" r="10" fill="#b4fff0"/><circle cx="20" cy="30" r="10" fill="#b4fff0"/><circle cx="40" cy="30" r="10" fill="#b4fff0"/><circle cx="30" cy="30" r="7" fill="#f4f0e6"/></svg>
-<svg class="deco-flower f5" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="20" r="10" fill="#ff8fa3"/><circle cx="30" cy="40" r="10" fill="#ff8fa3"/><circle cx="20" cy="30" r="10" fill="#ff8fa3"/><circle cx="40" cy="30" r="10" fill="#ff8fa3"/><circle cx="30" cy="30" r="7" fill="#f0c14b"/></svg>
+<nav class="nav" id="mainNav">
+<a class="nav-logo" href="#top">Playrium</a>
+<div class="nav-links">
+<a href="#top">Countries</a>
+<a href="#featured-wrap">Featured</a>
+<a href="#daily-challenge">Daily Challenge</a>
+<button class="mute-toggle" id="muteToggle" type="button" aria-label="Toggle sound" aria-pressed="false">🔇</button>
 </div>
-<header>
+</nav>
+
+<section class="hero" id="top">
+<div class="hero-bg" aria-hidden="true"></div>
+<div class="hero-left">
+<div class="hero-copy">
 <p class="eyebrow">Playrium</p>
-<h1 class="logo">Discover Interactive<br>Experiences.</h1>
-<p class="tagline">Explore handcrafted interactive worlds inspired by cultures, creativity and curiosity — pick one and start playing.</p>
-<div class="btn-row">
-<a href="#trending" class="btn-primary">Explore Experiences</a>
-<button class="btn-secondary" id="surpriseHero" type="button">🎲 Surprise Me</button>
+<h1 class="hero-title">Explore the world through<br>interactive experiences.</h1>
+<p class="hero-sub">Spin the globe. Pick a country. Discover something handcrafted to play.</p>
 </div>
-</header>
-  <section class="section" id="search-section">
-    <div class="section-head"><p class="section-eyebrow">Find An Experience</p></div>
-    <div class="search-box"><input type="text" id="searchInput" placeholder="Search by name, country, or tag - e.g. india, physics, relax" autocomplete="off" aria-label="Search experiences"></div>
-    <div class="grid" id="searchResults"></div>
-    <p class="search-empty" id="searchEmpty" style="display:none;">No experiences match your search. Try a different word.</p>
-  </section>
+<div class="globe-stage" id="globeStage">
+<canvas id="globeCanvas" aria-hidden="true"></canvas>
+<div class="globe-fallback" aria-hidden="true">🌍</div>
+</div>
+<p class="globe-hint" id="globeHint">Drag to rotate &middot; scroll to zoom &middot; click a country to explore</p>
+<nav class="country-hidden-nav" id="countryHiddenNav" aria-label="Countries">
+</nav>
+</div>
+<div class="hero-right">
+<div class="surprise-panel">
+<div class="surprise-die" aria-hidden="true">🎲</div>
+<p class="surprise-title">Surprise Me</p>
+<p class="surprise-copy">Discover a hidden interactive experience chosen just for you. Never repeated. Always unexpected.</p>
+<button class="btn-primary surprise-open-btn" id="openMysteryBtn" type="button">Open Mystery</button>
+</div>
+</div>
+</section>
+
+<div class="country-panel" id="countryPanel" role="dialog" aria-modal="true" aria-label="Country experiences" aria-hidden="true">
+<button class="country-panel-close" id="countryPanelClose" type="button" aria-label="Close">&times;</button>
+<div class="country-panel-flag" id="countryPanelFlag"></div>
+<h2 class="country-panel-name" id="countryPanelName"></h2>
+<p class="country-panel-count" id="countryPanelCount"></p>
+<div class="country-panel-divider"></div>
+<div id="countryPanelList"></div>
+<a class="btn-primary country-panel-cta" id="countryPanelCta" href="#">Explore Collection &rarr;</a>
+</div>
 
 <section class="section" id="featured-wrap">
-<div class="section-head"><p class="section-eyebrow">Featured Experience</p></div>
-<a class="featured" id="featuredCard" href="#"></a>
-</section>
-
-<section class="section" id="trending">
-<div class="section-head"><p class="section-eyebrow">🔥 Trending This Week</p></div>
-<div class="grid" id="trendingGrid"></div>
-</section>
-
-<section class="section" id="new">
-<div class="section-head"><p class="section-eyebrow">🆕 New This Week</p></div>
-<div class="row-scroll" id="newRow"></div>
-</section>
-
-<section class="section" id="loved">
-<div class="section-head"><p class="section-eyebrow">⭐ Most Loved</p></div>
-<div class="row-scroll" id="lovedRow"></div>
-</section>
-
-<section class="section" id="countries">
-<div class="section-head"><p class="section-eyebrow">🌍 Browse by Country</p></div>
-<div class="grid" id="countryGrid"></div>
-</section>
-
-<section class="section" id="collections">
-<div class="section-head"><p class="section-eyebrow">✨ Curated Collections</p></div>
-<div id="collectionRows"></div>
-</section>
-
-<section class="section" id="continue-playing" style="display:none">
-<div class="section-head"><p class="section-eyebrow">↩️ Continue Playing</p></div>
-<div class="row-scroll" id="continueRow"></div>
+<p class="section-eyebrow">Today's Featured Experience</p>
+<a class="featured" id="featuredCard" href="#">
+<div class="featured-icon" id="featuredIcon"></div>
+<div class="featured-info">
+<p class="featured-eyebrow" id="featuredEyebrow"></p>
+<h2 class="featured-title" id="featuredTitle"></h2>
+<p class="featured-tagline" id="featuredTagline"></p>
+<span class="btn-primary">Play Now &rarr;</span>
+</div>
+</a>
 </section>
 
 <section class="section" id="daily-challenge">
-<div class="section-head"><p class="section-eyebrow">🏆 Daily Challenge</p></div>
+<p class="section-eyebrow">Daily Challenge</p>
 <div class="challenge-banner" id="challengeBanner"></div>
 </section>
 
-<section class="section" id="coming-soon">
-<div class="section-head"><p class="section-eyebrow">🗺️ Coming Soon</p></div>
-<div class="row-scroll" id="comingSoonRow"></div>
-</section>
-
-<section class="section" id="community-vote">
-<div class="section-head"><p class="section-eyebrow">🗳️ Vote: Which Country Should Arrive Next?</p></div>
-<div class="vote-panel" id="votePanel"></div>
-</section>
-
-<section class="section" id="stats">
-<div class="stats-strip" id="statsStrip"></div>
-</section>
-
-<section class="section" id="newsletter">
-<div class="newsletter-box">
-<p class="newsletter-title">Get notified about new experiences</p>
-<form id="newsletterForm" class="newsletter-form">
-<input type="email" id="newsletterEmail" placeholder="you@example.com" required aria-label="Email address">
-<button type="submit" class="btn-primary">Notify Me</button>
-</form>
-<p class="newsletter-note" id="newsletterNote"></p>
-</div>
+<section class="section" id="continue-playing" style="display:none">
+<p class="section-eyebrow">Continue Playing</p>
+<div class="row-scroll" id="continueRow"></div>
 </section>
 
 <footer>
 <div class="footer-links">
-<a href="#">About</a>
-<a href="#countries">Countries</a>
-<a href="#collections">Collections</a>
-<a href="#coming-soon">Roadmap</a>
-<a href="#" id="suggestGameLink">Suggest a Game</a>
-<a href="#">Privacy</a>
-<a href="#">Contact</a>
+<a href="#top">About</a>
+<a href="#top">Countries</a>
+<a href="#top">Collections</a>
+<a href="mailto:hello@playrium.fun?subject=Suggest%20an%20Experience">Suggest Experience</a>
+<a href="#top">Privacy</a>
+<a href="mailto:hello@playrium.fun">Contact</a>
 </div>
 <p>Playrium</p>
 </footer>
 
-<button class="surprise-float" id="surpriseFloat" type="button" aria-label="Surprise Me">🎲</button>
-
 <div class="surprise-overlay" id="surpriseOverlay" aria-hidden="true" role="dialog" aria-label="Surprise Me discovery">
-<button class="surprise-close" id="surpriseClose" type="button" aria-label="Close">&times;</button>
 <div class="surprise-stage">
-<div class="surprise-globe" id="surpriseGlobe">🌐</div>
-<p class="surprise-step" id="surpriseStep">Spinning the globe&hellip;</p>
-<div class="surprise-country-reveal" id="surpriseCountryReveal" style="display:none"><div class="surprise-country-flag" id="surpriseCountryFlag"></div><p class="surprise-country-name" id="surpriseCountryName"></p></div><div class="surprise-result-card" id="surpriseResult" style="display:none">
+<button class="surprise-close" id="surpriseClose" type="button" aria-label="Close">&times;</button>
+<div class="surprise-logo" id="surpriseLogo">Playrium</div>
+<p class="surprise-step" id="surpriseStep"></p>
+<div class="surprise-country-reveal" id="surpriseCountryReveal"><div class="surprise-country-flag" id="surpriseCountryFlag"></div><p class="surprise-country-name" id="surpriseCountryName"></p></div>
+<div class="surprise-result-card" id="surpriseResult">
+<div class="surprise-particles" id="surpriseParticles"></div>
 <div class="surprise-result-icon" id="surpriseResultIcon"></div>
 <p class="surprise-result-title" id="surpriseResultTitle"></p>
 <p class="surprise-result-tag" id="surpriseResultTag"></p>
-<a class="btn-primary" id="surpriseResultPlay" href="#">Play Now &rarr;</a>
+<a class="btn-primary" id="surpriseResultPlay" href="#">Ready to Explore? Play &rarr;</a>
 </div>
 </div>
 </div>
-
 <script>
-const INDIA_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="200" fill="#FF9933"/><rect y="200" width="900" height="200" fill="#FFFFFF"/><rect y="400" width="900" height="200" fill="#138808"/><circle cx="450" cy="300" r="60" fill="none" stroke="#000080" stroke-width="5"/><circle cx="450" cy="300" r="6" fill="#000080"/></svg>';
-const JAPAN_FLAG = '<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg"><rect width="900" height="600" fill="#FFFFFF"/><circle cx="450" cy="300" r="120" fill="#BC002D"/></svg>';
-function flagImg(code){
-return '<img src="https://flagcdn.com/' + code.toLowerCase() + '.svg" alt="' + code + ' flag" loading="lazy">';
+
+function loadScriptWithFallback(urls, cb){
+var i = 0;
+function tryNext(){
+if (i >= urls.length){ cb(false); return; }
+var url = urls[i++];
+var done = false;
+var s = document.createElement('script');
+var timer = setTimeout(function(){ if(!done){ done = true; s.onerror = null; s.onload = null; tryNext(); } }, 4000);
+s.onload = function(){ if(!done){ done = true; clearTimeout(timer); cb(true); } };
+s.onerror = function(){ if(!done){ done = true; clearTimeout(timer); tryNext(); } };
+s.src = url;
+document.head.appendChild(s);
+}
+tryNext();
 }
 
-const COUNTRIES = [
-{ title:'India', tagline:'Twelve premium physics-driven toys.', count:'12 experiences', href:'india.html', accent:'#f0c14b', flag:INDIA_FLAG },
-{ title:'Japan', tagline:'Toys inspired by Japanese festivals and craft.', count:'4 experiences', href:'japan.html', accent:'#ff6b5e', flag:JAPAN_FLAG },
-{ title:'Philippines', tagline:'Toys inspired by Filipino games and island life.', count:'4 experiences', href:'philippines.html', accent:'#0038A8', flag:flagImg('PH') },
-];
-const EXPERIENCES = [
-{ title:'Gully Cricket™', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', flag:INDIA_FLAG, accent:'#f0c14b', icon:'🏏', tags:['traditional','skill','multiplayer'], id:'gully-cricket', collection:'Village Life', theme:'traditional', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['kancha-kings','seven-stones','sungka-streak'], yearAdded:2026 },
-{ title:'Matka Mania™', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', flag:INDIA_FLAG, accent:'#4fd6c4', icon:'🏺', tags:['physics','skill'], id:'matka-mania', collection:'Physics Playground', theme:'physics', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['hydraulic-press-lab','sensu-spinner','daruma-drop'], yearAdded:2026 },
-{ title:'Kancha Kings™', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', flag:INDIA_FLAG, accent:'#e8a13c', icon:'🔮', tags:['traditional','skill'], id:'kancha-kings', collection:'Village Life', theme:'traditional', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['gully-cricket','seven-stones','sungka-streak'], yearAdded:2026 },
-{ title:'Balloon Bazaar™', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', flag:INDIA_FLAG, accent:'#ff6b5e', icon:'🎈', tags:['funny','kids'], id:'balloon-bazaar', collection:'Family Favorites', theme:'funny', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['stapu','parol-glow','sensu-spinner'], yearAdded:2026 },
-{ title:'Spend ₹10,000 Crore™', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', flag:INDIA_FLAG, accent:'#f0c14b', icon:'💰', tags:['strategy','educational'], id:'spend-crore', collection:'Mind Challenges', theme:'strategy', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['pie-break','moksha-patam','world-size-explorer'], yearAdded:2026 },
-{ title:'Hydraulic Press Lab™', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', flag:INDIA_FLAG, accent:'#9a97a8', icon:'⚙️', tags:['physics','funny'], id:'hydraulic-press-lab', collection:'Physics Playground', theme:'physics', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['matka-mania','sensu-spinner','daruma-drop'], yearAdded:2026 },
-{ title:'World Size Explorer™', tagline:"The World Isn't What It Looks Like.", href:'world-size-explorer.html', country:'India', flag:INDIA_FLAG, accent:'#b4fff0', icon:'🌍', tags:['educational','puzzle','nature'], id:'world-size-explorer', collection:'Relaxing Toys', theme:'educational', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['zen-ripple','goldfish-scoop','sensu-spinner'], yearAdded:2026 },
-{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', flag:INDIA_FLAG, accent:'#138808', icon:'🐍', tags:['traditional','strategy'], id:'moksha-patam', collection:'Mind Challenges', theme:'traditional', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['pie-break','spend-crore','world-size-explorer'], yearAdded:2026 },
-{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', flag:INDIA_FLAG, accent:'#e87a3c', icon:'🥧', tags:['skill','puzzle'], id:'pie-break', collection:'Mind Challenges', theme:'skill', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['moksha-patam','spend-crore','world-size-explorer'], yearAdded:2026 },
-{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', flag:INDIA_FLAG, accent:'#9a97a8', icon:'🪨', tags:['traditional','multiplayer'], id:'seven-stones', collection:'Village Life', theme:'traditional', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['gully-cricket','kancha-kings','sungka-streak'], yearAdded:2026 },
-{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', flag:INDIA_FLAG, accent:'#ff8fa3', icon:'🔲', tags:['traditional','kids'], id:'stapu', collection:'Family Favorites', theme:'traditional', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['balloon-bazaar','parol-glow','sensu-spinner'], yearAdded:2026 },
-{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', flag:INDIA_FLAG, accent:'#ff8fa3', icon:'🎨', tags:['festival','puzzle'], id:'rangoli-maker', collection:'Festival Collection', theme:'festival', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['goldfish-scoop','koinobori-festival','parol-glow'], yearAdded:2026 },
-{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', flag:JAPAN_FLAG, accent:'#BC002D', icon:'🎮', tags:['skill','physics'], id:'daruma-drop', collection:'Physics Playground', theme:'skill', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['matka-mania','hydraulic-press-lab','sensu-spinner'], yearAdded:2026 },
-{ title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', flag:JAPAN_FLAG, accent:'#4fa8ff', icon:'🐟', tags:['festival','skill','nature'], id:'goldfish-scoop', collection:'Festival Collection', theme:'festival', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['koinobori-festival','parol-glow','rangoli-maker'], yearAdded:2026 },
-{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', flag:JAPAN_FLAG, accent:'#ff8fa3', icon:'🪭', tags:['physics','kids'], id:'sensu-spinner', collection:'Physics Playground', theme:'physics', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['matka-mania','hydraulic-press-lab','daruma-drop'], yearAdded:2026 },
-{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', flag:JAPAN_FLAG, accent:'#4fd6c4', icon:'🎏', tags:['festival','physics','nature'], id:'koinobori-festival', collection:'Festival Collection', theme:'festival', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['goldfish-scoop','parol-glow','rangoli-maker'], yearAdded:2026 },
-{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', flag:flagImg('PH'), accent:'#0038A8', icon:'🐚', tags:['traditional','strategy'], id:'sungka-streak', collection:'Village Life', theme:'traditional', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['gully-cricket','kancha-kings','seven-stones'], yearAdded:2026 },
-{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'🎋', tags:['traditional','skill'], id:'tinikling-tempo', collection:'Village Life', theme:'traditional', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['gully-cricket','kancha-kings','seven-stones'], yearAdded:2026 },
-{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', flag:flagImg('PH'), accent:'#f0c14b', icon:'⭐', tags:['festival','kids'], id:'parol-glow', collection:'Festival Collection', theme:'festival', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['goldfish-scoop','koinobori-festival','rangoli-maker'], yearAdded:2026 },
-{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', flag:flagImg('PH'), accent:'#ff6b5e', icon:'🚌', tags:['skill','strategy'], id:'jeepney-jam', collection:'Village Life', theme:'skill', difficulty:'medium', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['gully-cricket','kancha-kings','seven-stones'], yearAdded:2026 },
-{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', flag:'', accent:'#4fd6c4', icon:'🌊', tags:['physics','nature'], id:'zen-ripple', collection:'Physics Playground', theme:'physics', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['matka-mania','hydraulic-press-lab','sensu-spinner'], yearAdded:2026 },
-{ title:'Gravity Playground™', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:'Original', flag:'', accent:'#f0c14b', icon:'🌪️', tags:['physics','sandbox','relaxing'], id:'gravity-playground', collection:'Physics Playground', theme:'physics', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['matka-mania','hydraulic-press-lab','sensu-spinner'], yearAdded:2026 },
-{ title:'Cloud Painter™', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:'Original', flag:'', accent:'#7fd8ff', icon:'☁️', tags:['relaxing','creative','nature'], id:'cloud-painter', collection:'Relaxing Toys', theme:'relaxing', difficulty:'easy', editorScore:8, estimatedPlayTime:'2-3 min', hidden:false, featuredEligible:true, related:['zen-ripple','world-size-explorer','goldfish-scoop'], yearAdded:2026 },
-];
+var soundEnabled = false;
+var audioCtx = null;
+function playClick(freq){
+if (!soundEnabled) return;
+try{
+if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+var o = audioCtx.createOscillator();
+var g = audioCtx.createGain();
+o.type = 'sine';
+o.frequency.value = freq || 520;
+g.gain.value = 0.0001;
+o.connect(g); g.connect(audioCtx.destination);
+var now = audioCtx.currentTime;
+g.gain.setValueAtTime(0.0001, now);
+g.gain.exponentialRampToValueAtTime(0.05, now + 0.01);
+g.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+o.start(now); o.stop(now + 0.2);
+}catch(e){}
+}
 
-const COLLECTIONS = [
-{ label:'🏘️ Village Life', candidates:['gully-cricket.html','kancha-kings.html','seven-stones.html','sungka-streak.html','tinikling-tempo.html','jeepney-jam.html'] },
-{ label:'🎉 Festival Collection', candidates:['goldfish-scoop.html','koinobori-festival.html','parol-glow.html','rangoli-maker.html'] },
-{ label:'⚙️ Physics Playground', candidates:['matka-mania.html','hydraulic-press-lab.html','sensu-spinner.html','daruma-drop.html','zen-ripple.html','gravity-playground.html'] },
-{ label:'🌊 Relaxing Toys', candidates:['zen-ripple.html','world-size-explorer.html','goldfish-scoop.html','sensu-spinner.html','cloud-painter.html'] },
-{ label:'🎨 Creative Studio', candidates:['rangoli-maker.html','parol-glow.html'] },
-{ label:'🧠 Mind Challenges', candidates:['pie-break.html','moksha-patam.html','spend-crore.html','world-size-explorer.html','sungka-streak.html'] },
-{ label:'👨‍👩‍👧 Family Favorites', candidates:['balloon-bazaar.html','stapu.html','parol-glow.html','sensu-spinner.html','seven-stones.html'] },
+function setFlagEl(el, country){
+el.innerHTML = '';
+var img = document.createElement('img');
+img.src = 'https://flagcdn.com/h80/' + country.code + '.png';
+img.alt = country.name + ' flag';
+img.style.height = '2.6rem'; img.style.width = 'auto'; img.style.borderRadius = '.3rem'; img.style.boxShadow = '0 4px 14px rgba(0,0,0,.4)';
+img.onerror = function(){ el.textContent = country.flag; };
+el.appendChild(img);
+}
+
+var COUNTRIES = [
+{ id:'india', name:'India', flag:'\ud83c\uddee\ud83c\uddf3', code:'in', lat:21, lng:79, accent:'#f0c14b', href:'india.html', tagline:'Twelve premium physics-driven toys.' },
+{ id:'japan', name:'Japan', flag:'\ud83c\uddef\ud83c\uddf5', code:'jp', lat:36, lng:138, accent:'#ff6b5e', href:'japan.html', tagline:'Toys inspired by Japanese festivals and craft.' },
+{ id:'philippines', name:'Philippines', flag:'\ud83c\uddf5\ud83c\udded', code:'ph', lat:13, lng:122, accent:'#4fa8ff', href:'philippines.html', tagline:'Toys inspired by Filipino games and island life.' }
 ];
 
-const COMING_SOON = [
-{ name:'Brazil', code:'BR', planned:'6 experiences planned', eta:'Coming later this year' },
-{ name:'Mexico', code:'MX', planned:'5 experiences planned', eta:'Coming later this year' },
-{ name:'China', code:'CN', planned:'7 experiences planned', eta:'In early design' },
-{ name:'Egypt', code:'EG', planned:'5 experiences planned', eta:'In early design' },
-{ name:'Italy', code:'IT', planned:'6 experiences planned', eta:'Exploring ideas' },
-{ name:'Korea', code:'KR', planned:'6 experiences planned', eta:'Exploring ideas' },
+var EXPERIENCES = [
+{ title:'Gully Cricket\u2122', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', accent:'#f0c14b', icon:'\ud83c\udfcf' },
+{ title:'Matka Mania\u2122', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', accent:'#4fd6c4', icon:'\ud83c\udffa' },
+{ title:'Kancha Kings\u2122', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', accent:'#e8a13c', icon:'\ud83d\udd2e' },
+{ title:'Balloon Bazaar\u2122', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', accent:'#ff6b5e', icon:'\ud83c\udf88' },
+{ title:'Spend \u20b910,000 Crore\u2122', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', accent:'#f0c14b', icon:'\ud83d\udcb0' },
+{ title:'Hydraulic Press Lab\u2122', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', accent:'#9a97a8', icon:'\u2699\ufe0f' },
+{ title:'World Size Explorer\u2122', tagline:'The World Isn\'t What It Looks Like.', href:'world-size-explorer.html', country:'India', accent:'#b4fff0', icon:'\ud83c\udf0d' },
+{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', accent:'#138808', icon:'\ud83d\udc0d' },
+{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', accent:'#e87a3c', icon:'\ud83e\udd67' },
+{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', accent:'#9a97a8', icon:'\ud83e\udea8' },
+{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', accent:'#ff8fa3', icon:'\ud83d\udd32' },
+{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', accent:'#ff8fa3', icon:'\ud83c\udfa8' },
+{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', accent:'#BC002D', icon:'\ud83c\udfae' },
+{ title:'Goldfish Scoop', tagline:'Kingyo Sukui \u2014 Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', accent:'#4fa8ff', icon:'\ud83d\udc1f' },
+{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', accent:'#ff8fa3', icon:'\ud83c\udff5\ufe0f' },
+{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', accent:'#4fd6c4', icon:'\ud83c\udf8f' },
+{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', accent:'#0038A8', icon:'\ud83d\udc1a' },
+{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', accent:'#f0c14b', icon:'\ud83c\udf8b' },
+{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', accent:'#f0c14b', icon:'\u2b50' },
+{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', accent:'#ff6b5e', icon:'\ud83d\ude8c' },
+{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', accent:'#4fd6c4', icon:'\ud83c\udf0a' },
+{ title:'Gravity Playground\u2122', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:'Original', accent:'#f0c14b', icon:'\ud83c\udf2a\ufe0f' },
+{ title:'Cloud Painter\u2122', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:'Original', accent:'#7fd8ff', icon:'\u2601\ufe0f' }
 ];
 
-const VOTE_COUNTRIES = ['Brazil','Korea','Mexico','Egypt','Italy'];
-
-const CHALLENGE_TARGETS = {
-'kancha-kings.html': 'Beat Kancha Kings — clear the circle in under 30 seconds.',
+var CHALLENGE_TARGETS = {
+'kancha-kings.html': 'Beat Kancha Kings \u2014 clear the circle in under 30 seconds.',
 'gully-cricket.html': 'Score 50 runs in a single Gully Cricket innings.',
 'matka-mania.html': 'Balance the Matka for a full 20-second streak.',
 'hydraulic-press-lab.html': 'Crush 5 objects in a row in Hydraulic Press Lab.',
@@ -414,7 +381,7 @@ const CHALLENGE_TARGETS = {
 'stapu.html': 'Clear all squares in Stapu without a foot fault.',
 'moksha-patam.html': 'Reach the final square in Moksha Patam in one sitting.'
 };
-const DEFAULT_CHALLENGE_TARGET = 'Complete a full round without losing.';
+var DEFAULT_CHALLENGE_TARGET = 'Complete a full round without losing.';
 
 function playCount(href){ try{ return parseInt(localStorage.getItem('play_'+href) || '0', 10); }catch(e){ return 0; } }
 function lastPlayed(href){ try{ return parseInt(localStorage.getItem('last_'+href) || '0', 10); }catch(e){ return 0; } }
@@ -424,386 +391,513 @@ localStorage.setItem('play_'+href, String(playCount(href)+1));
 localStorage.setItem('last_'+href, String(Date.now()));
 }catch(e){}
 }
-function todayStamp(){
-const d = new Date();
-return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate();
+function todayStamp(){ var d = new Date(); return d.getUTCFullYear()+'-'+(d.getUTCMonth()+1)+'-'+d.getUTCDate(); }
+function getRecentSurprises(){ try{ return JSON.parse(localStorage.getItem('recent_surprises')||'[]'); }catch(e){ return []; } }
+function pushRecentSurprise(href){
+try{
+var list = getRecentSurprises();
+list.push(href);
+if (list.length > 10) list = list.slice(list.length-10);
+localStorage.setItem('recent_surprises', JSON.stringify(list));
+}catch(e){}
 }
 
-const visibleExperiences = new Set();
-const HOMEPAGE_HIDDEN_RESERVE = 4; // keep a few experiences unseen on the homepage so Surprise Me can always discover something new
+var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function makeCard(exp, opts){
-opts = opts || {};
-const el = document.createElement('a');
-el.className = 'card';
-el.href = exp.href;
-el.style.setProperty('--accent', exp.accent);
-el.style.animationDelay = (opts.delay || 0) + 's';
-el.addEventListener('click', () => bumpPlayCount(exp.href));
-const count = playCount(exp.href);
-const countHtml = count > 0 ? '<p class="card-count">Played ' + count + ' time' + (count===1?'':'s') + '</p>' : '';
-const badgeHtml = opts.badge ? '<span class="card-badge ' + (opts.badgeClass||'') + '">' + opts.badge + '</span>' : '';
-el.innerHTML =
-'<div class="card-icon">' + exp.icon + '</div>' +
-'<div class="card-flag">' + exp.flag + '</div>' +
-'<div class="card-content">' +
-'<p class="card-title"><span class="accent-dot"></span>' + exp.title + '</p>' +
-'<p class="card-tagline">' + exp.tagline + '</p>' +
-countHtml + badgeHtml +
-'<span class="card-cta">Play &rarr;</span>' +
-'</div>';
-return el;
+/* ---- procedural earth + cloud textures (no external image dependency) ---- */
+function seededRandom(seed){
+var s = seed % 2147483647; if (s <= 0) s += 2147483646;
+return function(){ s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; };
 }
-
-function renderFeatured(exp){
-const el = document.getElementById('featuredCard');
-el.href = exp.href;
-el.style.setProperty('--accent', exp.accent);
-el.onclick = () => bumpPlayCount(exp.href);
-el.innerHTML =
-'<div class="card-icon">' + exp.icon + '</div>' +
-'<div class="featured-info">' +
-'<p class="featured-eyebrow">Featured &middot; ' + exp.country + '</p>' +
-'<h2 class="featured-title">' + exp.title + '</h2>' +
-'<p class="featured-tagline">' + exp.tagline + '</p>' +
-'<span class="btn-primary">Play Now &rarr;</span>' +
-'</div>';
+function lngLatToXY(lng, lat, w, h){ return [ (lng+180)/360*w, (90-lat)/180*h ]; }
+function drawBlobLand(ctx, cx, cy, rw, rh, rand, color){
+ctx.fillStyle = color;
+var n = 7 + Math.floor(rand()*4);
+for (var i=0;i<n;i++){
+var ox = (rand()-0.5)*rw*0.8, oy = (rand()-0.5)*rh*0.8;
+var rr = (0.35 + rand()*0.5);
+ctx.beginPath();
+ctx.ellipse(cx+ox, cy+oy, rw*rr*0.5, rh*rr*0.5, rand()*Math.PI, 0, Math.PI*2);
+ctx.fill();
 }
-
-const dayIndex = Math.floor(Date.now() / 86400000) % EXPERIENCES.length; function rotateArr(arr, seed){ const n = arr.length; const s = ((seed % n) + n) % n; return arr.slice(s).concat(arr.slice(0, s)); }
-const featuredExp = EXPERIENCES[dayIndex];
-renderFeatured(featuredExp);
-visibleExperiences.add(featuredExp.href);
-
-const trendingPicks = rotateArr(['gully-cricket.html','kancha-kings.html','daruma-drop.html','sungka-streak.html','hydraulic-press-lab.html','tinikling-tempo.html','matka-mania.html','balloon-bazaar.html','jeepney-jam.html','goldfish-scoop.html'], dayIndex);
-const trendingGrid = document.getElementById('trendingGrid');
-const trendingChosen = trendingPicks.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,6);
-trendingChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); trendingGrid.appendChild(makeCard(exp, { delay:i*0.05, badge:'Trending', badgeClass:'tag-trending' })); });
-
-const newPicks = rotateArr(['gravity-playground.html','cloud-painter.html','zen-ripple.html','sensu-spinner.html','koinobori-festival.html','jeepney-jam.html','world-size-explorer.html','parol-glow.html','rangoli-maker.html'], dayIndex + 3);
-const newRow = document.getElementById('newRow');
-const newChosen = newPicks.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,4);
-newChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); newRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'New', badgeClass:'tag-new' })); });
-
-const lovedRow = document.getElementById('lovedRow');
-const withCounts = EXPERIENCES.map(e => ({ e, c:playCount(e.href) })).filter(x => x.c > 0 && !visibleExperiences.has(x.e.href)).sort((a,b)=>b.c-a.c);
-const lovedFallback = rotateArr(['moksha-patam.html','rangoli-maker.html','balloon-bazaar.html','pie-break.html','seven-stones.html','stapu.html'], dayIndex + 6);
-let lovedChosen = withCounts.length >= 4 ? withCounts.slice(0,4).map(x=>x.e) :
-lovedFallback.map(h => EXPERIENCES.find(e=>e.href===h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0,4);
-lovedChosen.forEach((exp, i) => { visibleExperiences.add(exp.href); lovedRow.appendChild(makeCard(exp, { delay:i*0.05, badge:'Most Loved', badgeClass:'tag-loved' })); });
-
-const countryGrid = document.getElementById('countryGrid');
-COUNTRIES.forEach((c, i) => {
-const el = document.createElement('a');
-el.className = 'card';
-el.href = c.href;
-el.style.setProperty('--accent', c.accent);
-el.style.animationDelay = (i * 0.05) + 's';
-el.innerHTML =
-'<div class="card-flag">' + c.flag + '</div>' +
-'<div class="card-content">' +
-'<p class="card-title"><span class="accent-dot"></span>' + c.title + '</p>' +
-'<p class="card-tagline">' + c.tagline + '</p>' +
-'<p class="card-count">' + c.count + '</p>' +
-'<span class="card-cta">Explore &rarr;</span>' +
-'</div>';
-countryGrid.appendChild(el);
-});
-
-const collectionRoot = document.getElementById('collectionRows');
-COLLECTIONS.forEach(col => {
-const collectionBudget = EXPERIENCES.length - visibleExperiences.size - HOMEPAGE_HIDDEN_RESERVE;
-if (collectionBudget <= 0) return;
-const matches = col.candidates.map(h => EXPERIENCES.find(e => e.href === h)).filter(e => e && !visibleExperiences.has(e.href)).slice(0, collectionBudget);
-if (matches.length === 0) return;
-matches.forEach(e => visibleExperiences.add(e.href));
-const wrap = document.createElement('div');
-wrap.className = 'collection-block';
-const label = document.createElement('p');
-label.className = 'collection-label';
-label.textContent = col.label;
-const row = document.createElement('div');
-row.className = 'row-scroll';
-matches.forEach((exp, i) => row.appendChild(makeCard(exp, { delay:i*0.05 })));
-wrap.appendChild(label);
-wrap.appendChild(row);
-collectionRoot.appendChild(wrap);
-});
-
-const playedEntries = EXPERIENCES
-.map(e => ({ e, c:playCount(e.href), t:lastPlayed(e.href) }))
-.filter(x => x.c > 0 && !visibleExperiences.has(x.e.href))
-.sort((a,b) => b.t - a.t);
-const continueBudget = Math.max(0, EXPERIENCES.length - visibleExperiences.size - HOMEPAGE_HIDDEN_RESERVE);
-const continueChosen = playedEntries.slice(0, Math.min(4, continueBudget));
-if (continueChosen.length > 0){
-const continueSection = document.getElementById('continue-playing');
-const continueRow = document.getElementById('continueRow');
-continueChosen.forEach((x, i) => {
-visibleExperiences.add(x.e.href);
-continueRow.appendChild(makeCard(x.e, { delay:i*0.05 }));
-});
-continueSection.style.display = '';
 }
-
-const challengeStart = Math.floor(Date.now() / 86400000) % EXPERIENCES.length;
-let challengeExp = null;
-for (let i = 0; i < EXPERIENCES.length; i++){
-const candidate = EXPERIENCES[(challengeStart + i) % EXPERIENCES.length];
-if (!visibleExperiences.has(candidate.href)){ challengeExp = candidate; break; }
-}
-if (!challengeExp) challengeExp = EXPERIENCES[challengeStart];
-visibleExperiences.add(challengeExp.href);
-const challengeDone = (function(){ try{ return localStorage.getItem('challenge_'+todayStamp()) === challengeExp.href; }catch(e){ return false; } })();
-const challengeBanner = document.getElementById('challengeBanner');
-const targetText = CHALLENGE_TARGETS[challengeExp.href] || (challengeExp.title + ': ' + DEFAULT_CHALLENGE_TARGET);
-challengeBanner.className = 'challenge-banner' + (challengeDone ? ' done' : '');
-challengeBanner.innerHTML =
-'<div class="challenge-icon">' + challengeExp.icon + '</div>' +
-'<div class="challenge-info">' +
-'<p class="challenge-title">Daily Challenge</p>' +
-'<p class="challenge-target">' + targetText + '</p>' +
-'<span class="challenge-badge">🏆 Daily Badge' + (challengeDone ? ' — Claimed today' : '') + '</span>' +
-'</div>' +
-'<a class="btn-primary" href="' + challengeExp.href + '" id="challengePlayBtn">Play Challenge &rarr;</a>' +
-(challengeDone ? '' : '<button class="btn-secondary" id="challengeClaimBtn" type="button">I did it — Claim Badge</button>');
-document.getElementById('challengePlayBtn').addEventListener('click', () => bumpPlayCount(challengeExp.href));
-const claimBtn = document.getElementById('challengeClaimBtn');
-if (claimBtn){
-claimBtn.addEventListener('click', () => {
-try{ localStorage.setItem('challenge_'+todayStamp(), challengeExp.href); }catch(e){}
-challengeBanner.classList.add('done');
-claimBtn.remove();
-challengeBanner.querySelector('.challenge-badge').textContent = '🏆 Daily Badge — Claimed today';
-});
-}
-
-const comingSoonRow = document.getElementById('comingSoonRow');
-COMING_SOON.forEach((c, i) => {
-const el = document.createElement('div');
-el.className = 'card locked';
-el.style.animationDelay = (i * 0.05) + 's';
-el.innerHTML =
-'<div class="card-flag">' + flagImg(c.code) + '</div>' +
-'<div class="card-content">' +
-'<p class="card-title">' + c.name + '</p>' +
-'<p class="card-tagline">' + c.planned + '</p>' +
-'<p class="coming-eta">' + c.eta + '</p>' +
-'<span class="card-badge">Coming Soon</span>' +
-'</div>';
-comingSoonRow.appendChild(el);
-});
-
-function getVotes(){
-try{ return JSON.parse(localStorage.getItem('playrium_votes') || '{}'); }catch(e){ return {}; }
-}
-function saveVotes(v){
-try{ localStorage.setItem('playrium_votes', JSON.stringify(v)); }catch(e){}
-}
-function getVotedChoice(){
-try{ return localStorage.getItem('playrium_voted') || ''; }catch(e){ return ''; }
-}
-function renderVotePanel(){
-const votes = getVotes();
-const voted = getVotedChoice();
-const total = VOTE_COUNTRIES.reduce((sum, c) => sum + (votes[c] || 0), 0);
-const panel = document.getElementById('votePanel');
-panel.innerHTML = '';
-VOTE_COUNTRIES.forEach(country => {
-const count = votes[country] || 0;
-const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-const row = document.createElement('div');
-row.className = 'vote-row';
-const name = document.createElement('span');
-name.className = 'vote-country';
-name.textContent = country;
-row.appendChild(name);
-if (voted){
-const track = document.createElement('div');
-track.className = 'vote-bar-track';
-const fill = document.createElement('div');
-fill.className = 'vote-bar-fill';
-fill.style.width = pct + '%';
-track.appendChild(fill);
-row.appendChild(track);
-const pctLabel = document.createElement('span');
-pctLabel.className = 'vote-pct';
-pctLabel.textContent = pct + '%';
-row.appendChild(pctLabel);
-} else {
-const btn = document.createElement('button');
-btn.className = 'vote-btn';
-btn.type = 'button';
-btn.textContent = 'Vote';
-btn.addEventListener('click', () => {
-const v = getVotes();
-v[country] = (v[country] || 0) + 1;
-saveVotes(v);
-try{ localStorage.setItem('playrium_voted', country); }catch(e){}
-renderVotePanel();
-});
-row.appendChild(btn);
-}
-panel.appendChild(row);
-});
-}
-renderVotePanel();
-
-const statsStrip = document.getElementById('statsStrip');
-const statsData = [
-{ num: EXPERIENCES.length, label:'Handcrafted Experiences' },
-{ num: COUNTRIES.length, label:'Countries Represented' },
-{ num: COLLECTIONS.length, label:'Curated Collections' },
+function makeEarthTexture(){
+var w = 2048, h = 1024;
+var c = document.createElement('canvas'); c.width = w; c.height = h;
+var ctx = c.getContext('2d');
+var grad = ctx.createLinearGradient(0,0,0,h);
+grad.addColorStop(0, '#0f3a5f'); grad.addColorStop(0.5, '#0d4d72'); grad.addColorStop(1, '#0a2f4a');
+ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+var rand = seededRandom(42);
+var landColor = '#3f7d4f';
+var masses = [
+[15,15,40,35], [15,50,30,20], [95,40,70,45], [-100,45,55,45],
+[-62,-15,32,55], [135,-25,32,28]
 ];
-statsData.forEach(s => {
-const box = document.createElement('div');
-const numEl = document.createElement('p');
-numEl.className = 'stat-num';
-numEl.textContent = '0';
-numEl.dataset.target = s.num;
-const labelEl = document.createElement('p');
-labelEl.className = 'stat-label';
-labelEl.textContent = s.label;
-box.appendChild(numEl);
-box.appendChild(labelEl);
-statsStrip.appendChild(box);
+masses.forEach(function(m){
+var p = lngLatToXY(m[0], m[1], w, h);
+drawBlobLand(ctx, p[0], p[1], m[2]/360*w*0.55, m[3]/180*h*0.55, rand, landColor);
 });
-const infinityBox = document.createElement('div');
-infinityBox.innerHTML = '<p class="stat-num">&infin;</p><p class="stat-label">Ways To Explore</p>';
-statsStrip.appendChild(infinityBox);
-
-function animateStats(){
-const nums = statsStrip.querySelectorAll('.stat-num[data-target]');
-nums.forEach(el => {
-const target = parseInt(el.dataset.target, 10);
-let current = 0;
-const step = Math.max(1, Math.ceil(target / 30));
-const timer = setInterval(() => {
-current += step;
-if (current >= target){ current = target; clearInterval(timer); }
-el.textContent = String(current);
-}, 30);
+[ [78,22,10,10], [136,36,7,7], [122,12,6,6] ].forEach(function(m){
+var p = lngLatToXY(m[0], m[1], w, h);
+drawBlobLand(ctx, p[0], p[1], m[2]/360*w, m[3]/180*h, rand, '#4a8f57');
 });
+ctx.globalAlpha = 0.08; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1;
+for (var y=0;y<=h;y+=h/12){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
+for (var x=0;x<=w;x+=w/24){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
+ctx.globalAlpha = 1;
+return c;
 }
-if ('IntersectionObserver' in window){
-const statsObserver = new IntersectionObserver((entries) => {
-entries.forEach(entry => {
-if (entry.isIntersecting){ animateStats(); statsObserver.disconnect(); }
+function makeCloudTexture(){
+var w = 2048, h = 1024;
+var c = document.createElement('canvas'); c.width = w; c.height = h;
+var ctx = c.getContext('2d');
+var rand = seededRandom(7);
+for (var i=0;i<70;i++){
+var cx = rand()*w, cy = rand()*h*0.85 + h*0.05;
+var rw = 40 + rand()*140, rh = 20 + rand()*60;
+var alpha = 0.08 + rand()*0.18;
+ctx.fillStyle = 'rgba(255,255,255,'+alpha+')';
+for (var j=0;j<4;j++){
+ctx.beginPath();
+ctx.ellipse(cx+(rand()-0.5)*rw, cy+(rand()-0.5)*rh, rw*0.3, rh*0.4, 0, 0, Math.PI*2);
+ctx.fill();
+}
+}
+return c;
+}
+function latLngToVector3(lat, lng, radius){
+var phi = (90-lat) * Math.PI/180;
+var theta = (lng+180) * Math.PI/180;
+var x = -radius * Math.sin(phi) * Math.cos(theta);
+var z = radius * Math.sin(phi) * Math.sin(theta);
+var y = radius * Math.cos(phi);
+return new THREE.Vector3(x,y,z);
+}
+
+var globe = { scene:null, camera:null, renderer:null, earth:null, clouds:null, markers:[], raycaster:null,
+autoRotate:true, dragging:false, lastX:0, lastY:0, velX:0, velY:0, rotY:0, rotX:0, zoom:5.6,
+hoveredMarker:null, spinBoost:0 };
+
+function initGlobe(){
+var stage = document.getElementById('globeStage');
+var canvas = document.getElementById('globeCanvas');
+var w = stage.clientWidth, h = stage.clientHeight;
+globe.scene = new THREE.Scene();
+globe.camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+globe.camera.position.set(0,0,globe.zoom);
+globe.renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true, alpha:true });
+globe.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+globe.renderer.setSize(w, h);
+
+var stars = new THREE.BufferGeometry();
+var starCount = 500;
+var positions = new Float32Array(starCount*3);
+for (var i=0;i<starCount;i++){
+var r = 20 + Math.random()*10;
+var th = Math.random()*Math.PI*2, ph = Math.acos(Math.random()*2-1);
+positions[i*3] = r*Math.sin(ph)*Math.cos(th);
+positions[i*3+1] = r*Math.sin(ph)*Math.sin(th);
+positions[i*3+2] = r*Math.cos(ph);
+}
+stars.setAttribute('position', new THREE.BufferAttribute(positions,3));
+var starMat = new THREE.PointsMaterial({ color:0xffffff, size:0.05, transparent:true, opacity:0.7 });
+globe.scene.add(new THREE.Points(stars, starMat));
+
+var earthTex = new THREE.CanvasTexture(makeEarthTexture());
+var earthGeo = new THREE.SphereGeometry(2, 64, 64);
+var earthMat = new THREE.MeshPhongMaterial({ map:earthTex, shininess:6, specular:0x111111 });
+globe.earth = new THREE.Mesh(earthGeo, earthMat);
+globe.scene.add(globe.earth);
+
+var cloudTex = new THREE.CanvasTexture(makeCloudTexture());
+var cloudGeo = new THREE.SphereGeometry(2.02, 64, 64);
+var cloudMat = new THREE.MeshLambertMaterial({ map:cloudTex, transparent:true, opacity:0.55 });
+globe.clouds = new THREE.Mesh(cloudGeo, cloudMat);
+globe.scene.add(globe.clouds);
+
+var atmoGeo = new THREE.SphereGeometry(2.12, 48, 48);
+var atmoMat = new THREE.ShaderMaterial({
+uniforms:{},
+vertexShader:'varying vec3 vNormal; void main(){ vNormal = normalize(normalMatrix * normal); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+fragmentShader:'varying vec3 vNormal; void main(){ float i = pow(0.68 - dot(vNormal, vec3(0,0,1.0)), 3.0); gl_FragColor = vec4(0.4,0.7,1.0, i * 0.9); }',
+blending:THREE.AdditiveBlending, side:THREE.BackSide, transparent:true
 });
-}, { threshold:0.4 });
-statsObserver.observe(statsStrip);
+globe.scene.add(new THREE.Mesh(atmoGeo, atmoMat));
+
+var sun = new THREE.DirectionalLight(0xffffff, 1.15);
+sun.position.set(5,2,3);
+globe.scene.add(sun);
+globe.scene.add(new THREE.AmbientLight(0x8899aa, 0.55));
+
+globe.raycaster = new THREE.Raycaster();
+COUNTRIES.forEach(function(country){
+var pos = latLngToVector3(country.lat, country.lng, 2.06);
+var markerGeo = new THREE.SphereGeometry(0.045, 16, 16);
+var markerMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(country.accent) });
+var marker = new THREE.Mesh(markerGeo, markerMat);
+marker.position.copy(pos);
+marker.userData.country = country;
+globe.earth.add(marker);
+var ringGeo = new THREE.RingGeometry(0.07, 0.1, 24);
+var ringMat = new THREE.MeshBasicMaterial({ color:new THREE.Color(country.accent), transparent:true, opacity:0.5, side:THREE.DoubleSide });
+var ring = new THREE.Mesh(ringGeo, ringMat);
+ring.position.copy(pos);
+ring.lookAt(pos.clone().multiplyScalar(2));
+globe.earth.add(ring);
+globe.markers.push({ country:country, mesh:marker, ring:ring, pos:pos });
+});
+
+setupGlobeInteraction(canvas);
+animateGlobe();
+window.addEventListener('resize', onGlobeResize);
+}
+function onGlobeResize(){
+var stage = document.getElementById('globeStage');
+if (!globe.renderer) return;
+var w = stage.clientWidth, h = stage.clientHeight;
+globe.camera.aspect = w/h; globe.camera.updateProjectionMatrix();
+globe.renderer.setSize(w,h);
+}
+
+function setupGlobeInteraction(canvas){
+var pointerDown = false, moved = false;
+function pointerPos(e){
+var rect = canvas.getBoundingClientRect();
+var cx = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+var cy = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+return { x:(cx/rect.width)*2-1, y:-(cy/rect.height)*2+1 };
+}
+function onDown(e){
+pointerDown = true; moved = false; globe.dragging = true;
+var p = e.touches ? e.touches[0] : e;
+globe.lastX = p.clientX; globe.lastY = p.clientY;
+globe.velX = 0; globe.velY = 0;
+}
+function onMove(e){
+var p = e.touches ? e.touches[0] : e;
+if (pointerDown){
+var dx = p.clientX - globe.lastX, dy = p.clientY - globe.lastY;
+if (Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+globe.rotY += dx * 0.005;
+globe.rotX += dy * 0.005;
+globe.rotX = Math.max(-1.1, Math.min(1.1, globe.rotX));
+globe.velX = dx * 0.005; globe.velY = dy * 0.005;
+globe.lastX = p.clientX; globe.lastY = p.clientY;
 } else {
-animateStats();
+updateHover(pointerPos(e));
 }
-
-const newsletterForm = document.getElementById('newsletterForm');
-const newsletterNote = document.getElementById('newsletterNote');
-newsletterForm.addEventListener('submit', (e) => {
+}
+function onUp(e){
+pointerDown = false; globe.dragging = false;
+if (!moved){ handleClick(pointerPos(e)); }
+}
+canvas.addEventListener('mousedown', onDown);
+canvas.addEventListener('mousemove', onMove);
+window.addEventListener('mouseup', onUp);
+canvas.addEventListener('touchstart', onDown, { passive:true });
+canvas.addEventListener('touchmove', onMove, { passive:true });
+canvas.addEventListener('touchend', onUp);
+canvas.addEventListener('wheel', function(e){
 e.preventDefault();
-newsletterNote.textContent = 'Thanks — we will let you know when new experiences arrive.';
-newsletterForm.reset();
+globe.zoom += e.deltaY * 0.003;
+globe.zoom = Math.max(3.2, Math.min(9, globe.zoom));
+}, { passive:false });
+}
+function updateHover(ndc){
+globe.raycaster.setFromCamera(ndc, globe.camera);
+var meshes = globe.markers.map(function(m){ return m.mesh; });
+var hits = globe.raycaster.intersectObjects(meshes);
+var newHover = hits.length ? globe.markers.find(function(m){ return m.mesh === hits[0].object; }) : null;
+if (newHover !== globe.hoveredMarker){
+if (globe.hoveredMarker) globe.hoveredMarker.mesh.scale.set(1,1,1);
+globe.hoveredMarker = newHover;
+if (globe.hoveredMarker) globe.hoveredMarker.mesh.scale.set(1.8,1.8,1.8);
+document.getElementById('globeCanvas').style.cursor = newHover ? 'pointer' : 'grab';
+}
+}
+function handleClick(ndc){
+globe.raycaster.setFromCamera(ndc, globe.camera);
+var meshes = globe.markers.map(function(m){ return m.mesh; });
+var hits = globe.raycaster.intersectObjects(meshes);
+if (hits.length){
+var found = globe.markers.find(function(m){ return m.mesh === hits[0].object; });
+if (found) selectCountry(found.country);
+}
+}
+var cameraTweening = false;
+function focusCameraOnMarker(pos, duration, cb){
+if (reducedMotion) duration = 50;
+var startRotY = globe.rotY, startRotX = globe.rotX, startZoom = globe.zoom;
+var worldPos = pos.clone();
+var targetTheta = Math.atan2(worldPos.x, worldPos.z);
+var targetRotY = -targetTheta;
+var targetRotX = Math.asin(Math.max(-1,Math.min(1,worldPos.y / worldPos.length())));
+var targetZoom = 3.6;
+var start = performance.now();
+cameraTweening = true;
+function step(now){
+var t = Math.min(1, (now-start)/duration);
+var e = 1 - Math.pow(1-t, 3);
+globe.rotY = startRotY + (targetRotY - startRotY) * e;
+globe.rotX = startRotX + (targetRotX - startRotX) * e;
+globe.zoom = startZoom + (targetZoom - startZoom) * e;
+if (t < 1) requestAnimationFrame(step); else { cameraTweening = false; if (cb) cb(); }
+}
+requestAnimationFrame(step);
+}
+function resetCamera(duration){
+if (reducedMotion) duration = 50;
+var startRotX = globe.rotX, startZoom = globe.zoom;
+var start = performance.now();
+function step(now){
+var t = Math.min(1, (now-start)/duration);
+var e = 1 - Math.pow(1-t, 3);
+globe.rotX = startRotX + (0 - startRotX) * e;
+globe.zoom = startZoom + (5.6 - startZoom) * e;
+if (t < 1) requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+}
+function animateGlobe(){
+requestAnimationFrame(animateGlobe);
+if (!globe.dragging){
+globe.rotY += globe.velX; globe.rotX += globe.velY;
+globe.velX *= 0.94; globe.velY *= 0.94;
+if (!cameraTweening && globe.autoRotate && !reducedMotion){ globe.rotY += 0.0018 + globe.spinBoost; }
+globe.rotX = Math.max(-1.1, Math.min(1.1, globe.rotX));
+}
+globe.earth.rotation.y = globe.rotY;
+globe.earth.rotation.x = globe.rotX;
+globe.clouds.rotation.y = globe.rotY * 1.15;
+globe.clouds.rotation.x = globe.rotX;
+globe.camera.position.set(0,0,globe.zoom);
+globe.camera.lookAt(0,0,0);
+globe.markers.forEach(function(m){
+var scale = 1 + Math.sin(Date.now()/600 + m.pos.x) * 0.08;
+if (m !== globe.hoveredMarker) m.ring.scale.set(scale, scale, scale);
 });
+globe.renderer.render(globe.scene, globe.camera);
+}
 
+var activeCountryId = null;
+function selectCountry(country){
+activeCountryId = country.id;
+var panel = document.getElementById('countryPanel');
+setFlagEl(document.getElementById('countryPanelFlag'), country);
+document.getElementById('countryPanelName').textContent = country.name;
+var exps = EXPERIENCES.filter(function(e){ return e.country.toLowerCase() === country.name.toLowerCase(); });
+document.getElementById('countryPanelCount').textContent = exps.length + ' Experiences';
+var list = document.getElementById('countryPanelList');
+list.innerHTML = '';
+exps.forEach(function(e){
+var row = document.createElement('a');
+row.className = 'exp-row';
+row.href = e.href;
+row.addEventListener('click', function(){ bumpPlayCount(e.href); });
+row.innerHTML = '<span class="exp-row-icon">'+e.icon+'</span><span class="exp-row-text"><span class="exp-row-title">'+e.title+'</span><span class="exp-row-tag">'+e.tagline+'</span></span>';
+list.appendChild(row);
+});
+document.getElementById('countryPanelCta').href = country.href;
+panel.classList.add('open');
+panel.setAttribute('aria-hidden', 'false');
+playClick(660);
+var marker = globe.markers.find(function(m){ return m.country.id === country.id; });
+if (marker) focusCameraOnMarker(marker.pos, reducedMotion ? 50 : 750);
+}
+function closeCountryPanel(){
+var panel = document.getElementById('countryPanel');
+panel.classList.remove('open');
+panel.setAttribute('aria-hidden', 'true');
+resetCamera(reducedMotion ? 50 : 650);
+activeCountryId = null;
+}
+document.getElementById('countryPanelClose').addEventListener('click', closeCountryPanel);
+
+function buildHiddenCountryNav(){
+var nav = document.getElementById('countryHiddenNav');
+COUNTRIES.forEach(function(c){
+var a = document.createElement('a');
+a.href = '#';
+a.className = 'country-hidden-link';
+a.textContent = 'Explore ' + c.name + ' (' + EXPERIENCES.filter(function(e){return e.country===c.name;}).length + ' experiences)';
+a.addEventListener('click', function(ev){ ev.preventDefault(); selectCountry(c); });
+nav.appendChild(a);
+});
+}
+buildHiddenCountryNav();
+
+/* ---------- FEATURED ---------- */
+var dayIndex = Math.floor(Date.now()/86400000) % EXPERIENCES.length;
+var featuredExp = EXPERIENCES[dayIndex];
+(function renderFeatured(){
+document.getElementById('featuredCard').href = featuredExp.href;
+document.getElementById('featuredCard').style.setProperty('--accent', featuredExp.accent);
+document.getElementById('featuredCard').addEventListener('click', function(){ bumpPlayCount(featuredExp.href); });
+document.getElementById('featuredIcon').textContent = featuredExp.icon;
+document.getElementById('featuredEyebrow').textContent = 'Featured \u00b7 ' + featuredExp.country;
+document.getElementById('featuredTitle').textContent = featuredExp.title;
+document.getElementById('featuredTagline').textContent = featuredExp.tagline;
+})();
+
+/* ---------- DAILY CHALLENGE ---------- */
+(function renderChallenge(){
+var challengeStart = (dayIndex + 5) % EXPERIENCES.length;
+var challengeExp = EXPERIENCES[challengeStart].href === featuredExp.href ? EXPERIENCES[(challengeStart+1)%EXPERIENCES.length] : EXPERIENCES[challengeStart];
+var done = false;
+try{ done = localStorage.getItem('challenge_'+todayStamp()) === challengeExp.href; }catch(e){}
+var banner = document.getElementById('challengeBanner');
+var targetText = CHALLENGE_TARGETS[challengeExp.href] || (challengeExp.title + ': ' + DEFAULT_CHALLENGE_TARGET);
+banner.className = 'challenge-banner' + (done ? ' done' : '');
+banner.innerHTML = '<div class="challenge-icon">'+challengeExp.icon+'</div><div class="challenge-info"><p class="challenge-title">Today\'s Challenge</p><p class="challenge-target">'+targetText+'</p><span class="challenge-badge">\ud83c\udfc6 Daily Badge'+(done?' \u2014 Claimed today':'')+'</span></div><a class="btn-primary" href="'+challengeExp.href+'" id="challengePlayBtn">Play Challenge &rarr;</a>'+(done?'':'<button class="btn-secondary" id="challengeClaimBtn" type="button">I did it \u2014 Claim Badge</button>');
+document.getElementById('challengePlayBtn').addEventListener('click', function(){ bumpPlayCount(challengeExp.href); });
+var claimBtn = document.getElementById('challengeClaimBtn');
+if (claimBtn){
+claimBtn.addEventListener('click', function(){
+try{ localStorage.setItem('challenge_'+todayStamp(), challengeExp.href); }catch(e){}
+banner.classList.add('done');
+claimBtn.remove();
+banner.querySelector('.challenge-badge').textContent = '\ud83c\udfc6 Daily Badge \u2014 Claimed today';
+});
+}
+})();
+
+/* ---------- CONTINUE PLAYING ---------- */
+(function renderContinue(){
+var played = EXPERIENCES.map(function(e){ return { e:e, c:playCount(e.href), t:lastPlayed(e.href) }; })
+.filter(function(x){ return x.c > 0; }).sort(function(a,b){ return b.t - a.t; }).slice(0,4);
+if (played.length === 0) return;
+var section = document.getElementById('continue-playing');
+var row = document.getElementById('continueRow');
+played.forEach(function(x){
+var card = document.createElement('a');
+card.className = 'mini-card';
+card.href = x.e.href;
+card.addEventListener('click', function(){ bumpPlayCount(x.e.href); });
+card.innerHTML = '<div class="mini-card-icon">'+x.e.icon+'</div><div class="mini-card-content"><p class="mini-card-title">'+x.e.title+'</p></div>';
+row.appendChild(card);
+});
+section.style.display = '';
+})();
+
+/* ---------- SURPRISE ME ---------- */
 function pickSurpriseExperience(){
-let pool = EXPERIENCES.filter(e => !visibleExperiences.has(e.href));
-if (pool.length === 0){
-pool = EXPERIENCES.filter(e => playCount(e.href) === 0);
-}
-if (pool.length === 0){
-const minCount = Math.min(...EXPERIENCES.map(e => playCount(e.href)));
-pool = EXPERIENCES.filter(e => playCount(e.href) === minCount);
-}
-if (pool.length === 0){
-pool = EXPERIENCES.slice();
-}
-return pool[Math.floor(Math.random() * pool.length)];
+var recent = getRecentSurprises();
+var visibleHrefs = [featuredExp.href];
+var pool = EXPERIENCES.filter(function(e){ return visibleHrefs.indexOf(e.href) === -1 && recent.indexOf(e.href) === -1; });
+if (pool.length === 0) pool = EXPERIENCES.filter(function(e){ return visibleHrefs.indexOf(e.href) === -1; });
+var neverPlayed = pool.filter(function(e){ return playCount(e.href) === 0; });
+if (neverPlayed.length > 0) return neverPlayed[Math.floor(Math.random()*neverPlayed.length)];
+var minCount = Math.min.apply(null, pool.map(function(e){ return playCount(e.href); }));
+var leastPlayed = pool.filter(function(e){ return playCount(e.href) === minCount; });
+if (leastPlayed.length > 0) return leastPlayed[Math.floor(Math.random()*leastPlayed.length)];
+return pool[Math.floor(Math.random()*pool.length)];
 }
 
-const surpriseOverlay = document.getElementById('surpriseOverlay');
-const surpriseStep = document.getElementById('surpriseStep');
-const surpriseResult = document.getElementById('surpriseResult');
-const surpriseResultIcon = document.getElementById('surpriseResultIcon');
-const surpriseResultTitle = document.getElementById('surpriseResultTitle');
-const surpriseResultTag = document.getElementById('surpriseResultTag');
-const surpriseResultPlay = document.getElementById('surpriseResultPlay'); const surpriseCountryReveal = document.getElementById('surpriseCountryReveal'); const surpriseCountryFlag = document.getElementById('surpriseCountryFlag'); const surpriseCountryName = document.getElementById('surpriseCountryName');
+function spawnParticles(){
+var wrap = document.getElementById('surpriseParticles');
+wrap.innerHTML = '';
+var n = reducedMotion ? 0 : 24;
+for (var i=0;i<n;i++){
+var s = document.createElement('span');
+var angle = Math.random()*Math.PI*2, dist = 60+Math.random()*90;
+s.style.left = '50%'; s.style.top = '40%';
+s.style.setProperty('--px', (Math.cos(angle)*dist)+'px');
+s.style.setProperty('--py', (Math.sin(angle)*dist)+'px');
+wrap.appendChild(s);
+setTimeout(function(el){ return function(){ el.classList.add('go'); }; }(s), 10);
+}
+}
 
-function runSurprise(){
-surpriseOverlay.classList.add('active');
-surpriseOverlay.setAttribute('aria-hidden', 'false');
-surpriseResult.style.display = 'none'; surpriseCountryReveal.style.display = 'none';
-surpriseStep.style.display = '';
-document.getElementById('surpriseGlobe').style.display = '';
-const steps = ['Spinning the globe…', 'Zooming into a country…', 'Selecting an experience…', 'Ready to play?'];
-let i = 0;
-surpriseStep.textContent = steps[0];
-const interval = setInterval(() => {
-i++;
-if (i < steps.length){
-surpriseStep.textContent = steps[i];
-} else {
-clearInterval(interval);
-const pick = pickSurpriseExperience();
-document.getElementById('surpriseGlobe').style.display = 'none';
-surpriseStep.style.display = 'none'; surpriseCountryFlag.textContent = pick.flag; surpriseCountryName.textContent = 'Landed in ' + pick.country + '!'; surpriseCountryReveal.style.display = ''; setTimeout(function(){ surpriseCountryReveal.style.display = 'none';
-surpriseResultIcon.textContent = pick.icon;
-surpriseResultTitle.textContent = pick.title;
-surpriseResultTag.textContent = pick.tagline;
-surpriseResultPlay.href = pick.href;
-surpriseResultPlay.onclick = () => bumpPlayCount(pick.href);
-surpriseResult.style.display = ''; }, 900);
+function runSurpriseSequence(){
+var overlay = document.getElementById('surpriseOverlay');
+var stepEl = document.getElementById('surpriseStep');
+var logoEl = document.getElementById('surpriseLogo');
+var countryReveal = document.getElementById('surpriseCountryReveal');
+var resultCard = document.getElementById('surpriseResult');
+logoEl.classList.remove('show'); countryReveal.classList.remove('show'); resultCard.classList.remove('show');
+stepEl.textContent = '';
+overlay.classList.add('active');
+overlay.setAttribute('aria-hidden','false');
+playClick(440);
+var chosen = pickSurpriseExperience();
+var country = COUNTRIES.find(function(c){ return c.name === chosen.country; });
+var d = reducedMotion ? 0.02 : 1;
+setTimeout(function(){ logoEl.classList.add('show'); }, 100*d);
+setTimeout(function(){ stepEl.textContent = 'Spinning the globe\u2026'; globe.spinBoost = 0.16; }, 500*d);
+if (country){
+var cascadeCount = 0;
+var cascadeTimer = setInterval(function(){
+var m = globe.markers[cascadeCount % globe.markers.length];
+if (m){ m.mesh.scale.set(1.6,1.6,1.6); setTimeout(function(){ if(m!==globe.hoveredMarker) m.mesh.scale.set(1,1,1); }, 200); }
+cascadeCount++;
+}, 140);
+setTimeout(function(){ clearInterval(cascadeTimer); }, 2000*d);
 }
-}, 550);
+setTimeout(function(){ stepEl.textContent = 'Slowing down\u2026'; globe.spinBoost = 0.04; }, 2000*d);
+setTimeout(function(){
+globe.spinBoost = 0;
+stepEl.textContent = 'Found something for you\u2026';
+if (country){
+var marker = globe.markers.find(function(m){ return m.country.id === country.id; });
+if (marker) focusCameraOnMarker(marker.pos, reducedMotion ? 50 : 700);
+setFlagEl(document.getElementById('surpriseCountryFlag'), country);
+document.getElementById('surpriseCountryName').textContent = country.name;
+countryReveal.classList.add('show');
 }
-function closeSurprise(){
-surpriseOverlay.classList.remove('active');
-surpriseOverlay.setAttribute('aria-hidden', 'true');
+}, 2500*d);
+setTimeout(function(){
+document.getElementById('surpriseResultIcon').textContent = chosen.icon;
+document.getElementById('surpriseResultTitle').textContent = chosen.title;
+document.getElementById('surpriseResultTag').textContent = chosen.tagline;
+document.getElementById('surpriseResultPlay').href = chosen.href;
+resultCard.classList.add('show');
+spawnParticles();
+stepEl.textContent = 'Ready to Explore?';
+pushRecentSurprise(chosen.href);
+playClick(880);
+}, 3400*d);
+document.getElementById('surpriseResultPlay').onclick = function(){ bumpPlayCount(chosen.href); };
 }
-document.getElementById('surpriseHero').addEventListener('click', runSurprise);
-document.getElementById('surpriseFloat').addEventListener('click', function(){
-this.classList.add('spin');
-setTimeout(() => this.classList.remove('spin'), 500);
-runSurprise();
+document.getElementById('openMysteryBtn').addEventListener('click', runSurpriseSequence);
+function closeSurpriseOverlay(){
+document.getElementById('surpriseOverlay').classList.remove('active');
+document.getElementById('surpriseOverlay').setAttribute('aria-hidden','true');
+globe.spinBoost = 0;
+resetCamera(reducedMotion ? 50 : 500);
+}
+document.getElementById('surpriseClose').addEventListener('click', closeSurpriseOverlay);
+
+/* ---------- NAV + MUTE ---------- */
+window.addEventListener('scroll', function(){
+document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 30);
 });
-document.getElementById('surpriseClose').addEventListener('click', closeSurprise);
-surpriseOverlay.addEventListener('click', (e) => { if (e.target === surpriseOverlay) closeSurprise(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSurprise(); });
-(function(){
-  var searchInput = document.getElementById('searchInput');
-  var searchResults = document.getElementById('searchResults');
-  var searchEmpty = document.getElementById('searchEmpty');
-  var homeSectionIds = ['featured-wrap','trending','new','loved','countries','collections','continue-playing','daily-challenge','coming-soon','community-vote','stats','newsletter'];
-  function setHomeVisible(visible){
-    homeSectionIds.forEach(function(id){
-      var el = document.getElementById(id);
-      if (el) el.style.display = visible ? '' : 'none';
-    });
-  }
-  if (searchInput) {
-    searchInput.addEventListener('input', function(){
-      var q = this.value.trim().toLowerCase();
-      if (!q) {
-        searchResults.innerHTML = '';
-        searchResults.style.display = 'none';
-        searchEmpty.style.display = 'none';
-        setHomeVisible(true);
-        return;
-      }
-      setHomeVisible(false);
-      var matches = EXPERIENCES.filter(function(exp){
-        var hay = (exp.title + ' ' + exp.tagline + ' ' + exp.country + ' ' + (exp.tags || []).join(' ')).toLowerCase();
-        return hay.indexOf(q) !== -1;
-      });
-      searchResults.innerHTML = '';
-      if (matches.length === 0) {
-        searchResults.style.display = 'none';
-        searchEmpty.style.display = '';
-      } else {
-        searchEmpty.style.display = 'none';
-        searchResults.style.display = '';
-        matches.slice(0, 24).forEach(function(exp, i){ searchResults.appendChild(makeCard(exp, { delay: i * 0.03 })); });
-      }
-    });
-  }
-})();</script>
+document.getElementById('muteToggle').addEventListener('click', function(){
+soundEnabled = !soundEnabled;
+this.textContent = soundEnabled ? '\ud83d\udd0a' : '\ud83d\udd07';
+this.setAttribute('aria-pressed', String(soundEnabled));
+if (soundEnabled) playClick(520);
+});
+
+/* ---------- INIT GLOBE (with CDN fallback + non-WebGL fallback) ---------- */
+function webglAvailable(){
+try{
+var c = document.createElement('canvas');
+return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+}catch(e){ return false; }
+}
+if (webglAvailable()){
+loadScriptWithFallback([
+'https://unpkg.com/three@0.128.0/build/three.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js',
+'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js'
+], function(ok){
+if (ok && window.THREE){ try{ initGlobe(); }catch(e){ document.getElementById('globeStage').classList.add('fallback'); } }
+else { document.getElementById('globeStage').classList.add('fallback'); }
+});
+} else {
+document.getElementById('globeStage').classList.add('fallback');
+}
+</script>
 </body>
 </html>
