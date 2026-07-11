@@ -227,39 +227,12 @@ transform:translate(-50%,-50%) scale(0); animation:relaxRippleOut 3.2s ease-out 
 .relax-result-title{ font-weight:700; font-size:1.3rem; margin:0 0 .3rem; }
 .relax-result-tag{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.95rem; margin:0 0 1.2rem; }
 
-/* ---------- SEARCH ---------- */
-.nav-link-btn{ font-family:var(--font-display); background:none; border:none; color:var(--chalk); font-size:.95rem; font-weight:500; cursor:pointer; padding:0; opacity:.85; }
-.nav-link-btn:hover{ opacity:1; }
-.search-overlay{ position:fixed; inset:0; z-index:70; display:flex; align-items:flex-start; justify-content:center;
-background:rgba(5,5,10,.86); opacity:0; pointer-events:none; transition:opacity .3s ease; padding-top:8vh; }
-.search-overlay.active{ opacity:1; pointer-events:auto; }
-.search-box{ width:100%; max-width:560px; background:var(--ui-glass-strong); border:1px solid var(--ui-glass-border); border-radius:1.2rem;
-padding:1.4rem; box-shadow:0 30px 70px rgba(0,0,0,.5); max-height:70vh; display:flex; flex-direction:column; }
-.search-input{ width:100%; font-family:var(--font-display); font-size:1.1rem; padding:.9rem 1.1rem; border-radius:.8rem; border:1px solid var(--ui-glass-border);
-background:rgba(255,255,255,.05); color:var(--chalk); outline:none; }
-.search-results{ margin-top:1rem; overflow-y:auto; display:flex; flex-direction:column; gap:.4rem; }
-.search-result-item{ display:flex; align-items:center; gap:.7rem; padding:.7rem .8rem; border-radius:.7rem; text-decoration:none; color:var(--chalk); }
-.search-result-item:hover{ background:rgba(255,255,255,.06); }
-.search-result-icon{ font-size:1.3rem; }
-.search-result-title{ font-weight:600; font-size:.95rem; }
-.search-result-meta{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.8rem; }
-.search-empty{ color:var(--chalk-dim); font-family:var(--font-chalk); text-align:center; padding:1rem; }
 </style>
 </head>
 
 <body>
-<nav class="nav" id="mainNav">
-<a class="nav-logo" href="index.html">Playrium</a>
-<div class="nav-links">
-<a href="index.html">Home</a>
-<a href="#top">Countries</a>
-<a href="#originals-panel">Playrium Originals</a>
-<a href="#relax-panel">Relax &amp; Satisfy</a>
-<button class="nav-link-btn" id="navSearchBtn" type="button">Search</button>
-<button class="nav-link-btn" id="navRandomBtn" type="button">Random</button>
-<button class="mute-toggle" id="muteToggle" type="button" aria-label="Toggle sound" aria-pressed="false">🔇</button>
-</div>
-</nav>
+<header id="site-header"></header>
+<button class="mute-toggle" id="muteToggle" type="button" aria-label="Toggle sound" aria-pressed="false" style="position:fixed;top:14px;right:14px;z-index:55;">🔇</button>
 
 <section class="hero" id="top">
 <div class="hero-bg" aria-hidden="true"></div>
@@ -330,17 +303,7 @@ background:rgba(255,255,255,.05); color:var(--chalk); outline:none; }
 <div class="row-scroll" id="continueRow"></div>
 </section>
 
-<footer>
-<div class="footer-links">
-<a href="#top">About</a>
-<a href="#top">Countries</a>
-<a href="#top">Collections</a>
-<a href="mailto:hello@playrium.fun?subject=Suggest%20an%20Experience">Suggest Experience</a>
-<a href="#top">Privacy</a>
-<a href="mailto:hello@playrium.fun">Contact</a>
-</div>
-<p>Playrium</p>
-</footer>
+<footer id="site-footer"></footer>
 
 <div class="surprise-overlay" id="surpriseOverlay" aria-hidden="true" role="dialog" aria-label="Surprise Me discovery">
 <div class="surprise-stage">
@@ -375,13 +338,6 @@ background:rgba(255,255,255,.05); color:var(--chalk); outline:none; }
 <p class="relax-result-tag" id="relaxResultTag"></p>
 <a class="btn-primary" id="relaxResultPlay" href="#">Explore &rarr;</a>
 </div>
-</div>
-</div>
-
-<div class="search-overlay" id="searchOverlay" aria-hidden="true" role="dialog" aria-label="Search experiences">
-<div class="search-box">
-<input class="search-input" id="searchInput" type="text" placeholder="Search by title, country, tag, or mood…" autocomplete="off">
-<div class="search-results" id="searchResults"></div>
 </div>
 </div>
 
@@ -1015,59 +971,6 @@ document.getElementById('relaxRippleWrap').classList.remove('show');
 }
 document.getElementById('relaxClose').addEventListener('click', closeRelaxOverlay);
 
-/* ---------- SEARCH ---------- */
-function matchesQuery(e, q){
-q = q.toLowerCase();
-var countryLabel = e.country || 'Playrium Originals';
-if (e.title.toLowerCase().indexOf(q) > -1) return true;
-if (countryLabel.toLowerCase().indexOf(q) > -1) return true;
-if (e.tags && e.tags.some(function(t){ return t.toLowerCase().indexOf(q) > -1; })) return true;
-if (e.moods && e.moods.some(function(m){ return m.toLowerCase().indexOf(q) > -1; })) return true;
-return false;
-}
-function renderSearchResults(q){
-var resultsEl = document.getElementById('searchResults');
-resultsEl.innerHTML = '';
-if (!q){ return; }
-var matches = EXPERIENCES.filter(function(e){ return matchesQuery(e, q); }).slice(0, 12);
-if (matches.length === 0){
-resultsEl.innerHTML = '<p class="search-empty">No experiences found.</p>';
-return;
-}
-matches.forEach(function(e){
-var a = document.createElement('a');
-a.className = 'search-result-item';
-a.href = e.href;
-a.addEventListener('click', function(){ bumpPlayCount(e.href); });
-var countryLabel = e.country || 'Playrium Originals';
-a.innerHTML = '<span class="search-result-icon">'+e.icon+'</span><span><span class="search-result-title">'+e.title+'</span><br><span class="search-result-meta">'+countryLabel+'</span></span>';
-resultsEl.appendChild(a);
-});
-}
-function openSearch(){
-document.getElementById('searchOverlay').classList.add('active');
-document.getElementById('searchOverlay').setAttribute('aria-hidden','false');
-document.getElementById('searchInput').value = '';
-document.getElementById('searchResults').innerHTML = '';
-setTimeout(function(){ document.getElementById('searchInput').focus(); }, 50);
-}
-function closeSearch(){
-document.getElementById('searchOverlay').classList.remove('active');
-document.getElementById('searchOverlay').setAttribute('aria-hidden','true');
-}
-document.getElementById('navSearchBtn').addEventListener('click', openSearch);
-document.getElementById('searchInput').addEventListener('input', function(){ renderSearchResults(this.value); });
-document.getElementById('searchOverlay').addEventListener('click', function(ev){ if (ev.target === this) closeSearch(); });
-document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape') closeSearch(); });
-
-/* ---------- RANDOM ---------- */
-document.getElementById('navRandomBtn').addEventListener('click', function(){
-var pick = EXPERIENCES[Math.floor(Math.random()*EXPERIENCES.length)];
-bumpPlayCount(pick.href);
-window.location.href = pick.href;
-});
-
-
 /* ---------- NAV + MUTE ---------- */
 window.addEventListener('scroll', function(){
 document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 30);
@@ -1099,5 +1002,8 @@ else { document.getElementById('globeStage').classList.add('fallback'); }
 document.getElementById('globeStage').classList.add('fallback');
 }
 </script>
+<script src="components/experiences-data.js"></script>
+<script src="components/header.js"></script>
+<script src="components/footer.js"></script>
 </body>
 </html>
