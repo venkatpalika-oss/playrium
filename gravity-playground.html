@@ -19,34 +19,34 @@
 <style>
 :root{ --glass:rgba(244,240,230,.07); --glass-b:rgba(244,240,230,.16); --chalk:#f4f0e6; --chalk-dim:#9a97a8; }
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#05050a;font-family:'Fredoka',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;}
-#stage{position:fixed;inset:0;overflow:hidden;touch-action:none;}
+html,body{margin:0;padding:0;width:100%;background:#05050a;font-family:'Fredoka',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;}
+#stageWrap{position:relative;height:100vh;overflow:hidden;} #stage{position:absolute;inset:0;overflow:hidden;touch-action:none;}
 #world{position:absolute;inset:0;width:100%;height:100%;display:block;}
 #fx{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;}
 .glass{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-b);border-radius:1.2rem;box-shadow:0 12px 34px rgba(0,0,0,.4);}
-.topbar{position:fixed;top:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;z-index:6;transition:opacity .5s ease;max-width:94vw;}
+.topbar{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.6rem;padding:.55rem .8rem;z-index:6;transition:opacity .5s ease;max-width:94vw;}
 .topbar select{background:transparent;color:var(--chalk);border:none;font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer;padding:.2rem .3rem;}
 .topbar select option{background:#141420;color:var(--chalk);}
 #gravityDialWrap{position:relative;width:38px;height:38px;border-radius:50%;background:rgba(244,240,230,.08);border:1px solid var(--glass-b);cursor:grab;flex:0 0 auto;}
 #gravityHandle{position:absolute;left:50%;top:4px;width:6px;height:6px;border-radius:50%;background:#f0c14b;box-shadow:0 0 8px #f0c14b;transform:translateX(-50%);transform-origin:3px 15px;}
 #gravityStrength{width:70px;accent-color:#f0c14b;}
 .hud{font-size:.68rem;color:var(--chalk-dim);white-space:nowrap;font-family:'Kalam',cursive;}
-.dock{position:fixed;left:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:.4rem;padding:.6rem .5rem;max-height:78vh;overflow-y:auto;transition:opacity .5s ease;}
+.dock{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:.4rem;padding:.6rem .5rem;max-height:78vh;overflow-y:auto;transition:opacity .5s ease;}
 .dock::-webkit-scrollbar{width:4px;} .dock::-webkit-scrollbar-thumb{background:var(--glass-b);border-radius:4px;}
 .obj-tile{width:46px;height:46px;border-radius:.9rem;background:rgba(244,240,230,.05);border:1px solid transparent;display:flex;align-items:center;justify-content:center;font-size:1.35rem;cursor:grab;transition:transform .2s ease,border-color .2s ease;position:relative;}
 .obj-tile:hover{transform:translateY(-2px);border-color:var(--glass-b);}
 .obj-tile.selected{border-color:#f0c14b;box-shadow:0 0 14px rgba(240,193,75,.4);}
-.util{position:fixed;right:10px;bottom:14px;z-index:6;display:flex;flex-direction:column;gap:.5rem;transition:opacity .5s ease;}
+.util{position:absolute;right:10px;bottom:14px;z-index:6;display:flex;flex-direction:column;gap:.5rem;transition:opacity .5s ease;}
 .util-btn{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;cursor:pointer;color:var(--chalk);border:none;}
-.fun-row{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:.4rem;padding:.5rem .6rem;z-index:6;overflow-x:auto;max-width:92vw;transition:opacity .5s ease;}
+.fun-row{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:.4rem;padding:.5rem .6rem;z-index:6;overflow-x:auto;max-width:92vw;transition:opacity .5s ease;}
 .fun-btn{white-space:nowrap;background:rgba(244,240,230,.06);border:1px solid var(--glass-b);color:var(--chalk);font-family:inherit;font-size:.72rem;font-weight:600;padding:.42rem .8rem;border-radius:999px;cursor:pointer;transition:transform .2s ease,background .2s ease;}
 .fun-btn:hover{transform:translateY(-2px);background:rgba(244,240,230,.12);}
 #dragGhost{position:fixed;pointer-events:none;font-size:1.6rem;z-index:10;transform:translate(-50%,-50%);opacity:.9;display:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5));}
 .chrome{opacity:1;transition:opacity .6s ease;}
 .chrome.idle{opacity:.28;}
-.surprise-toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:6;padding:.5rem 1rem;font-size:.78rem;color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .6s ease;font-family:'Kalam',cursive;}
+.surprise-toast{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:6;padding:.5rem 1rem;font-size:.78rem;color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .6s ease;font-family:'Kalam',cursive;}
 .surprise-toast.show{opacity:1;}
-#aboutLink{position:fixed;bottom:14px;left:14px;z-index:6;font-size:.7rem;color:var(--chalk-dim);text-decoration:none;opacity:.6;font-family:'Kalam',cursive;}
+#aboutLink{position:absolute;bottom:14px;left:14px;z-index:6;font-size:.7rem;color:var(--chalk-dim);text-decoration:none;opacity:.6;font-family:'Kalam',cursive;}
 #aboutLink:hover{opacity:1;}
 .btn-primary,.btn-secondary{font-family:inherit;font-weight:600;font-size:.9rem;padding:.75rem 1.5rem;border-radius:999px;border:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;}
 .btn-primary{background:var(--chalk);color:#0a0a0f;}
@@ -56,7 +56,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
 @media (max-width:720px){ .dock{left:6px;max-height:60vh;} .obj-tile{width:40px;height:40px;font-size:1.15rem;} .fun-row{max-width:88vw;} }
 </style>
 </head>
-<body>
+<body><div id="stageWrap">
 <div id="stage">
 <canvas id="world"></canvas>
 <canvas id="fx"></canvas>
@@ -105,7 +105,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
 <div class="surprise-toast" id="surpriseToast"></div>
 <a id="aboutLink" href="index.html">🌪 Gravity Playground™ · Back to Playrium</a>
 
-<section id="pr-explore">
+</div><section id="pr-explore">
 <div id="pr-breadcrumb"></div>
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
