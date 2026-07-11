@@ -110,10 +110,10 @@ html,body{margin:0;padding:0;width:100%;background:#05050a;font-family:'Fredoka'
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
-<script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+<script>function loadMatterWithFallback(cb){var urls=['https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js','https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js','https://unpkg.com/matter-js@0.19.0/build/matter.min.js'];var i=0;var done=false;function tryNext(){if(done||i>=urls.length){return;}var s=document.createElement('script');var timer=setTimeout(function(){if(!done){s.onload=null;s.onerror=null;tryNext();}},4000);s.onload=function(){if(done){return;}done=true;clearTimeout(timer);cb();};s.onerror=function(){clearTimeout(timer);tryNext();};s.src=urls[i++];document.head.appendChild(s);}tryNext();}</script>
 <script>
 (function(){
-'use strict';
+'use strict';loadMatterWithFallback(function(){
 var Engine=Matter.Engine, World=Matter.World, Bodies=Matter.Bodies, Body=Matter.Body, Composite=Matter.Composite, Events=Matter.Events, Common=Matter.Common;
 
 /* ============ CANVAS SETUP ============ */
@@ -655,7 +655,7 @@ document.addEventListener('visibilitychange', function(){
 if(document.hidden){ rafPaused=true; } else if(rafPaused){ lastFrame=performance.now(); rafPaused=false; }
 });
 
-})();
+});})();
 </script>
 <script>window.PAGE_META = { slug: 'gravity-playground' };</script>
 <script src="components/experiences-data.js"></script>
