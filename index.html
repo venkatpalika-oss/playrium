@@ -114,17 +114,22 @@ color:var(--chalk); transition:background .25s ease; }
 .country-panel-cta{ display:block; text-align:center; margin-top:1.4rem; }
 /* ---------- SURPRISE OVERLAY ---------- */
 .surprise-overlay{ position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
-background:rgba(5,5,10,.94); opacity:0; pointer-events:none; transition:opacity .4s ease; }
+background:rgba(5,5,10,.82); opacity:0; pointer-events:none; transition:opacity .5s ease; }
 .surprise-overlay.active{ opacity:1; pointer-events:auto; }
 .surprise-stage{ text-align:center; color:var(--chalk); padding:2rem; max-width:440px; position:relative; }
 .surprise-close{ position:absolute; top:-1rem; right:-1rem; background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; }
 .surprise-logo{ font-weight:700; font-size:1.4rem; opacity:0; transition:opacity .5s ease; }
 .surprise-logo.show{ opacity:1; }
 .surprise-step{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.05rem; margin-top:1.1rem; min-height:1.6rem; }
-.surprise-country-reveal{ margin-top:1.2rem; display:none; }
-.surprise-country-reveal.show{ display:block; animation:popIn .5s cubic-bezier(.2,.8,.2,1); }
-.surprise-country-flag{ font-size:3rem; line-height:1; }
-.surprise-country-name{ font-family:var(--font-chalk); color:var(--chalk); font-size:1.2rem; font-weight:700; margin:.5rem 0 0; }
+.surprise-portal-wrap{ width:150px; height:150px; margin:1.4rem auto 0; opacity:0; transform:scale(.4);
+transition:opacity .6s ease, transform .6s cubic-bezier(.2,.8,.2,1); }
+.surprise-portal-wrap.show{ opacity:1; transform:scale(1); }
+.surprise-portal-wrap.hide{ opacity:0; transform:scale(.7); }
+.surprise-portal{ width:100%; height:100%; border-radius:50%;
+background:conic-gradient(from 0deg, #f0c14b, #4fd6c4, #7fd8ff, #f0c14b);
+box-shadow:0 0 70px rgba(240,193,75,.45); animation:portalSpin 3s linear infinite; }
+@keyframes portalSpin{ to{ transform:rotate(360deg); } }
+.surprise-result-eyebrow{ font-weight:600; letter-spacing:.1em; text-transform:uppercase; font-size:.78rem; color:var(--chalk-dim); margin:0 0 .3rem; }
 .surprise-result-card{ margin-top:1.3rem; background:#14141e; border:1px solid var(--ui-glass-border); border-radius:1.2rem;
 padding:1.7rem; display:none; transform:perspective(800px) rotateY(90deg); opacity:0; }
 .surprise-result-card.show{ display:block; animation:flipIn .6s cubic-bezier(.2,.8,.2,1) forwards; }
@@ -222,6 +227,7 @@ border-radius:1.6rem 1.6rem 0 0; transform:translateY(100%); }
 <div class="hero-right">
 <div class="surprise-panel">
 <div class="surprise-die" aria-hidden="true">🎲</div>
+<p class="section-eyebrow" style="font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;opacity:.6;margin:0 0 .3rem;">✨ Playrium Originals</p>
 <p class="surprise-title">Surprise Me</p>
 <p class="surprise-copy">Discover a hidden interactive experience chosen just for you. Never repeated. Always unexpected.</p>
 <button class="btn-primary surprise-open-btn" id="openMysteryBtn" type="button">Open Mystery</button>
@@ -279,13 +285,14 @@ border-radius:1.6rem 1.6rem 0 0; transform:translateY(100%); }
 <button class="surprise-close" id="surpriseClose" type="button" aria-label="Close">&times;</button>
 <div class="surprise-logo" id="surpriseLogo">Playrium</div>
 <p class="surprise-step" id="surpriseStep"></p>
-<div class="surprise-country-reveal" id="surpriseCountryReveal"><div class="surprise-country-flag" id="surpriseCountryFlag"></div><p class="surprise-country-name" id="surpriseCountryName"></p></div>
+<div class="surprise-portal-wrap" id="surprisePortalWrap"><div class="surprise-portal" aria-hidden="true"></div></div>
 <div class="surprise-result-card" id="surpriseResult">
 <div class="surprise-particles" id="surpriseParticles"></div>
+<p class="surprise-result-eyebrow">✨ You discovered</p>
 <div class="surprise-result-icon" id="surpriseResultIcon"></div>
 <p class="surprise-result-title" id="surpriseResultTitle"></p>
 <p class="surprise-result-tag" id="surpriseResultTag"></p>
-<a class="btn-primary" id="surpriseResultPlay" href="#">Ready to Explore? Play &rarr;</a>
+<a class="btn-primary" id="surpriseResultPlay" href="#">Explore &rarr;</a>
 </div>
 </div>
 </div>
@@ -344,29 +351,29 @@ var COUNTRIES = [
 ];
 
 var EXPERIENCES = [
-{ title:'Gully Cricket\u2122', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', accent:'#f0c14b', icon:'\ud83c\udfcf' },
-{ title:'Matka Mania\u2122', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', accent:'#4fd6c4', icon:'\ud83c\udffa' },
-{ title:'Kancha Kings\u2122', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', accent:'#e8a13c', icon:'\ud83d\udd2e' },
-{ title:'Balloon Bazaar\u2122', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', accent:'#ff6b5e', icon:'\ud83c\udf88' },
-{ title:'Spend \u20b910,000 Crore\u2122', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', accent:'#f0c14b', icon:'\ud83d\udcb0' },
-{ title:'Hydraulic Press Lab\u2122', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', accent:'#9a97a8', icon:'\u2699\ufe0f' },
-{ title:'World Size Explorer\u2122', tagline:'The World Isn\'t What It Looks Like.', href:'world-size-explorer.html', country:'India', accent:'#b4fff0', icon:'\ud83c\udf0d' },
-{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', accent:'#138808', icon:'\ud83d\udc0d' },
-{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', accent:'#e87a3c', icon:'\ud83e\udd67' },
-{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', accent:'#9a97a8', icon:'\ud83e\udea8' },
-{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', accent:'#ff8fa3', icon:'\ud83d\udd32' },
-{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', accent:'#ff8fa3', icon:'\ud83c\udfa8' },
-{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', accent:'#BC002D', icon:'\ud83c\udfae' },
-{ title:'Goldfish Scoop', tagline:'Kingyo Sukui \u2014 Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', accent:'#4fa8ff', icon:'\ud83d\udc1f' },
-{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', accent:'#ff8fa3', icon:'\ud83c\udff5\ufe0f' },
-{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', accent:'#4fd6c4', icon:'\ud83c\udf8f' },
-{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', accent:'#0038A8', icon:'\ud83d\udc1a' },
-{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', accent:'#f0c14b', icon:'\ud83c\udf8b' },
-{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', accent:'#f0c14b', icon:'\u2b50' },
-{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', accent:'#ff6b5e', icon:'\ud83d\ude8c' },
-{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', accent:'#4fd6c4', icon:'\ud83c\udf0a' },
-{ title:'Gravity Playground\u2122', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:'Original', accent:'#f0c14b', icon:'\ud83c\udf2a\ufe0f' },
-{ title:'Cloud Painter\u2122', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:'Original', accent:'#7fd8ff', icon:'\u2601\ufe0f' }
+{ title:'Gully Cricket™', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', accent:'#f0c14b', icon:'🏏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Matka Mania™', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', accent:'#4fd6c4', icon:'🏺', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Kancha Kings™', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', accent:'#e8a13c', icon:'🔮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Balloon Bazaar™', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', accent:'#ff6b5e', icon:'🎈', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
+{ title:'Spend ₹10,000 Crore™', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', accent:'#f0c14b', icon:'💰', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
+{ title:'Hydraulic Press Lab™', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', accent:'#9a97a8', icon:'⚙️', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
+{ title:'World Size Explorer™', tagline:'The World Isn\'t What It Looks Like.', href:'world-size-explorer.html', country:'India', accent:'#b4fff0', icon:'🌍', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
+{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', accent:'#138808', icon:'🐍', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', accent:'#e87a3c', icon:'🥧', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', accent:'#9a97a8', icon:'🪨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', accent:'#ff8fa3', icon:'🔲', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', accent:'#ff8fa3', icon:'🎨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', accent:'#BC002D', icon:'🎮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', accent:'#4fa8ff', icon:'🐟', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', accent:'#ff8fa3', icon:'🏵️', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', accent:'#4fd6c4', icon:'🎏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', accent:'#0038A8', icon:'🐚', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', accent:'#f0c14b', icon:'🎋', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', accent:'#f0c14b', icon:'⭐', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', accent:'#ff6b5e', icon:'🚌', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
+{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', accent:'#4fd6c4', icon:'🌊', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true } },
+{ title:'Gravity Playground™', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:'Original', accent:'#f0c14b', icon:'🌪️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true } },
+{ title:'Cloud Painter™', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:'Original', accent:'#7fd8ff', icon:'☁️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true } }
 ];
 
 var CHALLENGE_TARGETS = {
@@ -686,7 +693,7 @@ activeCountryId = country.id;
 var panel = document.getElementById('countryPanel');
 setFlagEl(document.getElementById('countryPanelFlag'), country);
 document.getElementById('countryPanelName').textContent = country.name;
-var exps = EXPERIENCES.filter(function(e){ return e.country.toLowerCase() === country.name.toLowerCase(); });
+var exps = EXPERIENCES.filter(function(e){ return e.discovery.globe && e.country && e.country.toLowerCase() === country.name.toLowerCase(); });
 document.getElementById('countryPanelCount').textContent = exps.length + ' Experiences';
 var list = document.getElementById('countryPanelList');
 list.innerHTML = '';
@@ -720,7 +727,7 @@ COUNTRIES.forEach(function(c){
 var a = document.createElement('a');
 a.href = '#';
 a.className = 'country-hidden-link';
-a.textContent = 'Explore ' + c.name + ' (' + EXPERIENCES.filter(function(e){return e.country===c.name;}).length + ' experiences)';
+a.textContent = 'Explore ' + c.name + ' (' + EXPERIENCES.filter(function(e){return e.discovery.globe && e.country===c.name;}).length + ' experiences)';
 a.addEventListener('click', function(ev){ ev.preventDefault(); selectCountry(c); });
 nav.appendChild(a);
 });
@@ -782,10 +789,12 @@ section.style.display = '';
 
 /* ---------- SURPRISE ME ---------- */
 function pickSurpriseExperience(){
+var originals = EXPERIENCES.filter(function(e){ return e.discovery.surprise; });
 var recent = getRecentSurprises();
 var visibleHrefs = [featuredExp.href];
-var pool = EXPERIENCES.filter(function(e){ return visibleHrefs.indexOf(e.href) === -1 && recent.indexOf(e.href) === -1; });
-if (pool.length === 0) pool = EXPERIENCES.filter(function(e){ return visibleHrefs.indexOf(e.href) === -1; });
+var pool = originals.filter(function(e){ return visibleHrefs.indexOf(e.href) === -1 && recent.indexOf(e.href) === -1; });
+if (pool.length === 0) pool = originals.filter(function(e){ return visibleHrefs.indexOf(e.href) === -1; });
+if (pool.length === 0) pool = originals;
 var neverPlayed = pool.filter(function(e){ return playCount(e.href) === 0; });
 if (neverPlayed.length > 0) return neverPlayed[Math.floor(Math.random()*neverPlayed.length)];
 var minCount = Math.min.apply(null, pool.map(function(e){ return playCount(e.href); }));
@@ -813,56 +822,45 @@ function runSurpriseSequence(){
 var overlay = document.getElementById('surpriseOverlay');
 var stepEl = document.getElementById('surpriseStep');
 var logoEl = document.getElementById('surpriseLogo');
-var countryReveal = document.getElementById('surpriseCountryReveal');
+var portalWrap = document.getElementById('surprisePortalWrap');
 var resultCard = document.getElementById('surpriseResult');
-logoEl.classList.remove('show'); countryReveal.classList.remove('show'); resultCard.classList.remove('show');
+logoEl.classList.remove('show'); portalWrap.classList.remove('show'); portalWrap.classList.remove('hide'); resultCard.classList.remove('show');
 stepEl.textContent = '';
 overlay.classList.add('active');
 overlay.setAttribute('aria-hidden','false');
 playClick(440);
 var chosen = pickSurpriseExperience();
-var country = COUNTRIES.find(function(c){ return c.name === chosen.country; });
 var d = reducedMotion ? 0.02 : 1;
 setTimeout(function(){ logoEl.classList.add('show'); }, 100*d);
-setTimeout(function(){ stepEl.textContent = 'Spinning the globe\u2026'; globe.spinBoost = 0.16; }, 500*d);
-if (country){
+setTimeout(function(){ stepEl.textContent = 'A portal is opening\u2026'; globe.spinBoost = 0.16; portalWrap.classList.add('show'); }, 500*d);
 var cascadeCount = 0;
 var cascadeTimer = setInterval(function(){
 var m = globe.markers[cascadeCount % globe.markers.length];
 if (m){ m.mesh.scale.set(1.6,1.6,1.6); setTimeout(function(){ if(m!==globe.hoveredMarker) m.mesh.scale.set(1,1,1); }, 200); }
 cascadeCount++;
 }, 140);
-setTimeout(function(){ clearInterval(cascadeTimer); }, 2000*d);
-}
-setTimeout(function(){ stepEl.textContent = 'Slowing down\u2026'; globe.spinBoost = 0.04; }, 2000*d);
+setTimeout(function(){ clearInterval(cascadeTimer); }, 2400*d);
+setTimeout(function(){ stepEl.textContent = 'Something wonderful is forming\u2026'; }, 1600*d);
+setTimeout(function(){ stepEl.textContent = ''; globe.spinBoost = 0.04; portalWrap.classList.add('hide'); }, 2400*d);
 setTimeout(function(){
 globe.spinBoost = 0;
-stepEl.textContent = 'Found something for you\u2026';
-if (country){
-var marker = globe.markers.find(function(m){ return m.country.id === country.id; });
-if (marker) focusCameraOnMarker(marker.pos, reducedMotion ? 50 : 700);
-setFlagEl(document.getElementById('surpriseCountryFlag'), country);
-document.getElementById('surpriseCountryName').textContent = country.name;
-countryReveal.classList.add('show');
-}
-}, 2500*d);
-setTimeout(function(){
 document.getElementById('surpriseResultIcon').textContent = chosen.icon;
 document.getElementById('surpriseResultTitle').textContent = chosen.title;
 document.getElementById('surpriseResultTag').textContent = chosen.tagline;
 document.getElementById('surpriseResultPlay').href = chosen.href;
 resultCard.classList.add('show');
 spawnParticles();
-stepEl.textContent = 'Ready to Explore?';
 pushRecentSurprise(chosen.href);
 playClick(880);
-}, 3400*d);
+}, 3000*d);
 document.getElementById('surpriseResultPlay').onclick = function(){ bumpPlayCount(chosen.href); };
 }
 document.getElementById('openMysteryBtn').addEventListener('click', runSurpriseSequence);
 function closeSurpriseOverlay(){
 document.getElementById('surpriseOverlay').classList.remove('active');
 document.getElementById('surpriseOverlay').setAttribute('aria-hidden','true');
+document.getElementById('surprisePortalWrap').classList.remove('show');
+document.getElementById('surprisePortalWrap').classList.remove('hide');
 globe.spinBoost = 0;
 resetCamera(reducedMotion ? 50 : 500);
 }
