@@ -50,7 +50,10 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 @media (max-width:720px){ .toolDock{max-height:56vh;} .tool-tile{width:38px;height:38px;font-size:1.05rem;} .weatherRow{gap:.3rem;} .weather-btn{width:38px;height:38px;} .skyStrip{max-width:86vw;} }
 </style>
 </head>
-<body> <div id="stageWrap">
+<body>
+<header id="site-header"></header>
+<div id="pr-breadcrumb"></div>
+ <div id="stageWrap">
 <div id="stage">
 <canvas id="sky" aria-label="Cloud Painter interactive sky canvas"></canvas>
 </div>
@@ -480,9 +483,12 @@ if(document.hidden){ rafPaused=true; } else if(rafPaused){ lastFrame=performance
 </script>
 <script>window.PAGE_META = { slug: 'cloud-painter' };</script>
 <script src="components/experiences-data.js"></script>
+<script src="components/header.js"></script>
+<script src="components/footer.js"></script>
 <script src="components/breadcrumb.js"></script>
 <script src="components/did-you-know.js"></script><script src="components/related.js"></script>
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
+<footer id="site-footer"></footer>
 </body>
 </html>
