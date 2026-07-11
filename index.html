@@ -190,7 +190,7 @@ background:rgba(10,10,15,.94); opacity:0; pointer-events:none; transition:opacit
 .surprise-result-icon{ font-size:3rem; }
 .surprise-result-title{ font-weight:700; font-size:1.3rem; margin:.6rem 0 .2rem; }
 .surprise-result-tag{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.95rem; margin:0 0 1rem; }
-.surprise-close{ position:absolute; top:1.4rem; right:1.6rem; background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; }
+.surprise-country-reveal{ margin-top:1.2rem; } .surprise-country-flag{ font-size:3rem; line-height:1; } .surprise-country-name{ font-family:var(--font-chalk); color:var(--chalk); font-size:1.2rem; font-weight:700; margin:.6rem 0 0; } .surprise-close{ position:absolute; top:1.4rem; right:1.6rem; background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; }
 #countryGrid .card:hover, #comingSoonRow .card:hover{ transform:translateY(-6px) rotate(-.6deg) scale(1.015); }
 @media (prefers-reduced-motion:reduce){
 *{ animation-duration:.001s !important; transition-duration:.001s !important; }
@@ -334,7 +334,7 @@ background:rgba(10,10,15,.94); opacity:0; pointer-events:none; transition:opacit
 <div class="surprise-stage">
 <div class="surprise-globe" id="surpriseGlobe">🌐</div>
 <p class="surprise-step" id="surpriseStep">Spinning the globe&hellip;</p>
-<div class="surprise-result-card" id="surpriseResult" style="display:none">
+<div class="surprise-country-reveal" id="surpriseCountryReveal" style="display:none"><div class="surprise-country-flag" id="surpriseCountryFlag"></div><p class="surprise-country-name" id="surpriseCountryName"></p></div><div class="surprise-result-card" id="surpriseResult" style="display:none">
 <div class="surprise-result-icon" id="surpriseResultIcon"></div>
 <p class="surprise-result-title" id="surpriseResultTitle"></p>
 <p class="surprise-result-tag" id="surpriseResultTag"></p>
@@ -725,12 +725,12 @@ const surpriseResult = document.getElementById('surpriseResult');
 const surpriseResultIcon = document.getElementById('surpriseResultIcon');
 const surpriseResultTitle = document.getElementById('surpriseResultTitle');
 const surpriseResultTag = document.getElementById('surpriseResultTag');
-const surpriseResultPlay = document.getElementById('surpriseResultPlay');
+const surpriseResultPlay = document.getElementById('surpriseResultPlay'); const surpriseCountryReveal = document.getElementById('surpriseCountryReveal'); const surpriseCountryFlag = document.getElementById('surpriseCountryFlag'); const surpriseCountryName = document.getElementById('surpriseCountryName');
 
 function runSurprise(){
 surpriseOverlay.classList.add('active');
 surpriseOverlay.setAttribute('aria-hidden', 'false');
-surpriseResult.style.display = 'none';
+surpriseResult.style.display = 'none'; surpriseCountryReveal.style.display = 'none';
 surpriseStep.style.display = '';
 document.getElementById('surpriseGlobe').style.display = '';
 const steps = ['Spinning the globe…', 'Zooming into a country…', 'Selecting an experience…', 'Ready to play?'];
@@ -744,13 +744,13 @@ surpriseStep.textContent = steps[i];
 clearInterval(interval);
 const pick = pickSurpriseExperience();
 document.getElementById('surpriseGlobe').style.display = 'none';
-surpriseStep.style.display = 'none';
+surpriseStep.style.display = 'none'; surpriseCountryFlag.textContent = pick.flag; surpriseCountryName.textContent = 'Landed in ' + pick.country + '!'; surpriseCountryReveal.style.display = ''; setTimeout(function(){ surpriseCountryReveal.style.display = 'none';
 surpriseResultIcon.textContent = pick.icon;
 surpriseResultTitle.textContent = pick.title;
 surpriseResultTag.textContent = pick.tagline;
 surpriseResultPlay.href = pick.href;
 surpriseResultPlay.onclick = () => bumpPlayCount(pick.href);
-surpriseResult.style.display = '';
+surpriseResult.style.display = ''; }, 900);
 }
 }, 550);
 }
