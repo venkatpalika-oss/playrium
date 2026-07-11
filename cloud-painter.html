@@ -19,30 +19,30 @@
 <style>
 :root{ --glass:rgba(244,240,230,.07); --glass-b:rgba(244,240,230,.16); --chalk:#f4f0e6; --chalk-dim:#cfcad8; }
 *{box-sizing:border-box;}
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#1a2036;font-family:'Fredoka',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;}
-#stage{position:fixed;inset:0;overflow:hidden;touch-action:none;}
+html,body{margin:0;padding:0;width:100%;background:#1a2036;font-family:'Fredoka',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent;}
+#stageWrap{position:relative;height:100vh;overflow:hidden;} #stage{position:absolute;inset:0;overflow:hidden;touch-action:none;}
 #sky{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair;}
 .glass{background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--glass-b);border-radius:1.2rem;box-shadow:0 12px 34px rgba(0,0,0,.35);}
 .chrome{transition:opacity .6s ease;}
 .chrome.idle{opacity:.22;}
-.toolDock{position:fixed;left:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:.35rem;padding:.55rem .45rem;max-height:80vh;overflow-y:auto;}
+.toolDock{position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:.35rem;padding:.55rem .45rem;max-height:80vh;overflow-y:auto;}
 .toolDock::-webkit-scrollbar{width:4px;} .toolDock::-webkit-scrollbar-thumb{background:var(--glass-b);border-radius:4px;}
 .tool-tile{width:42px;height:42px;border-radius:.85rem;background:rgba(244,240,230,.05);display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;border:1px solid transparent;transition:transform .2s ease,border-color .2s ease;}
 .tool-tile:hover{transform:translateY(-2px);border-color:var(--glass-b);}
 .tool-tile.selected{border-color:#ffd9a0;box-shadow:0 0 14px rgba(255,217,160,.4);}
-.skyStrip{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:.35rem;padding:.4rem .5rem;max-width:90vw;overflow-x:auto;}
+.skyStrip{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:.35rem;padding:.4rem .5rem;max-width:90vw;overflow-x:auto;}
 .skyStrip::-webkit-scrollbar{display:none;}
 .sky-thumb{flex:0 0 auto;padding:.4rem .75rem;border-radius:999px;background:rgba(244,240,230,.05);border:1px solid transparent;color:var(--chalk);font-size:.7rem;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;}
 .sky-thumb.selected{border-color:#ffd9a0;background:rgba(255,217,160,.14);}
-.weatherRow{position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:.35rem;padding:.5rem .45rem;}
+.weatherRow{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:6;display:flex;flex-direction:column;gap:.35rem;padding:.5rem .45rem;}
 .weather-btn{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.05rem;cursor:pointer;border:1px solid transparent;background:rgba(244,240,230,.05);color:var(--chalk);}
 .weather-btn.active{border-color:#7fd8ff;box-shadow:0 0 14px rgba(127,216,255,.4);}
-.bottomUtil{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:6;display:flex;gap:.4rem;padding:.5rem .6rem;}
+.bottomUtil{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:6;display:flex;gap:.4rem;padding:.5rem .6rem;}
 .util-pill{background:rgba(244,240,230,.06);border:1px solid var(--glass-b);color:var(--chalk);font-family:inherit;font-size:.72rem;font-weight:600;padding:.42rem .8rem;border-radius:999px;cursor:pointer;white-space:nowrap;}
 .util-pill:hover{transform:translateY(-2px);}
-.surprise-toast{position:fixed;top:66px;left:50%;transform:translateX(-50%);z-index:6;padding:.5rem 1rem;font-size:.78rem;color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .8s ease;font-family:'Kalam',cursive;}
+.surprise-toast{position:absolute;top:66px;left:50%;transform:translateX(-50%);z-index:6;padding:.5rem 1rem;font-size:.78rem;color:var(--chalk);opacity:0;pointer-events:none;transition:opacity .8s ease;font-family:'Kalam',cursive;}
 .surprise-toast.show{opacity:1;}
-#aboutLink{position:fixed;bottom:14px;left:14px;z-index:6;font-size:.7rem;color:var(--chalk-dim);text-decoration:none;opacity:.55;font-family:'Kalam',cursive;}
+#aboutLink{position:absolute;bottom:14px;left:14px;z-index:6;font-size:.7rem;color:var(--chalk-dim);text-decoration:none;opacity:.55;font-family:'Kalam',cursive;}
 #aboutLink:hover{opacity:1;}
 button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-btn:focus-visible,.util-pill:focus-visible{outline:2px solid #b4fff0;outline-offset:2px;}
 #pr-explore{position:relative;background:#0a0a0f;}
@@ -50,7 +50,7 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 @media (max-width:720px){ .toolDock{max-height:56vh;} .tool-tile{width:38px;height:38px;font-size:1.05rem;} .weatherRow{gap:.3rem;} .weather-btn{width:38px;height:38px;} .skyStrip{max-width:86vw;} }
 </style>
 </head>
-<body>
+<body> <div id="stageWrap">
 <div id="stage">
 <canvas id="sky" aria-label="Cloud Painter interactive sky canvas"></canvas>
 </div>
@@ -69,7 +69,7 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 <div class="surprise-toast" id="surpriseToast"></div>
 <a id="aboutLink" href="index.html">☁ Cloud Painter™ · Back to Playrium</a>
 
-<section id="pr-explore">
+</div> <section id="pr-explore">
 <div id="pr-breadcrumb"></div>
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
@@ -103,7 +103,7 @@ aurora:{label:'Aurora Sky', top:'#04101a', bottom:'#0c2436', sun:'#bfffe0', ambi
 fantasy:{label:'Fantasy Sky', top:'#241a3d', bottom:'#5a3d78', sun:'#ffd6f2', ambient:'dusk'}
 };
 var SKY_ORDER=['morning','sunrise','afternoon','sunset','twilight','night','storm','aurora','fantasy'];
-var currentSky='afternoon', skyFrom=SKIES.afternoon, skyTo=SKIES.afternoon, skyT=1;
+var currentSky='afternoon', skyFrom={top:hexToRgb(SKIES.afternoon.top),bottom:hexToRgb(SKIES.afternoon.bottom)}, skyTo=SKIES.afternoon, skyT=1;
 function setSky(name){
 if(!SKIES[name]) return;
 skyFrom={top:currentTop.slice(),bottom:currentBottom.slice()};
