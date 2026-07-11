@@ -194,16 +194,69 @@ border-radius:1.6rem 1.6rem 0 0; transform:translateY(100%); }
 @media (prefers-reduced-motion:reduce){
 *{ animation-duration:.001s !important; transition-duration:.001s !important; }
 }
+
+/* ---------- HERO PANELS / RELAX PANEL ---------- */
+.hero-panels{ display:flex; flex-direction:column; gap:1rem; width:100%; align-items:center; }
+.relax-panel{ width:100%; max-width:320px; border-radius:1.6rem; padding:1.8rem 1.6rem; text-align:center;
+background:var(--ui-glass-strong); border:1px solid var(--ui-glass-border); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+box-shadow:0 30px 70px rgba(0,0,0,.45); }
+.relax-icon{ font-size:2.6rem; display:inline-block; animation:relaxFloat 4.5s ease-in-out infinite; }
+@keyframes relaxFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-8px);} }
+.relax-title{ color:var(--chalk); font-weight:700; font-size:1.15rem; margin:.8rem 0 .4rem; letter-spacing:.02em; }
+.relax-copy{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.88rem; margin:0 0 1.2rem; line-height:1.5; }
+.relax-open-btn{ width:100%; justify-content:center; }
+
+/* ---------- RELAX OVERLAY ---------- */
+.relax-overlay{ position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+background:rgba(5,10,10,.82); opacity:0; pointer-events:none; transition:opacity .7s ease; }
+.relax-overlay.active{ opacity:1; pointer-events:auto; }
+.relax-stage{ text-align:center; color:var(--chalk); padding:2rem; max-width:440px; position:relative; }
+.relax-close{ position:absolute; top:-1rem; right:-1rem; background:none; border:none; color:var(--chalk-dim); font-size:1.6rem; cursor:pointer; }
+.relax-step{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.05rem; margin-top:1.1rem; min-height:1.6rem; }
+.relax-ripple-wrap{ width:180px; height:180px; margin:1.4rem auto 0; position:relative; opacity:0; transition:opacity 1s ease; }
+.relax-ripple-wrap.show{ opacity:1; }
+.relax-ripple{ position:absolute; left:50%; top:50%; width:20px; height:20px; border-radius:50%; border:1px solid rgba(127,216,255,.55);
+transform:translate(-50%,-50%) scale(0); animation:relaxRippleOut 3.2s ease-out infinite; }
+.relax-ripple:nth-child(2){ animation-delay:.9s; }
+.relax-ripple:nth-child(3){ animation-delay:1.8s; }
+@keyframes relaxRippleOut{ 0%{ transform:translate(-50%,-50%) scale(0); opacity:.9;} 100%{ transform:translate(-50%,-50%) scale(9); opacity:0;} }
+.relax-result-card{ margin-top:1.6rem; opacity:0; transform:scale(.92); transition:opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
+.relax-result-card.show{ opacity:1; transform:scale(1); }
+.relax-result-eyebrow{ color:var(--chalk-dim); font-family:var(--font-chalk); font-size:.95rem; margin:0 0 .4rem; }
+.relax-result-icon{ font-size:3rem; margin:0 0 .5rem; }
+.relax-result-title{ font-weight:700; font-size:1.3rem; margin:0 0 .3rem; }
+.relax-result-tag{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.95rem; margin:0 0 1.2rem; }
+
+/* ---------- SEARCH ---------- */
+.nav-link-btn{ font-family:var(--font-display); background:none; border:none; color:var(--chalk); font-size:.95rem; font-weight:500; cursor:pointer; padding:0; opacity:.85; }
+.nav-link-btn:hover{ opacity:1; }
+.search-overlay{ position:fixed; inset:0; z-index:70; display:flex; align-items:flex-start; justify-content:center;
+background:rgba(5,5,10,.86); opacity:0; pointer-events:none; transition:opacity .3s ease; padding-top:8vh; }
+.search-overlay.active{ opacity:1; pointer-events:auto; }
+.search-box{ width:100%; max-width:560px; background:var(--ui-glass-strong); border:1px solid var(--ui-glass-border); border-radius:1.2rem;
+padding:1.4rem; box-shadow:0 30px 70px rgba(0,0,0,.5); max-height:70vh; display:flex; flex-direction:column; }
+.search-input{ width:100%; font-family:var(--font-display); font-size:1.1rem; padding:.9rem 1.1rem; border-radius:.8rem; border:1px solid var(--ui-glass-border);
+background:rgba(255,255,255,.05); color:var(--chalk); outline:none; }
+.search-results{ margin-top:1rem; overflow-y:auto; display:flex; flex-direction:column; gap:.4rem; }
+.search-result-item{ display:flex; align-items:center; gap:.7rem; padding:.7rem .8rem; border-radius:.7rem; text-decoration:none; color:var(--chalk); }
+.search-result-item:hover{ background:rgba(255,255,255,.06); }
+.search-result-icon{ font-size:1.3rem; }
+.search-result-title{ font-weight:600; font-size:.95rem; }
+.search-result-meta{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:.8rem; }
+.search-empty{ color:var(--chalk-dim); font-family:var(--font-chalk); text-align:center; padding:1rem; }
 </style>
 </head>
 
 <body>
 <nav class="nav" id="mainNav">
-<a class="nav-logo" href="#top">Playrium</a>
+<a class="nav-logo" href="index.html">Playrium</a>
 <div class="nav-links">
+<a href="index.html">Home</a>
 <a href="#top">Countries</a>
-<a href="#featured-wrap">Featured</a>
-<a href="#daily-challenge">Daily Challenge</a>
+<a href="#originals-panel">Playrium Originals</a>
+<a href="#relax-panel">Relax &amp; Satisfy</a>
+<button class="nav-link-btn" id="navSearchBtn" type="button">Search</button>
+<button class="nav-link-btn" id="navRandomBtn" type="button">Random</button>
 <button class="mute-toggle" id="muteToggle" type="button" aria-label="Toggle sound" aria-pressed="false">🔇</button>
 </div>
 </nav>
@@ -225,12 +278,21 @@ border-radius:1.6rem 1.6rem 0 0; transform:translateY(100%); }
 </nav>
 </div>
 <div class="hero-right">
-<div class="surprise-panel">
+<div class="hero-panels">
+<div class="surprise-panel" id="originals-panel">
 <div class="surprise-die" aria-hidden="true">🎲</div>
 <p class="section-eyebrow" style="font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;opacity:.6;margin:0 0 .3rem;">✨ Playrium Originals</p>
 <p class="surprise-title">Surprise Me</p>
 <p class="surprise-copy">Discover a hidden interactive experience chosen just for you. Never repeated. Always unexpected.</p>
 <button class="btn-primary surprise-open-btn" id="openMysteryBtn" type="button">Open Mystery</button>
+</div>
+<div class="relax-panel" id="relax-panel">
+<div class="relax-icon" aria-hidden="true">🧘</div>
+<p class="section-eyebrow" style="font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;opacity:.6;margin:0 0 .3rem;">🌿 Relax &amp; Satisfy</p>
+<p class="relax-title">Take A Break</p>
+<p class="relax-copy">A calmer pick for a calmer moment — soft, satisfying, unhurried.</p>
+<button class="btn-primary relax-open-btn" id="openRelaxBtn" type="button">Relax Now</button>
+</div>
 </div>
 </div>
 </section>
@@ -296,6 +358,33 @@ border-radius:1.6rem 1.6rem 0 0; transform:translateY(100%); }
 </div>
 </div>
 </div>
+
+<div class="relax-overlay" id="relaxOverlay" aria-hidden="true" role="dialog" aria-label="Relax and Satisfy discovery">
+<div class="relax-stage">
+<button class="relax-close" id="relaxClose" type="button" aria-label="Close">&times;</button>
+<p class="relax-step" id="relaxStep"></p>
+<div class="relax-ripple-wrap" id="relaxRippleWrap">
+<div class="relax-ripple"></div>
+<div class="relax-ripple"></div>
+<div class="relax-ripple"></div>
+</div>
+<div class="relax-result-card" id="relaxResult">
+<p class="relax-result-eyebrow">🌿 Take a breath</p>
+<div class="relax-result-icon" id="relaxResultIcon"></div>
+<p class="relax-result-title" id="relaxResultTitle"></p>
+<p class="relax-result-tag" id="relaxResultTag"></p>
+<a class="btn-primary" id="relaxResultPlay" href="#">Explore &rarr;</a>
+</div>
+</div>
+</div>
+
+<div class="search-overlay" id="searchOverlay" aria-hidden="true" role="dialog" aria-label="Search experiences">
+<div class="search-box">
+<input class="search-input" id="searchInput" type="text" placeholder="Search by title, country, tag, or mood…" autocomplete="off">
+<div class="search-results" id="searchResults"></div>
+</div>
+</div>
+
 <script>
 
 function loadScriptWithFallback(urls, cb){
@@ -351,29 +440,29 @@ var COUNTRIES = [
 ];
 
 var EXPERIENCES = [
-{ title:'Gully Cricket™', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', accent:'#f0c14b', icon:'🏏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Matka Mania™', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', accent:'#4fd6c4', icon:'🏺', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Kancha Kings™', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', accent:'#e8a13c', icon:'🔮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Balloon Bazaar™', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', accent:'#ff6b5e', icon:'🎈', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
-{ title:'Spend ₹10,000 Crore™', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', accent:'#f0c14b', icon:'💰', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
-{ title:'Hydraulic Press Lab™', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', accent:'#9a97a8', icon:'⚙️', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
-{ title:'World Size Explorer™', tagline:'The World Isn\'t What It Looks Like.', href:'world-size-explorer.html', country:'India', accent:'#b4fff0', icon:'🌍', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true } },
-{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', accent:'#138808', icon:'🐍', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', accent:'#e87a3c', icon:'🥧', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', accent:'#9a97a8', icon:'🪨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', accent:'#ff8fa3', icon:'🔲', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', accent:'#ff8fa3', icon:'🎨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', accent:'#BC002D', icon:'🎮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', accent:'#4fa8ff', icon:'🐟', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', accent:'#ff8fa3', icon:'🏵️', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', accent:'#4fd6c4', icon:'🎏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', accent:'#0038A8', icon:'🐚', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', accent:'#f0c14b', icon:'🎋', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', accent:'#f0c14b', icon:'⭐', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', accent:'#ff6b5e', icon:'🚌', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true } },
-{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:'Original', accent:'#4fd6c4', icon:'🌊', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true } },
-{ title:'Gravity Playground™', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:'Original', accent:'#f0c14b', icon:'🌪️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true } },
-{ title:'Cloud Painter™', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:'Original', accent:'#7fd8ff', icon:'☁️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true } }
+{ title:'Gully Cricket™', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', accent:'#f0c14b', icon:'🏏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','skill','multiplayer'], moods:['family','physics'] },
+{ title:'Matka Mania™', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', accent:'#4fd6c4', icon:'🏺', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['physics','skill'], moods:['physics'] },
+{ title:'Kancha Kings™', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', accent:'#e8a13c', icon:'🔮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','skill'], moods:['physics','family'] },
+{ title:'Balloon Bazaar™', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', accent:'#ff6b5e', icon:'🎈', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['funny','kids'], moods:['relax','satisfying','family'] },
+{ title:'Spend ₹10,000 Crore™', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', accent:'#f0c14b', icon:'💰', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['strategy','educational'], moods:['mind'] },
+{ title:'Hydraulic Press Lab™', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', accent:'#9a97a8', icon:'⚙️', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['physics','funny'], moods:['satisfying','physics'] },
+{ title:'World Size Explorer™', tagline:'The World Isn\'t What It Looks Like.', href:'world-size-explorer.html', country:'India', accent:'#b4fff0', icon:'🌍', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['educational','puzzle','nature'], moods:['mind'] },
+{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', accent:'#138808', icon:'🐍', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','strategy'], moods:['family','mind'] },
+{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', accent:'#e87a3c', icon:'🥧', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['skill','puzzle'], moods:['mind','physics'] },
+{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', accent:'#9a97a8', icon:'🪨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','multiplayer'], moods:['family'] },
+{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', accent:'#ff8fa3', icon:'🔲', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','kids'], moods:['family'] },
+{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', accent:'#ff8fa3', icon:'🎨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','puzzle'], moods:['creative','relax'] },
+{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', accent:'#BC002D', icon:'🎮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['skill','physics'], moods:['physics','mind'] },
+{ title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', accent:'#4fa8ff', icon:'🐟', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','skill','nature'], moods:['family','relax'] },
+{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', accent:'#ff8fa3', icon:'🏵️', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['physics','kids'], moods:['physics','satisfying'] },
+{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', accent:'#4fd6c4', icon:'🎏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','physics','nature'], moods:['relax','physics'] },
+{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', accent:'#0038A8', icon:'🐚', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','strategy'], moods:['mind'] },
+{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', accent:'#f0c14b', icon:'🎋', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','skill'], moods:['physics','family'] },
+{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', accent:'#f0c14b', icon:'⭐', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','kids'], moods:['creative','relax'] },
+{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', accent:'#ff6b5e', icon:'🚌', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['skill','strategy'], moods:['mind'] },
+{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:null, accent:'#4fd6c4', icon:'🌊', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true }, tags:['physics','nature'], moods:['relax','satisfying'] },
+{ title:'Gravity Playground™', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:null, accent:'#f0c14b', icon:'🌪️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true }, tags:['physics','sandbox','relaxing'], moods:['relax','experimental','physics'] },
+{ title:'Cloud Painter™', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:null, accent:'#7fd8ff', icon:'☁️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true }, tags:['relaxing','creative','nature'], moods:['relax','creative','satisfying'] }
 ];
 
 var CHALLENGE_TARGETS = {
@@ -742,7 +831,7 @@ document.getElementById('featuredCard').href = featuredExp.href;
 document.getElementById('featuredCard').style.setProperty('--accent', featuredExp.accent);
 document.getElementById('featuredCard').addEventListener('click', function(){ bumpPlayCount(featuredExp.href); });
 document.getElementById('featuredIcon').textContent = featuredExp.icon;
-document.getElementById('featuredEyebrow').textContent = 'Featured \u00b7 ' + featuredExp.country;
+document.getElementById('featuredEyebrow').textContent = 'Featured \u00b7 ' + (featuredExp.country || 'Playrium Originals');
 document.getElementById('featuredTitle').textContent = featuredExp.title;
 document.getElementById('featuredTagline').textContent = featuredExp.tagline;
 })();
@@ -865,6 +954,119 @@ globe.spinBoost = 0;
 resetCamera(reducedMotion ? 50 : 500);
 }
 document.getElementById('surpriseClose').addEventListener('click', closeSurpriseOverlay);
+
+/* ---------- RELAX & SATISFY ---------- */
+function isRelaxExp(e){ return e.moods && (e.moods.indexOf('relax') > -1 || e.moods.indexOf('satisfying') > -1); }
+function getRecentRelax(){ try{ return JSON.parse(localStorage.getItem('recent_relax')||'[]'); }catch(e){ return []; } }
+function pushRecentRelax(href){
+try{
+var list = getRecentRelax();
+list.push(href);
+if (list.length > 10) list = list.slice(list.length-10);
+localStorage.setItem('recent_relax', JSON.stringify(list));
+}catch(e){}
+}
+function pickRelaxExperience(){
+var relaxPool = EXPERIENCES.filter(function(e){ return e.moods && e.moods.indexOf('relax') > -1; });
+var satisfyingPool = EXPERIENCES.filter(function(e){ return e.moods && e.moods.indexOf('satisfying') > -1; });
+var allRelaxing = EXPERIENCES.filter(isRelaxExp);
+var recent = getRecentRelax();
+var freshRelax = relaxPool.filter(function(e){ return recent.indexOf(e.href) === -1; });
+if (freshRelax.length > 0) return freshRelax[Math.floor(Math.random()*freshRelax.length)];
+var freshSatisfying = satisfyingPool.filter(function(e){ return recent.indexOf(e.href) === -1; });
+if (freshSatisfying.length > 0) return freshSatisfying[Math.floor(Math.random()*freshSatisfying.length)];
+if (allRelaxing.length > 0){
+var minCount = Math.min.apply(null, allRelaxing.map(function(e){ return playCount(e.href); }));
+var leastPlayed = allRelaxing.filter(function(e){ return playCount(e.href) === minCount; });
+if (leastPlayed.length > 0) return leastPlayed[Math.floor(Math.random()*leastPlayed.length)];
+}
+return EXPERIENCES[Math.floor(Math.random()*EXPERIENCES.length)];
+}
+function runRelaxSequence(){
+var overlay = document.getElementById('relaxOverlay');
+var stepEl = document.getElementById('relaxStep');
+var rippleWrap = document.getElementById('relaxRippleWrap');
+var resultCard = document.getElementById('relaxResult');
+rippleWrap.classList.remove('show'); resultCard.classList.remove('show');
+overlay.classList.add('active');
+overlay.setAttribute('aria-hidden','false');
+playClick(320);
+var chosen = pickRelaxExperience();
+var d = reducedMotion ? 0.02 : 1;
+stepEl.textContent = 'Breathe in…';
+setTimeout(function(){ rippleWrap.classList.add('show'); stepEl.textContent = 'Let the ripples settle…'; }, 400*d);
+setTimeout(function(){
+stepEl.textContent = '';
+document.getElementById('relaxResultIcon').textContent = chosen.icon;
+document.getElementById('relaxResultTitle').textContent = chosen.title;
+document.getElementById('relaxResultTag').textContent = chosen.tagline;
+document.getElementById('relaxResultPlay').href = chosen.href;
+resultCard.classList.add('show');
+pushRecentRelax(chosen.href);
+playClick(660);
+}, 3000*d);
+document.getElementById('relaxResultPlay').onclick = function(){ bumpPlayCount(chosen.href); };
+}
+document.getElementById('openRelaxBtn').addEventListener('click', runRelaxSequence);
+function closeRelaxOverlay(){
+document.getElementById('relaxOverlay').classList.remove('active');
+document.getElementById('relaxOverlay').setAttribute('aria-hidden','true');
+document.getElementById('relaxRippleWrap').classList.remove('show');
+}
+document.getElementById('relaxClose').addEventListener('click', closeRelaxOverlay);
+
+/* ---------- SEARCH ---------- */
+function matchesQuery(e, q){
+q = q.toLowerCase();
+var countryLabel = e.country || 'Playrium Originals';
+if (e.title.toLowerCase().indexOf(q) > -1) return true;
+if (countryLabel.toLowerCase().indexOf(q) > -1) return true;
+if (e.tags && e.tags.some(function(t){ return t.toLowerCase().indexOf(q) > -1; })) return true;
+if (e.moods && e.moods.some(function(m){ return m.toLowerCase().indexOf(q) > -1; })) return true;
+return false;
+}
+function renderSearchResults(q){
+var resultsEl = document.getElementById('searchResults');
+resultsEl.innerHTML = '';
+if (!q){ return; }
+var matches = EXPERIENCES.filter(function(e){ return matchesQuery(e, q); }).slice(0, 12);
+if (matches.length === 0){
+resultsEl.innerHTML = '<p class="search-empty">No experiences found.</p>';
+return;
+}
+matches.forEach(function(e){
+var a = document.createElement('a');
+a.className = 'search-result-item';
+a.href = e.href;
+a.addEventListener('click', function(){ bumpPlayCount(e.href); });
+var countryLabel = e.country || 'Playrium Originals';
+a.innerHTML = '<span class="search-result-icon">'+e.icon+'</span><span><span class="search-result-title">'+e.title+'</span><br><span class="search-result-meta">'+countryLabel+'</span></span>';
+resultsEl.appendChild(a);
+});
+}
+function openSearch(){
+document.getElementById('searchOverlay').classList.add('active');
+document.getElementById('searchOverlay').setAttribute('aria-hidden','false');
+document.getElementById('searchInput').value = '';
+document.getElementById('searchResults').innerHTML = '';
+setTimeout(function(){ document.getElementById('searchInput').focus(); }, 50);
+}
+function closeSearch(){
+document.getElementById('searchOverlay').classList.remove('active');
+document.getElementById('searchOverlay').setAttribute('aria-hidden','true');
+}
+document.getElementById('navSearchBtn').addEventListener('click', openSearch);
+document.getElementById('searchInput').addEventListener('input', function(){ renderSearchResults(this.value); });
+document.getElementById('searchOverlay').addEventListener('click', function(ev){ if (ev.target === this) closeSearch(); });
+document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape') closeSearch(); });
+
+/* ---------- RANDOM ---------- */
+document.getElementById('navRandomBtn').addEventListener('click', function(){
+var pick = EXPERIENCES[Math.floor(Math.random()*EXPERIENCES.length)];
+bumpPlayCount(pick.href);
+window.location.href = pick.href;
+});
+
 
 /* ---------- NAV + MUTE ---------- */
 window.addEventListener('scroll', function(){
