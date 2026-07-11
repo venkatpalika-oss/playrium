@@ -6,359 +6,315 @@
  */
 (function () {
   var EXPERIENCES = [
-  {
-    "slug": "gully-cricket",
-    "title": "Gully Cricket™",
-    "tagline": "Every Street Has A Legend.",
-    "href": "gully-cricket.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#f0c14b",
-    "icon": "🏏",
-    "tags": [
-      "traditional",
-      "skill",
-      "multiplayer"
-    ]
-  },
-  {
-    "slug": "matka-mania",
-    "title": "Matka Mania™",
-    "tagline": "Balance. Race. Survive.",
-    "href": "matka-mania.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#4fd6c4",
-    "icon": "🏺",
-    "tags": [
-      "physics",
-      "skill"
-    ]
-  },
-  {
-    "slug": "kancha-kings",
-    "title": "Kancha Kings™",
-    "tagline": "Aim. Shoot. Rule The Circle.",
-    "href": "kancha-kings.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#e8a13c",
-    "icon": "🔮",
-    "tags": [
-      "traditional",
-      "skill"
-    ]
-  },
-  {
-    "slug": "balloon-bazaar",
-    "title": "Balloon Bazaar™",
-    "tagline": "Every Balloon Has A Surprise.",
-    "href": "balloon-bazaar.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#ff6b5e",
-    "icon": "🎈",
-    "tags": [
-      "funny",
-      "kids"
-    ]
-  },
-  {
-    "slug": "spend-crore",
-    "title": "Spend ₹10,000 Crore™",
-    "tagline": "Can You Spend It All?",
-    "href": "spend-crore.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#f0c14b",
-    "icon": "💰",
-    "tags": [
-      "strategy",
-      "educational"
-    ]
-  },
-  {
-    "slug": "hydraulic-press-lab",
-    "title": "Hydraulic Press Lab™",
-    "tagline": "What Happens If You Crush It?",
-    "href": "hydraulic-press-lab.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#9a97a8",
-    "icon": "⚙️",
-    "tags": [
-      "physics",
-      "funny"
-    ]
-  },
-  {
-    "slug": "world-size-explorer",
-    "title": "World Size Explorer™",
-    "tagline": "The World Isn't What It Looks Like.",
-    "href": "world-size-explorer.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#b4fff0",
-    "icon": "🌍",
-    "tags": [
-      "educational",
-      "puzzle",
-      "nature"
-    ]
-  },
-  {
-    "slug": "moksha-patam",
-    "title": "Moksha Patam",
-    "tagline": "Every Ladder Is Virtue. Every Snake Is Vice.",
-    "href": "moksha-patam.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#138808",
-    "icon": "🐍",
-    "tags": [
-      "traditional",
-      "strategy"
-    ]
-  },
-  {
-    "slug": "pie-break",
-    "title": "Pie Break",
-    "tagline": "Ten Slices. One Ring. One Throw.",
-    "href": "pie-break.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#e87a3c",
-    "icon": "🥧",
-    "tags": [
-      "skill",
-      "puzzle"
-    ]
-  },
-  {
-    "slug": "seven-stones",
-    "title": "Seven Stones",
-    "tagline": "Knock It Down. Rebuild Before Time Runs Out.",
-    "href": "seven-stones.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#9a97a8",
-    "icon": "🪨",
-    "tags": [
-      "traditional",
-      "multiplayer"
-    ]
-  },
-  {
-    "slug": "stapu",
-    "title": "Stapu",
-    "tagline": "Toss. Hop. Master The Squares.",
-    "href": "stapu.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#ff8fa3",
-    "icon": "🔲",
-    "tags": [
-      "traditional",
-      "kids"
-    ]
-  },
-  {
-    "slug": "rangoli-maker",
-    "title": "Rangoli Maker",
-    "tagline": "Every Mark Mirrors Into Beauty.",
-    "href": "rangoli-maker.html",
-    "country": "India",
-    "flag": "🇮🇳",
-    "accent": "#ff8fa3",
-    "icon": "🎨",
-    "tags": [
-      "festival",
-      "puzzle"
-    ]
-  },
-  {
-    "slug": "daruma-drop",
-    "title": "Daruma Drop",
-    "tagline": "One Perfect Hit Changes Everything.",
-    "href": "daruma-drop.html",
-    "country": "Japan",
-    "flag": "🇯🇵",
-    "accent": "#BC002D",
-    "icon": "🎮",
-    "tags": [
-      "skill",
-      "physics"
-    ]
-  },
-  {
-    "slug": "goldfish-scoop",
-    "title": "Goldfish Scoop",
-    "tagline": "Kingyo Sukui — Scoop Before The Paper Tears.",
-    "href": "goldfish-scoop.html",
-    "country": "Japan",
-    "flag": "🇯🇵",
-    "accent": "#4fa8ff",
-    "icon": "🐟",
-    "tags": [
-      "festival",
-      "skill",
-      "nature"
-    ]
-  },
-  {
-    "slug": "sensu-spinner",
-    "title": "Sensu Spinner",
-    "tagline": "Flick. Fan. Flow.",
-    "href": "sensu-spinner.html",
-    "country": "Japan",
-    "flag": "🇯🇵",
-    "accent": "#ff8fa3",
-    "icon": "🪭",
-    "tags": [
-      "physics",
-      "kids"
-    ]
-  },
-  {
-    "slug": "koinobori-festival",
-    "title": "Koinobori Festival",
-    "tagline": "Ride The Wind. Race The Sky.",
-    "href": "koinobori-festival.html",
-    "country": "Japan",
-    "flag": "🇯🇵",
-    "accent": "#4fd6c4",
-    "icon": "🎏",
-    "tags": [
-      "festival",
-      "physics",
-      "nature"
-    ]
-  },
-  {
-    "slug": "sungka-streak",
-    "title": "Sungka Streak",
-    "tagline": "Time The Sow. Fill The Store.",
-    "href": "sungka-streak.html",
-    "country": "Philippines",
-    "flag": "🇵🇭",
-    "accent": "#0038A8",
-    "icon": "🐚",
-    "tags": [
-      "traditional",
-      "strategy"
-    ]
-  },
-  {
-    "slug": "tinikling-tempo",
-    "title": "Tinikling Tempo",
-    "tagline": "Hop Between The Clapping Poles.",
-    "href": "tinikling-tempo.html",
-    "country": "Philippines",
-    "flag": "🇵🇭",
-    "accent": "#f0c14b",
-    "icon": "🎋",
-    "tags": [
-      "traditional",
-      "skill"
-    ]
-  },
-  {
-    "slug": "parol-glow",
-    "title": "Parol Glow",
-    "tagline": "Spark The Star Lantern Alight.",
-    "href": "parol-glow.html",
-    "country": "Philippines",
-    "flag": "🇵🇭",
-    "accent": "#f0c14b",
-    "icon": "⭐",
-    "tags": [
-      "festival",
-      "kids"
-    ]
-  },
-  {
-    "slug": "jeepney-jam",
-    "title": "Jeepney Jam",
-    "tagline": "Weave The Streets. Stack The Fares.",
-    "href": "jeepney-jam.html",
-    "country": "Philippines",
-    "flag": "🇵🇭",
-    "accent": "#ff6b5e",
-    "icon": "🚌",
-    "tags": [
-      "skill",
-      "strategy"
-    ]
-  },
-  {
-    "slug": "zen-ripple",
-    "title": "Zen Ripple",
-    "tagline": "Touch The Water. Watch It Come Alive.",
-    "href": "zen-ripple.html",
-    "country": "Original",
-    "flag": "",
-    "accent": "#4fd6c4",
-    "icon": "🌊",
-    "tags": [
-      "physics",
-      "nature"
-    ]
-  },
-  {
-    "slug": "gravity-playground",
-    "title": "Gravity Playground™",
-    "tagline": "Change Gravity. Change Reality.",
-    "href": "gravity-playground.html",
-    "country": "Original",
-    "flag": "",
-    "accent": "#f0c14b",
-    "icon": "🌪️",
-    "tags": [
-      "physics",
-      "sandbox",
-      "relaxing"
-    ]
-  },
-  {
-    "slug": "cloud-painter",
-    "title": "Cloud Painter™",
-    "tagline": "Draw The Sky. Watch Nature Paint The Rest.",
-    "href": "cloud-painter.html",
-    "country": "Original",
-    "flag": "",
-    "accent": "#7fd8ff",
-    "icon": "☁️",
-    "tags": [
-      "relaxing",
-      "creative",
-      "nature"
-    ]
-  }
-];
+    {
+      "slug": "gully-cricket",
+      "title": "Gully Cricket™",
+      "tagline": "Every Street Has A Legend.",
+      "href": "gully-cricket.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#f0c14b",
+      "icon": "🏏",
+      "tags": ["traditional","skill","multiplayer"],
+      "moods": ["family","physics"]
+    },
+    {
+      "slug": "matka-mania",
+      "title": "Matka Mania™",
+      "tagline": "Balance. Race. Survive.",
+      "href": "matka-mania.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#4fd6c4",
+      "icon": "🏺",
+      "tags": ["physics","skill"],
+      "moods": ["physics"]
+    },
+    {
+      "slug": "kancha-kings",
+      "title": "Kancha Kings™",
+      "tagline": "Aim. Shoot. Rule The Circle.",
+      "href": "kancha-kings.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#e8a13c",
+      "icon": "🔮",
+      "tags": ["traditional","skill"],
+      "moods": ["physics","family"]
+    },
+    {
+      "slug": "balloon-bazaar",
+      "title": "Balloon Bazaar™",
+      "tagline": "Every Balloon Has A Surprise.",
+      "href": "balloon-bazaar.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#ff6b5e",
+      "icon": "🎈",
+      "tags": ["funny","kids"],
+      "moods": ["relax","satisfying","family"]
+    },
+    {
+      "slug": "spend-crore",
+      "title": "Spend ₹10,000 Crore™",
+      "tagline": "Can You Spend It All?",
+      "href": "spend-crore.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#f0c14b",
+      "icon": "💰",
+      "tags": ["strategy","educational"],
+      "moods": ["mind"]
+    },
+    {
+      "slug": "hydraulic-press-lab",
+      "title": "Hydraulic Press Lab™",
+      "tagline": "What Happens If You Crush It?",
+      "href": "hydraulic-press-lab.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#9a97a8",
+      "icon": "⚙️",
+      "tags": ["physics","funny"],
+      "moods": ["satisfying","physics"]
+    },
+    {
+      "slug": "world-size-explorer",
+      "title": "World Size Explorer™",
+      "tagline": "The World Isn't What It Looks Like.",
+      "href": "world-size-explorer.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#b4fff0",
+      "icon": "🌍",
+      "tags": ["educational","puzzle","nature"],
+      "moods": ["mind"]
+    },
+    {
+      "slug": "moksha-patam",
+      "title": "Moksha Patam",
+      "tagline": "Every Ladder Is Virtue. Every Snake Is Vice.",
+      "href": "moksha-patam.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#138808",
+      "icon": "🐍",
+      "tags": ["traditional","strategy"],
+      "moods": ["family","mind"]
+    },
+    {
+      "slug": "pie-break",
+      "title": "Pie Break",
+      "tagline": "Ten Slices. One Ring. One Throw.",
+      "href": "pie-break.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#e87a3c",
+      "icon": "🥧",
+      "tags": ["skill","puzzle"],
+      "moods": ["mind","physics"]
+    },
+    {
+      "slug": "seven-stones",
+      "title": "Seven Stones",
+      "tagline": "Knock It Down. Rebuild Before Time Runs Out.",
+      "href": "seven-stones.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#9a97a8",
+      "icon": "🪨",
+      "tags": ["traditional","multiplayer"],
+      "moods": ["family"]
+    },
+    {
+      "slug": "stapu",
+      "title": "Stapu",
+      "tagline": "Toss. Hop. Master The Squares.",
+      "href": "stapu.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#ff8fa3",
+      "icon": "🔲",
+      "tags": ["traditional","kids"],
+      "moods": ["family"]
+    },
+    {
+      "slug": "rangoli-maker",
+      "title": "Rangoli Maker",
+      "tagline": "Every Mark Mirrors Into Beauty.",
+      "href": "rangoli-maker.html",
+      "country": "India",
+      "flag": "🇮🇳",
+      "accent": "#ff8fa3",
+      "icon": "🎨",
+      "tags": ["festival","puzzle"],
+      "moods": ["creative","relax"]
+    },
+    {
+      "slug": "daruma-drop",
+      "title": "Daruma Drop",
+      "tagline": "One Perfect Hit Changes Everything.",
+      "href": "daruma-drop.html",
+      "country": "Japan",
+      "flag": "🇯🇵",
+      "accent": "#BC002D",
+      "icon": "🎮",
+      "tags": ["skill","physics"],
+      "moods": ["physics","mind"]
+    },
+    {
+      "slug": "goldfish-scoop",
+      "title": "Goldfish Scoop",
+      "tagline": "Kingyo Sukui — Scoop Before The Paper Tears.",
+      "href": "goldfish-scoop.html",
+      "country": "Japan",
+      "flag": "🇯🇵",
+      "accent": "#4fa8ff",
+      "icon": "🐟",
+      "tags": ["festival","skill","nature"],
+      "moods": ["family","relax"]
+    },
+    {
+      "slug": "sensu-spinner",
+      "title": "Sensu Spinner",
+      "tagline": "Flick. Fan. Flow.",
+      "href": "sensu-spinner.html",
+      "country": "Japan",
+      "flag": "🇯🇵",
+      "accent": "#ff8fa3",
+      "icon": "🪭",
+      "tags": ["physics","kids"],
+      "moods": ["physics","satisfying"]
+    },
+    {
+      "slug": "koinobori-festival",
+      "title": "Koinobori Festival",
+      "tagline": "Ride The Wind. Race The Sky.",
+      "href": "koinobori-festival.html",
+      "country": "Japan",
+      "flag": "🇯🇵",
+      "accent": "#4fd6c4",
+      "icon": "🎏",
+      "tags": ["festival","physics","nature"],
+      "moods": ["relax","physics"]
+    },
+    {
+      "slug": "sungka-streak",
+      "title": "Sungka Streak",
+      "tagline": "Time The Sow. Fill The Store.",
+      "href": "sungka-streak.html",
+      "country": "Philippines",
+      "flag": "🇵🇭",
+      "accent": "#0038A8",
+      "icon": "🐚",
+      "tags": ["traditional","strategy"],
+      "moods": ["mind"]
+    },
+    {
+      "slug": "tinikling-tempo",
+      "title": "Tinikling Tempo",
+      "tagline": "Hop Between The Clapping Poles.",
+      "href": "tinikling-tempo.html",
+      "country": "Philippines",
+      "flag": "🇵🇭",
+      "accent": "#f0c14b",
+      "icon": "🎋",
+      "tags": ["traditional","skill"],
+      "moods": ["physics","family"]
+    },
+    {
+      "slug": "parol-glow",
+      "title": "Parol Glow",
+      "tagline": "Spark The Star Lantern Alight.",
+      "href": "parol-glow.html",
+      "country": "Philippines",
+      "flag": "🇵🇭",
+      "accent": "#f0c14b",
+      "icon": "⭐",
+      "tags": ["festival","kids"],
+      "moods": ["creative","relax"]
+    },
+    {
+      "slug": "jeepney-jam",
+      "title": "Jeepney Jam",
+      "tagline": "Weave The Streets. Stack The Fares.",
+      "href": "jeepney-jam.html",
+      "country": "Philippines",
+      "flag": "🇵🇭",
+      "accent": "#ff6b5e",
+      "icon": "🚌",
+      "tags": ["skill","strategy"],
+      "moods": ["mind"]
+    },
+    {
+      "slug": "zen-ripple",
+      "title": "Zen Ripple",
+      "tagline": "Touch The Water. Watch It Come Alive.",
+      "href": "zen-ripple.html",
+      "country": null,
+      "flag": "",
+      "accent": "#4fd6c4",
+      "icon": "🌊",
+      "tags": ["physics","nature"],
+      "moods": ["relax","satisfying"]
+    },
+    {
+      "slug": "gravity-playground",
+      "title": "Gravity Playground™",
+      "tagline": "Change Gravity. Change Reality.",
+      "href": "gravity-playground.html",
+      "country": null,
+      "flag": "",
+      "accent": "#f0c14b",
+      "icon": "🌪️",
+      "tags": ["physics","sandbox","relaxing"],
+      "moods": ["relax","experimental","physics"]
+    },
+    {
+      "slug": "cloud-painter",
+      "title": "Cloud Painter™",
+      "tagline": "Draw The Sky. Watch Nature Paint The Rest.",
+      "href": "cloud-painter.html",
+      "country": null,
+      "flag": "",
+      "accent": "#7fd8ff",
+      "icon": "☁️",
+      "tags": ["relaxing","creative","nature"],
+      "moods": ["relax","creative","satisfying"]
+    }
+    ];
 
-  var HUBS = [
-    { title: 'India Collection', href: 'india.html', country: 'India', flag: '\uD83C\uDDEE\uD83C\uDDF3' },
-    { title: 'Japan Collection', href: 'japan.html', country: 'Japan', flag: '\uD83C\uDDEF\uD83C\uDDF5' },
-    { title: 'Philippines Collection', href: 'philippines.html', country: 'Philippines', flag: '\uD83C\uDDF5\uD83C\uDDED' }
-  ];
+ var HUBS = [
+   { title: 'India Collection', href: 'india.html', country: 'India', flag: '🇮🇳' },
+   { title: 'Japan Collection', href: 'japan.html', country: 'Japan', flag: '🇯🇵' },
+   { title: 'Philippines Collection', href: 'philippines.html', country: 'Philippines', flag: '🇵🇭' }
+   ];
 
-  var HOME = { title: 'Playrium', href: 'index.html' };
+ var HOME = { title: 'Playrium', href: 'index.html' };
 
-  window.PLAYRIUM_EXPERIENCES = EXPERIENCES;
+ var ORIGINALS_HUB = { title: 'Playrium Originals', href: 'index.html#originals-panel', country: null };
+
+ window.PLAYRIUM_EXPERIENCES = EXPERIENCES;
   window.PLAYRIUM_HUBS = HUBS;
   window.PLAYRIUM_HOME = HOME;
+  window.PLAYRIUM_ORIGINALS_HUB = ORIGINALS_HUB;
 
-  window.PLAYRIUM_getExperience = function (slug) {
-    for (var i = 0; i < EXPERIENCES.length; i++) {
-      if (EXPERIENCES[i].slug === slug) return EXPERIENCES[i];
-    }
-    return null;
-  };
+ window.PLAYRIUM_getExperience = function (slug) {
+   for (var i = 0; i < EXPERIENCES.length; i++) {
+     if (EXPERIENCES[i].slug === slug) return EXPERIENCES[i];
+   }
+   return null;
+ };
 
-  window.PLAYRIUM_getHub = function (country) {
-    for (var i = 0; i < HUBS.length; i++) {
-      if (HUBS[i].country === country) return HUBS[i];
-    }
-    return null;
-  };
+ window.PLAYRIUM_getHub = function (country) {
+   for (var i = 0; i < HUBS.length; i++) {
+     if (HUBS[i].country === country) return HUBS[i];
+   }
+   return null;
+ };
+
+ window.PLAYRIUM_isRelax = function (exp) {
+   if (!exp || !exp.moods) return false;
+   return exp.moods.indexOf('relax') > -1 || exp.moods.indexOf('satisfying') > -1;
+ };
 })();
