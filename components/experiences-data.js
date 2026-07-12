@@ -16,7 +16,8 @@
       "accent": "#f0c14b",
       "icon": "🏏",
       "tags": ["traditional","skill","multiplayer"],
-      "moods": ["family","physics"]
+      "moods": ["family","physics"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "matka-mania",
@@ -28,7 +29,8 @@
       "accent": "#4fd6c4",
       "icon": "🏺",
       "tags": ["physics","skill"],
-      "moods": ["physics"]
+      "moods": ["physics"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "kancha-kings",
@@ -40,7 +42,8 @@
       "accent": "#e8a13c",
       "icon": "🔮",
       "tags": ["traditional","skill"],
-      "moods": ["physics","family"]
+      "moods": ["physics","family"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "balloon-bazaar",
@@ -52,7 +55,8 @@
       "accent": "#ff6b5e",
       "icon": "🎈",
       "tags": ["funny","kids"],
-      "moods": ["relax","satisfying","family"]
+      "moods": ["relax","satisfying","family"],
+      "discovery": { "globe": true, "surprise": true, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "spend-crore",
@@ -64,7 +68,8 @@
       "accent": "#f0c14b",
       "icon": "💰",
       "tags": ["strategy","educational"],
-      "moods": ["mind"]
+      "moods": ["mind"],
+      "discovery": { "globe": true, "surprise": true, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "hydraulic-press-lab",
@@ -76,7 +81,8 @@
       "accent": "#9a97a8",
       "icon": "⚙️",
       "tags": ["physics","funny"],
-      "moods": ["satisfying","physics"]
+      "moods": ["satisfying","physics"],
+      "discovery": { "globe": true, "surprise": true, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "world-size-explorer",
@@ -88,7 +94,8 @@
       "accent": "#b4fff0",
       "icon": "🌍",
       "tags": ["educational","puzzle","nature"],
-      "moods": ["mind"]
+      "moods": ["mind"],
+      "discovery": { "globe": true, "surprise": true, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "moksha-patam",
@@ -100,7 +107,8 @@
       "accent": "#138808",
       "icon": "🐍",
       "tags": ["traditional","strategy"],
-      "moods": ["family","mind"]
+      "moods": ["family","mind"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "pie-break",
@@ -112,7 +120,8 @@
       "accent": "#e87a3c",
       "icon": "🥧",
       "tags": ["skill","puzzle"],
-      "moods": ["mind","physics"]
+      "moods": ["mind","physics"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "seven-stones",
@@ -124,7 +133,8 @@
       "accent": "#9a97a8",
       "icon": "🪨",
       "tags": ["traditional","multiplayer"],
-      "moods": ["family"]
+      "moods": ["family"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "stapu",
@@ -136,7 +146,8 @@
       "accent": "#ff8fa3",
       "icon": "🔲",
       "tags": ["traditional","kids"],
-      "moods": ["family"]
+      "moods": ["family"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "rangoli-maker",
@@ -148,7 +159,8 @@
       "accent": "#ff8fa3",
       "icon": "🎨",
       "tags": ["festival","puzzle"],
-      "moods": ["creative","relax"]
+      "moods": ["creative","relax"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "daruma-drop",
@@ -160,7 +172,8 @@
       "accent": "#BC002D",
       "icon": "🎮",
       "tags": ["skill","physics"],
-      "moods": ["physics","mind"]
+      "moods": ["physics","mind"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "goldfish-scoop",
@@ -172,7 +185,8 @@
       "accent": "#4fa8ff",
       "icon": "🐟",
       "tags": ["festival","skill","nature"],
-      "moods": ["family","relax"]
+      "moods": ["family","relax"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "sensu-spinner",
@@ -184,7 +198,8 @@
       "accent": "#ff8fa3",
       "icon": "🪭",
       "tags": ["physics","kids"],
-      "moods": ["physics","satisfying"]
+      "moods": ["physics","satisfying"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "koinobori-festival",
@@ -196,7 +211,8 @@
       "accent": "#4fd6c4",
       "icon": "🎏",
       "tags": ["festival","physics","nature"],
-      "moods": ["relax","physics"]
+      "moods": ["relax","physics"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "sungka-streak",
@@ -208,7 +224,8 @@
       "accent": "#0038A8",
       "icon": "🐚",
       "tags": ["traditional","strategy"],
-      "moods": ["mind"]
+      "moods": ["mind"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "tinikling-tempo",
@@ -220,7 +237,8 @@
       "accent": "#f0c14b",
       "icon": "🎋",
       "tags": ["traditional","skill"],
-      "moods": ["physics","family"]
+      "moods": ["physics","family"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "parol-glow",
@@ -232,7 +250,8 @@
       "accent": "#f0c14b",
       "icon": "⭐",
       "tags": ["festival","kids"],
-      "moods": ["creative","relax"]
+      "moods": ["creative","relax"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "jeepney-jam",
@@ -244,7 +263,8 @@
       "accent": "#ff6b5e",
       "icon": "🚌",
       "tags": ["skill","strategy"],
-      "moods": ["mind"]
+      "moods": ["mind"],
+      "discovery": { "globe": true, "surprise": false, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "zen-ripple",
@@ -256,7 +276,8 @@
       "accent": "#4fd6c4",
       "icon": "🌊",
       "tags": ["physics","nature"],
-      "moods": ["relax","satisfying"]
+      "moods": ["relax","satisfying"],
+      "discovery": { "globe": false, "surprise": true, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "gravity-playground",
@@ -268,7 +289,8 @@
       "accent": "#f0c14b",
       "icon": "🌪️",
       "tags": ["physics","sandbox","relaxing"],
-      "moods": ["relax","experimental","physics"]
+      "moods": ["relax","experimental","physics"],
+      "discovery": { "globe": false, "surprise": true, "featured": true, "dailyChallenge": true }
     },
     {
       "slug": "cloud-painter",
@@ -280,7 +302,8 @@
       "accent": "#7fd8ff",
       "icon": "☁️",
       "tags": ["relaxing","creative","nature"],
-      "moods": ["relax","creative","satisfying"]
+      "moods": ["relax","creative","satisfying"],
+      "discovery": { "globe": false, "surprise": true, "featured": true, "dailyChallenge": true }
     }
     ];
 
@@ -307,6 +330,7 @@
  };
 
  window.PLAYRIUM_getHub = function (country) {
+   if (country == null) return ORIGINALS_HUB;
    for (var i = 0; i < HUBS.length; i++) {
      if (HUBS[i].country === country) return HUBS[i];
    }
