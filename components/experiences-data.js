@@ -315,7 +315,7 @@
 
  var HOME = { title: 'Playrium', href: 'index.html' };
 
- var ORIGINALS_HUB = { title: 'Playrium Originals', href: 'index.html#originals-panel', country: null };
+ var ORIGINALS_HUB = { title: 'Playrium Originals', href: 'index.html#originals-panel', country: null, flag: '✨' };
 
  window.PLAYRIUM_EXPERIENCES = EXPERIENCES;
   window.PLAYRIUM_HUBS = HUBS;
