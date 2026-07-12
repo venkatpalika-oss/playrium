@@ -341,6 +341,7 @@ transform:translate(-50%,-50%) scale(0); animation:relaxRippleOut 3.2s ease-out 
 </div>
 </div>
 
+<script src="components/experiences-data.js"></script>
 <script>
 
 function loadScriptWithFallback(urls, cb){
@@ -395,31 +396,7 @@ var COUNTRIES = [
 { id:'philippines', name:'Philippines', flag:'\ud83c\uddf5\ud83c\udded', code:'ph', lat:13, lng:122, accent:'#4fa8ff', href:'philippines.html', tagline:'Toys inspired by Filipino games and island life.' }
 ];
 
-var EXPERIENCES = [
-{ title:'Gully Cricket™', tagline:'Every Street Has A Legend.', href:'gully-cricket.html', country:'India', accent:'#f0c14b', icon:'🏏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','skill','multiplayer'], moods:['family','physics'] },
-{ title:'Matka Mania™', tagline:'Balance. Race. Survive.', href:'matka-mania.html', country:'India', accent:'#4fd6c4', icon:'🏺', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['physics','skill'], moods:['physics'] },
-{ title:'Kancha Kings™', tagline:'Aim. Shoot. Rule The Circle.', href:'kancha-kings.html', country:'India', accent:'#e8a13c', icon:'🔮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','skill'], moods:['physics','family'] },
-{ title:'Balloon Bazaar™', tagline:'Every Balloon Has A Surprise.', href:'balloon-bazaar.html', country:'India', accent:'#ff6b5e', icon:'🎈', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['funny','kids'], moods:['relax','satisfying','family'] },
-{ title:'Spend ₹10,000 Crore™', tagline:'Can You Spend It All?', href:'spend-crore.html', country:'India', accent:'#f0c14b', icon:'💰', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['strategy','educational'], moods:['mind'] },
-{ title:'Hydraulic Press Lab™', tagline:'What Happens If You Crush It?', href:'hydraulic-press-lab.html', country:'India', accent:'#9a97a8', icon:'⚙️', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['physics','funny'], moods:['satisfying','physics'] },
-{ title:'World Size Explorer™', tagline:'The World Isn\'t What It Looks Like.', href:'world-size-explorer.html', country:'India', accent:'#b4fff0', icon:'🌍', discovery:{ globe:true, surprise:true, featured:true, dailyChallenge:true }, tags:['educational','puzzle','nature'], moods:['mind'] },
-{ title:'Moksha Patam', tagline:'Every Ladder Is Virtue. Every Snake Is Vice.', href:'moksha-patam.html', country:'India', accent:'#138808', icon:'🐍', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','strategy'], moods:['family','mind'] },
-{ title:'Pie Break', tagline:'Ten Slices. One Ring. One Throw.', href:'pie-break.html', country:'India', accent:'#e87a3c', icon:'🥧', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['skill','puzzle'], moods:['mind','physics'] },
-{ title:'Seven Stones', tagline:'Knock It Down. Rebuild Before Time Runs Out.', href:'seven-stones.html', country:'India', accent:'#9a97a8', icon:'🪨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','multiplayer'], moods:['family'] },
-{ title:'Stapu', tagline:'Toss. Hop. Master The Squares.', href:'stapu.html', country:'India', accent:'#ff8fa3', icon:'🔲', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','kids'], moods:['family'] },
-{ title:'Rangoli Maker', tagline:'Every Mark Mirrors Into Beauty.', href:'rangoli-maker.html', country:'India', accent:'#ff8fa3', icon:'🎨', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','puzzle'], moods:['creative','relax'] },
-{ title:'Daruma Drop', tagline:'One Perfect Hit Changes Everything.', href:'daruma-drop.html', country:'Japan', accent:'#BC002D', icon:'🎮', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['skill','physics'], moods:['physics','mind'] },
-{ title:'Goldfish Scoop', tagline:'Kingyo Sukui — Scoop Before The Paper Tears.', href:'goldfish-scoop.html', country:'Japan', accent:'#4fa8ff', icon:'🐟', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','skill','nature'], moods:['family','relax'] },
-{ title:'Sensu Spinner', tagline:'Flick. Fan. Flow.', href:'sensu-spinner.html', country:'Japan', accent:'#ff8fa3', icon:'🏵️', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['physics','kids'], moods:['physics','satisfying'] },
-{ title:'Koinobori Festival', tagline:'Ride The Wind. Race The Sky.', href:'koinobori-festival.html', country:'Japan', accent:'#4fd6c4', icon:'🎏', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','physics','nature'], moods:['relax','physics'] },
-{ title:'Sungka Streak', tagline:'Time The Sow. Fill The Store.', href:'sungka-streak.html', country:'Philippines', accent:'#0038A8', icon:'🐚', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','strategy'], moods:['mind'] },
-{ title:'Tinikling Tempo', tagline:'Hop Between The Clapping Poles.', href:'tinikling-tempo.html', country:'Philippines', accent:'#f0c14b', icon:'🎋', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['traditional','skill'], moods:['physics','family'] },
-{ title:'Parol Glow', tagline:'Spark The Star Lantern Alight.', href:'parol-glow.html', country:'Philippines', accent:'#f0c14b', icon:'⭐', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['festival','kids'], moods:['creative','relax'] },
-{ title:'Jeepney Jam', tagline:'Weave The Streets. Stack The Fares.', href:'jeepney-jam.html', country:'Philippines', accent:'#ff6b5e', icon:'🚌', discovery:{ globe:true, surprise:false, featured:true, dailyChallenge:true }, tags:['skill','strategy'], moods:['mind'] },
-{ title:'Zen Ripple', tagline:'Touch The Water. Watch It Come Alive.', href:'zen-ripple.html', country:null, accent:'#4fd6c4', icon:'🌊', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true }, tags:['physics','nature'], moods:['relax','satisfying'] },
-{ title:'Gravity Playground™', tagline:'Change Gravity. Change Reality.', href:'gravity-playground.html', country:null, accent:'#f0c14b', icon:'🌪️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true }, tags:['physics','sandbox','relaxing'], moods:['relax','experimental','physics'] },
-{ title:'Cloud Painter™', tagline:'Draw The Sky. Watch Nature Paint The Rest.', href:'cloud-painter.html', country:null, accent:'#7fd8ff', icon:'☁️', discovery:{ globe:false, surprise:true, featured:true, dailyChallenge:true }, tags:['relaxing','creative','nature'], moods:['relax','creative','satisfying'] }
-];
+var EXPERIENCES = window.PLAYRIUM_EXPERIENCES || [];
 
 var CHALLENGE_TARGETS = {
 'kancha-kings.html': 'Beat Kancha Kings \u2014 clear the circle in under 30 seconds.',
@@ -1002,7 +979,6 @@ else { document.getElementById('globeStage').classList.add('fallback'); }
 document.getElementById('globeStage').classList.add('fallback');
 }
 </script>
-<script src="components/experiences-data.js"></script>
 <script src="components/header.js"></script>
 <script src="components/footer.js"></script>
 </body>
