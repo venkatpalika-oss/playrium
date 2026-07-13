@@ -42,6 +42,7 @@
     mount.innerHTML =
       '<div class="pr-footer-links">' +
       '<a href="' + anchor('#top') + '">About</a>' +
+    '<a href="experiences.html">Explore</a>' +
       '<a href="' + anchor('#top') + '">Countries</a>' +
       '<a href="' + anchor('#originals-panel') + '">Playrium Originals</a>' +
       '<a href="mailto:hello@playrium.fun?subject=Suggest%20an%20Experience">Suggest Experience</a>' +
