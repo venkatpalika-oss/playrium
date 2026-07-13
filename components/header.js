@@ -6,6 +6,8 @@
  * Do not duplicate nav markup on individual pages — include this script and let it render.
  */
 (function () {
+var lastFocusedEl = null;
+
   function injectStyle() {
     if (document.getElementById('pr-header-style')) return;
     var css = ''
@@ -101,20 +103,31 @@ function exploreHref() { return 'experiences.html'; }
   }
 
   function openSearch() {
-    document.getElementById('prSearchOverlay').classList.add('active');
-    document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'false');
-    var input = document.getElementById('prSearchInput');
-    input.value = '';
-    document.getElementById('prSearchResults').innerHTML = '';
-    setTimeout(function () { input.focus(); }, 50);
-  }
+lastFocusedEl = document.activeElement;
+document.getElementById('prSearchOverlay').classList.add('active');
+document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'false');
+var input = document.getElementById('prSearchInput');
+input.value = '';
+document.getElementById('prSearchResults').innerHTML = '';
+setTimeout(function () { input.focus(); }, 50);
+}
 
-  function closeSearch() {
-    document.getElementById('prSearchOverlay').classList.remove('active');
-    document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'true');
-  }
+function closeSearch() {
+document.getElementById('prSearchOverlay').classList.remove('active');
+document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'true');
+if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
+lastFocusedEl.focus();
+}
+lastFocusedEl = null;
+}
 
-  function isTypingTarget(el) {
+function getSearchFocusable() {
+var input = document.getElementById('prSearchInput');
+var results = Array.prototype.slice.call(document.querySelectorAll('#prSearchResults .pr-search-result-item'));
+return [input].concat(results);
+}
+
+function isTypingTarget(el) {
   var tag = el && el.tagName ? el.tagName.toLowerCase() : '';
   return tag === 'input' || tag === 'textarea' || (el && el.isContentEditable);
 }
@@ -131,12 +144,27 @@ function wireEvents() {
   document.getElementById('prSearchInput').addEventListener('input', function () { renderSearchResults(this.value); });
   document.getElementById('prSearchOverlay').addEventListener('click', function (ev) { if (ev.target === this) closeSearch(); });
   document.addEventListener('keydown', function (ev) {
-    if (ev.key === 'Escape') { closeSearch(); return; }
-    if (isTypingTarget(ev.target)) return;
-    if (ev.key === '/') { ev.preventDefault(); openSearch(); return; }
-    if (ev.key === 'r' || ev.key === 'R') { goToRandom(); }
-  });
-  document.getElementById('prNavRandomBtn').addEventListener('click', goToRandom);
+if (ev.key === 'Escape') { closeSearch(); return; }
+var overlay = document.getElementById('prSearchOverlay');
+if (ev.key === 'Tab' && overlay && overlay.classList.contains('active')) {
+var focusable = getSearchFocusable();
+if (!focusable.length) return;
+var idx = focusable.indexOf(document.activeElement);
+var nextIdx;
+if (ev.shiftKey) {
+nextIdx = (idx <= 0) ? focusable.length - 1 : idx - 1;
+} else {
+nextIdx = (idx === -1 || idx === focusable.length - 1) ? 0 : idx + 1;
+}
+ev.preventDefault();
+focusable[nextIdx].focus();
+return;
+}
+if (isTypingTarget(ev.target)) return;
+if (ev.key === '/') { ev.preventDefault(); openSearch(); return; }
+if (ev.key === 'r' || ev.key === 'R') { goToRandom(); }
+});
+document.getElementById('prNavRandomBtn').addEventListener('click', goToRandom);
 }
 
 function render() {
