@@ -58,6 +58,7 @@
     return isIndexPage() ? frag : full;
   }
   function relaxHref() { return isIndexPage() ? '#relax-panel' : homeHref() + '#relax-panel'; }
+function exploreHref() { return 'experiences.html'; }
 
   function experiences() { return window.PLAYRIUM_EXPERIENCES || []; }
 
@@ -113,21 +114,32 @@
     document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'true');
   }
 
-  function wireEvents() {
-    document.getElementById('prNavSearchBtn').addEventListener('click', openSearch);
-    document.getElementById('prSearchInput').addEventListener('input', function () { renderSearchResults(this.value); });
-    document.getElementById('prSearchOverlay').addEventListener('click', function (ev) { if (ev.target === this) closeSearch(); });
-    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeSearch(); });
-    document.getElementById('prNavRandomBtn').addEventListener('click', function () {
-      var list = experiences();
-      if (!list.length) return;
-      var pick = list[Math.floor(Math.random() * list.length)];
-      bumpPlayCount(pick.href);
-      window.location.href = pick.href;
-    });
-  }
+  function isTypingTarget(el) {
+  var tag = el && el.tagName ? el.tagName.toLowerCase() : '';
+  return tag === 'input' || tag === 'textarea' || (el && el.isContentEditable);
+}
 
-  function render() {
+function goToRandom() {
+  var list = experiences();
+  if (!list.length) return;
+  var pick = list[Math.floor(Math.random() * list.length)];
+  bumpPlayCount(pick.href);
+  window.location.href = pick.href;
+}
+
+function wireEvents() {
+  document.getElementById('prSearchInput').addEventListener('input', function () { renderSearchResults(this.value); });
+  document.getElementById('prSearchOverlay').addEventListener('click', function (ev) { if (ev.target === this) closeSearch(); });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape') { closeSearch(); return; }
+    if (isTypingTarget(ev.target)) return;
+    if (ev.key === '/') { ev.preventDefault(); openSearch(); return; }
+    if (ev.key === 'r' || ev.key === 'R') { goToRandom(); }
+  });
+  document.getElementById('prNavRandomBtn').addEventListener('click', goToRandom);
+}
+
+function render() {
     injectStyle();
     var mount = getMount();
     mount.className = 'pr-header';
@@ -137,10 +149,10 @@
       '<a class="pr-nav-logo" href="' + homeHref() + '">Playrium</a>' +
       '<div class="pr-nav-links">' +
       '<a href="' + homeHref() + '">Home</a>' +
+      '<a href="' + exploreHref() + '">Explore</a>' +
       '<a href="' + countriesHref() + '">Countries</a>' +
       '<a href="' + originalsHref() + '">Playrium Originals</a>' +
       '<a href="' + relaxHref() + '">Relax &amp; Satisfy</a>' +
-      '<button class="pr-nav-btn" id="prNavSearchBtn" type="button">Search</button>' +
       '<button class="pr-nav-btn" id="prNavRandomBtn" type="button">Random</button>' +
       '</div>' +
       '</nav>' +
