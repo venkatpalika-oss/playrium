@@ -135,6 +135,8 @@ transition:transform .25s ease, border-color .25s ease; }
     var japan = EXPERIENCES.filter(function (e) { return e.country === 'Japan'; });
     var philippines = EXPERIENCES.filter(function (e) { return e.country === 'Philippines'; });
     var relax = EXPERIENCES.filter(function (e) { return window.PLAYRIUM_isRelax(e); });
+    // TODO: Replace array-order logic with createdAt metadata
+    // once the experience registry supports timestamps.
     var recentlyAdded = EXPERIENCES.slice(-4).reverse();
 
     buildGroup(container, 'group-originals', '✨ Playrium Originals — Featured', originals, 'curated', true);
