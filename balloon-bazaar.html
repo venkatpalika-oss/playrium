@@ -576,20 +576,20 @@ function balloonAt(x,y){
 }
 
 canvas.addEventListener('pointerdown', e=>{
-  const b = balloonAt(e.clientX, e.clientY);
+  const rect = canvas.getBoundingClientRect(); const lx = e.clientX - rect.left, ly = e.clientY - rect.top; const b = balloonAt(lx, ly);
   if(!b) return;
   pointerDown = true; activeBalloon = b; b.dragging=true;
-  dragStartPos = {x:e.clientX,y:e.clientY}; dragMoved=0;
-  lastPositions = [{x:e.clientX,y:e.clientY,t:performance.now()}];
+  dragStartPos = {x:lx,y:ly}; dragMoved=0;
+  lastPositions = [{x:lx,y:ly,t:performance.now()}];
   Sound.squeak();
 });
 window.addEventListener('pointermove', e=>{
   if(!pointerDown || !activeBalloon) return;
   const b = activeBalloon;
-  const dx=e.clientX-b.x, dy=e.clientY-b.y;
-  dragMoved += Math.hypot(e.clientX-lastPositions[lastPositions.length-1].x, e.clientY-lastPositions[lastPositions.length-1].y);
+  const rect = canvas.getBoundingClientRect(); const lx = e.clientX - rect.left, ly = e.clientY - rect.top; const dx=lx-b.x, dy=ly-b.y;
+  dragMoved += Math.hypot(lx-lastPositions[lastPositions.length-1].x, ly-lastPositions[lastPositions.length-1].y);
   b.x += dx*0.35; b.y += dy*0.35;
-  lastPositions.push({x:e.clientX,y:e.clientY,t:performance.now()});
+  lastPositions.push({x:lx,y:ly,t:performance.now()});
   if(lastPositions.length>6) lastPositions.shift();
 });
 window.addEventListener('pointerup', ()=>{
