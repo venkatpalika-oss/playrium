@@ -2,6 +2,8 @@
 
 This document tracks the relative priority of upcoming Tier A Originals. It should be revisited after each Original completes Phase 5 Human Testing, since validated learnings, for example about what drives replayability or which interaction patterns confuse testers, may shift priorities for the experiences that follow.
 
+> Note: The scores below are prioritization hypotheses based on design-phase reasoning, not validated data. They are expected to be replaced by findings from each Original's Phase 1 Experience Evaluation and Phase 5 Human Testing as that evidence becomes available.
+
 ## Current Status
 Sand Art Studio (TM) has completed Phases 1 through 4 and is currently frozen at Phase 5, Human Testing, awaiting real user data. No other Original should begin in-depth design work until that data is available, since it is expected to meaningfully inform the experiences below.
 
