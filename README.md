@@ -7,13 +7,14 @@ Playrium is a curated collection of handcrafted interactive experiences designed
 - Protect Wonder
 - Protect Discipline
 - Curate Relentlessly
+- Build Just-in-Time
 
-Every experience follows the Playrium Constitution: understandable in under 10 seconds with no tutorial, rewards curiosity, feels premium on both desktop and mobile, and delivers at least one genuine "wow" moment.
+Every experience follows the Playrium Constitution: understandable in under 10 seconds with no tutorial, rewards curiosity, feels premium on both desktop and mobile, and delivers at least one genuine "wow" moment. Every new repository, document, dependency, service, or process must have an immediate purpose; infrastructure is never created "just in case," only when the next validated step actually requires it.
 
 ## Repository Structure
 
 - components/ - shared JS used across pages: header, footer, navigation, breadcrumb, related experiences, schema, did-you-know, and the experiences-data source of truth.
-- docs/ - the Playrium Originals Framework (Design Bible, Evaluation Template, Design Template, QA Checklist, Production Checklist), the Originals Roadmap Prioritization, and platform-level roadmap docs (country rollout, monetization, spin globe discovery proposal).
+- docs/ - the Playrium Originals Framework (Design Bible, Evaluation Template, Design Template, QA Checklist, Production Checklist), the Originals Roadmap Prioritization, the Analytics Measurement Plan, and platform-level roadmap docs (country rollout, monetization, spin globe discovery proposal).
 - Individual experience pages live as flat HTML files at the repository root (for example cloud-painter.html, gravity-playground.html, zen-ripple.html), alongside the country hub pages (india.html, japan.html, philippines.html) and the homepage (index.html).
 - sitemap.xml, robots.txt, and .htaccess support SEO and production hosting on the custom domain.
 
@@ -49,6 +50,10 @@ See docs/PLAYRIUM-ORIGINALS-DESIGN-BIBLE.md for the full framework.
 ## Deployment
 
 Playrium deploys via GitHub Pages to playrium.fun (custom domain) and venkatpalika-oss.github.io/playrium.
+
+## Analytics
+
+No analytics are installed yet, by design. See docs/ANALYTICS-MEASUREMENT-PLAN.md for the metrics that will be tracked and the specific conditions that trigger installing a tool.
 
 ## Roadmap
 
