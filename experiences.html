@@ -217,7 +217,7 @@ transition:transform .25s ease, border-color .25s ease; }
       var cards = container.querySelectorAll('.exp-card');
       Array.prototype.forEach.call(cards, function (card) {
         var searchOk = matchesSearch(card, q);
-        var chipOk = card.dataset.group === 'all' ? matchesChip(card, activeChip) : true;
+        var chipOk = matchesChip(card, activeChip);
         var visible = searchOk && chipOk;
         card.classList.toggle('is-hidden', !visible);
         if (visible) anyVisible = true;
@@ -225,6 +225,8 @@ transition:transform .25s ease, border-color .25s ease; }
       var groups = container.querySelectorAll('.group');
       Array.prototype.forEach.call(groups, function (g) {
         var visibleCards = g.querySelectorAll('.exp-card:not(.is-hidden)');
+        var countEl = g.querySelector('.group-count');
+        if (countEl) countEl.textContent = '(' + visibleCards.length + ')';
         g.classList.toggle('is-hidden', visibleCards.length === 0);
       });
       document.getElementById('emptyState').style.display = anyVisible ? 'none' : 'block';
