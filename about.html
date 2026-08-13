@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>About — Playrium</title>
+<meta name="description" content="Playrium is an interactive museum of handcrafted experiences inspired by cultures around the world. Learn what Playrium is and how it works.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="About — Playrium">
+<meta property="og:description" content="Playrium is an interactive museum of handcrafted experiences inspired by cultures around the world.">
+<meta property="og:image" content="https://www.playrium.fun/favicon.png">
+<meta property="og:url" content="https://www.playrium.fun/about.html">
+<link rel="canonical" href="https://www.playrium.fun/about.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg-deep:#05050a; --bg-mid:#12121c;
+--chalk:#f4f0e6; --chalk-dim:#9a97a8;
+--ui-glass:rgba(244,240,230,.07); --ui-glass-border:rgba(244,240,230,.14);
+--ui-glass-strong:rgba(20,20,28,.55);
+--font-display:'Fredoka', system-ui, sans-serif; --font-chalk:'Kalam', cursive;
+}
+*{box-sizing:border-box;}
+html,body{ margin:0; padding:0; width:100%; min-height:100%; background:var(--bg-deep);
+font-family:var(--font-display); -webkit-tap-highlight-color:transparent; }
+body{ color:var(--chalk); }
+a{ -webkit-tap-highlight-color:transparent; }
+:focus-visible{ outline:2px solid #b4fff0; outline-offset:2px; }
+.pr-breadcrumb-fallback{ max-width:900px; margin:0 auto; padding:1.2rem 1.5rem 0; color:var(--chalk-dim); font-size:.85rem; }
+.pr-breadcrumb-fallback a{ color:var(--chalk-dim); text-decoration:none; }
+.pr-breadcrumb-fallback a:hover{ color:var(--chalk); }
+.page-head{ max-width:900px; margin:0 auto; padding:3.4rem 1.5rem 1.2rem; text-align:center; }
+.page-eyebrow{ color:var(--chalk); opacity:.7; letter-spacing:.3em; text-transform:uppercase; font-size:.75rem; font-weight:500; margin:0 0 .6rem; }
+.page-title{ font-weight:700; font-size:clamp(1.6rem,3.2vw,2.4rem); margin:0; letter-spacing:-.01em; }
+.page-sub{ font-family:var(--font-chalk); color:var(--chalk-dim); font-size:1.02rem; margin:.7rem auto 0; max-width:560px; }
+.content{ max-width:720px; margin:0 auto; padding:1.5rem 1.5rem 3.5rem; }
+.content section{ background:var(--ui-glass-strong); border:1px solid var(--ui-glass-border); border-radius:1.4rem; padding:1.8rem 1.8rem; margin-bottom:1.2rem; }
+.content h2{ font-weight:600; font-size:1.15rem; margin:0 0 .7rem; }
+.content p{ color:var(--chalk-dim); line-height:1.7; font-size:.95rem; margin:0 0 .8rem; }
+.content p:last-child{ margin-bottom:0; }
+.content a{ color:var(--chalk); }
+.cta-row{ text-align:center; padding:.6rem 0 0; }
+.btn-primary{ font-family:var(--font-display); font-weight:600; font-size:.95rem; padding:.9rem 1.8rem;
+border-radius:999px; border:none; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:.4rem;
+background:var(--chalk); color:var(--bg-deep); box-shadow:0 10px 30px rgba(244,240,230,.15); transition:transform .3s cubic-bezier(.2,.8,.2,1); }
+.btn-primary:hover{ transform:translateY(-3px); }
+</style>
+</head>
+<body>
+<header id="site-header"></header>
+<nav class="pr-breadcrumb-fallback" aria-label="Breadcrumb"><a href="index.html">Playrium</a> &rsaquo; About</nav>
+
+<section class="page-head">
+<p class="page-eyebrow">Playrium</p>
+<h1 class="page-title">About Playrium</h1>
+<p class="page-sub">An interactive museum of the world — handcrafted, playful, and free to explore.</p>
+</section>
+
+<main class="content">
+<section>
+<h2>What is Playrium?</h2>
+<p>Playrium is a collection of small, handcrafted interactive experiences inspired by cultures around the world. Spin the globe, pick a country, and discover something playful — from gully cricket in India to goldfish scooping at a Japanese festival to sungka on a Philippine porch.</p>
+<p>Every experience is built by hand to run right in your browser. No downloads, no accounts, no ads — just play.</p>
+</section>
+<section>
+<h2>How it works</h2>
+<p>Start on the <a href="index.html">home globe</a> and click a glowing marker, or browse the <a href="experiences.html">complete catalogue</a>. Feeling lucky? Try Surprise Me for a hidden pick, Relax &amp; Satisfy for something calmer, or the daily challenge for a small goal to chase.</p>
+<p>Your progress — recently played experiences and daily badges — is stored only on your own device.</p>
+</section>
+<section>
+<h2>Suggest an experience</h2>
+<p>Playrium keeps growing. If there's a game, toy, or tradition from your part of the world you'd love to see here, <a href="mailto:hello@playrium.fun?subject=Suggest%20an%20Experience">send a suggestion</a> — we read everything.</p>
+</section>
+<p class="cta-row"><a class="btn-primary" href="experiences.html">Explore the catalogue &rarr;</a></p>
+</main>
+
+<footer id="site-footer"></footer>
+<script src="components/experiences-data.js"></script>
+<script src="components/header.js"></script>
+<script src="components/footer.js"></script>
+</body>
+</html>
