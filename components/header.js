@@ -52,7 +52,7 @@ var lastFocusedEl = null;
   }
 
   function homeHref() { return (window.PLAYRIUM_HOME && window.PLAYRIUM_HOME.href) || 'index.html'; }
-  function countriesHref() { return isIndexPage() ? '#top' : homeHref() + '#top'; }
+  function countriesHref() { return isIndexPage() ? '#globeStage' : homeHref() + '#globeStage'; }
   function originalsHref() {
     var full = (window.PLAYRIUM_ORIGINALS_HUB && window.PLAYRIUM_ORIGINALS_HUB.href) || 'index.html#originals-panel';
     var hashIdx = full.indexOf('#');
@@ -161,9 +161,11 @@ focusable[nextIdx].focus();
 return;
 }
 if (isTypingTarget(ev.target)) return;
+if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
 if (ev.key === '/') { ev.preventDefault(); openSearch(); return; }
 if (ev.key === 'r' || ev.key === 'R') { goToRandom(); }
 });
+document.getElementById('prNavSearchBtn').addEventListener('click', openSearch);
 document.getElementById('prNavRandomBtn').addEventListener('click', goToRandom);
 }
 
@@ -181,6 +183,7 @@ function render() {
       '<a href="' + countriesHref() + '">Countries</a>' +
       '<a href="' + originalsHref() + '">Playrium Originals</a>' +
       '<a href="' + relaxHref() + '">Relax &amp; Satisfy</a>' +
+      '<button class="pr-nav-btn" id="prNavSearchBtn" type="button" aria-label="Search experiences" title="Search (or press /)">🔍 Search</button>' +
       '<button class="pr-nav-btn" id="prNavRandomBtn" type="button">Random</button>' +
       '</div>' +
       '</nav>' +
