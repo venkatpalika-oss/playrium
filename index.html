@@ -86,6 +86,9 @@ font-size:9rem; background:radial-gradient(circle at 35% 30%, #2c5a7c, #0d1b2a 7
 @keyframes hintNudge{ 0%,100%{ transform:translateX(0);} 50%{ transform:translateX(4px);} }
 .country-hidden-nav{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 .country-hidden-nav.show-focus a:focus{ position:fixed; width:auto; height:auto; clip:auto; top:1rem; left:1rem; z-index:100; background:var(--chalk); color:var(--bg-deep); padding:.6rem 1rem; border-radius:.6rem; }
+.country-quick-nav{ position:relative; z-index:2; display:flex; gap:.6rem; justify-content:center; flex-wrap:wrap; margin-top:.8rem; }
+.country-quick-nav a{ font-family:var(--font-display); font-weight:600; font-size:.8rem; color:var(--chalk-dim); text-decoration:none; padding:.45rem 1rem; border-radius:999px; border:1px solid var(--ui-glass-border); background:var(--ui-glass); transition:color .2s ease, border-color .2s ease; }
+.country-quick-nav a:hover{ color:var(--chalk); border-color:rgba(244,240,230,.35); }
 
 /* ---------- SURPRISE PANEL ---------- */
 .hero-right{ position:relative; z-index:2; flex:0 0 32%; display:flex; align-items:center; justify-content:center; min-width:260px; }
@@ -252,7 +255,7 @@ box-shadow:0 30px 70px rgba(0,0,0,.45); }
 
 <body>
 <header id="site-header"></header>
-<button class="mute-toggle" id="muteToggle" type="button" aria-label="Toggle sound" aria-pressed="false" style="position:fixed;top:14px;right:14px;z-index:55;">🔇</button>
+<button class="mute-toggle" id="muteToggle" type="button" aria-label="Toggle sound" aria-pressed="false" style="position:fixed;top:72px;right:14px;z-index:45;">🔇</button>
 
 <section class="hero" id="top">
 <div class="hero-bg" aria-hidden="true"></div>
@@ -272,7 +275,7 @@ box-shadow:0 30px 70px rgba(0,0,0,.45); }
 <div class="globe-fallback" aria-hidden="true">🌍</div>
 </div>
 <p class="globe-hint" id="globeHint"><span aria-hidden="true">🌍</span> <span class="hint-arrows">← Drag →</span> &middot; <span>Click a glowing marker</span></p>
-<nav class="country-hidden-nav" id="countryHiddenNav" aria-label="Countries">
+<nav class="country-quick-nav" id="countryHiddenNav" aria-label="Countries">
 </nav>
 </div>
 <div class="hero-right">
@@ -737,7 +740,7 @@ requestAnimationFrame(animateGlobe);
 if (!globe.dragging){
 globe.rotY += globe.velX; globe.rotX += globe.velY;
 globe.velX *= 0.94; globe.velY *= 0.94;
-if (!cameraTweening && globe.autoRotate && !reducedMotion){ globe.rotY += 0.0018 + globe.spinBoost; }
+if (!cameraTweening && globe.autoRotate && !reducedMotion && !globe.hoveredMarker){ globe.rotY += 0.0018 + globe.spinBoost; }
 globe.rotX = Math.max(-1.1, Math.min(1.1, globe.rotX));
 }
 globe.earth.rotation.y = globe.rotY;
@@ -793,7 +796,9 @@ COUNTRIES.forEach(function(c){
 var a = document.createElement('a');
 a.href = '#';
 a.className = 'country-hidden-link';
-a.textContent = 'Explore ' + c.name + ' (' + EXPERIENCES.filter(function(e){return e.discovery.globe && e.country===c.name;}).length + ' experiences)';
+var expCount = EXPERIENCES.filter(function(e){return e.discovery.globe && e.country===c.name;}).length;
+a.textContent = c.flag + ' ' + c.name + ' (' + expCount + ')';
+a.setAttribute('aria-label', 'Explore ' + c.name + ' (' + expCount + ' experiences)');
 a.addEventListener('click', function(ev){ ev.preventDefault(); selectCountry(c); });
 nav.appendChild(a);
 });
@@ -827,6 +832,14 @@ document.getElementById('challengePlayBtn').addEventListener('click', function()
 var claimBtn = document.getElementById('challengeClaimBtn');
 if (claimBtn){
 claimBtn.addEventListener('click', function(){
+var last = lastPlayed(challengeExp.href);
+var playedToday = last > 0 && (Date.now() - last) < 86400000;
+if (!playedToday){
+claimBtn.textContent = 'Play the challenge first — then claim';
+claimBtn.disabled = true;
+setTimeout(function(){ claimBtn.textContent = 'I did it — Claim Badge'; claimBtn.disabled = false; }, 2600);
+return;
+}
 try{ localStorage.setItem('challenge_'+todayStamp(), challengeExp.href); }catch(e){}
 banner.classList.add('done');
 claimBtn.remove();
