@@ -24,7 +24,7 @@ jobs:
           server: 'server260.web-hosting.com'
           port: '21098'
           username: 'playszzp'
-          ssh_private_key: ${{ secrets.NC_SSH_PRIVATE_KEY }}
+          password: ${{ secrets.FTP_PASSWORD }}
           local_path: '/tmp/deploy-dist/*'
           remote_path: '/home/playszzp/public_html'
           sftp_only: true
