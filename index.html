@@ -301,11 +301,11 @@ box-shadow:0 30px 70px rgba(0,0,0,.45); }
 
 <section class="stats-strip" id="statsStrip">
 <div class="stats-strip-inner">
-<span><strong id="statExpCount">0</strong> Experiences</span>
+<span><strong id="statExpCount">23</strong> Experiences</span>
 <span class="stat-dot">•</span>
-<span><strong id="statCountryCount">0</strong> Countries</span>
+<span><strong id="statCountryCount">3</strong> Countries</span>
 <span class="stat-dot">•</span>
-<span><strong id="statOriginalsCount">0</strong> Originals</span>
+<span><strong id="statOriginalsCount">3</strong> Originals</span>
 <span class="stat-dot">•</span>
 <span class="stat-soon">More Coming Soon</span>
 </div>
@@ -451,7 +451,7 @@ var CHALLENGE_TARGETS = {
 'stapu.html': 'Clear all squares in Stapu without a foot fault.',
 'moksha-patam.html': 'Reach the final square in Moksha Patam in one sitting.'
 };
-var DEFAULT_CHALLENGE_TARGET = 'Complete a full round without losing.';
+
 
 function playCount(href){ try{ return parseInt(localStorage.getItem('play_'+href) || '0', 10); }catch(e){ return 0; } }
 function lastPlayed(href){ try{ return parseInt(localStorage.getItem('last_'+href) || '0', 10); }catch(e){ return 0; } }
@@ -820,12 +820,19 @@ document.getElementById('featuredTagline').textContent = featuredExp.tagline;
 
 /* ---------- DAILY CHALLENGE ---------- */
 (function renderChallenge(){
-var challengeStart = (dayIndex + 5) % EXPERIENCES.length;
-var challengeExp = EXPERIENCES[challengeStart].href === featuredExp.href ? EXPERIENCES[(challengeStart+1)%EXPERIENCES.length] : EXPERIENCES[challengeStart];
+var challengePool = EXPERIENCES.filter(function(e){
+return e.discovery && e.discovery.dailyChallenge && CHALLENGE_TARGETS[e.href];
+});
+if (!challengePool.length){ document.getElementById('daily-challenge').hidden = true; return; }
+var challengeStart = Math.floor(Date.now()/86400000) % challengePool.length;
+var challengeExp = challengePool[challengeStart];
+if (challengePool.length > 1 && challengeExp.href === featuredExp.href){
+challengeExp = challengePool[(challengeStart + 1) % challengePool.length];
+}
 var done = false;
 try{ done = localStorage.getItem('challenge_'+todayStamp()) === challengeExp.href; }catch(e){}
 var banner = document.getElementById('challengeBanner');
-var targetText = CHALLENGE_TARGETS[challengeExp.href] || (challengeExp.title + ': ' + DEFAULT_CHALLENGE_TARGET);
+var targetText = CHALLENGE_TARGETS[challengeExp.href];
 banner.className = 'challenge-banner' + (done ? ' done' : '');
 banner.innerHTML = '<div class="challenge-icon">'+challengeExp.icon+'</div><div class="challenge-info"><p class="challenge-title">Today\'s Challenge</p><p class="challenge-target">'+targetText+'</p><span class="challenge-badge">\ud83c\udfc6 Daily Badge'+(done?' \u2014 Claimed today':'')+'</span></div><a class="btn-primary" href="'+challengeExp.href+'" id="challengePlayBtn">Play Challenge &rarr;</a>'+(done?'':'<button class="btn-secondary" id="challengeClaimBtn" type="button">I did it \u2014 Claim Badge</button>');
 document.getElementById('challengePlayBtn').addEventListener('click', function(){ bumpPlayCount(challengeExp.href); });

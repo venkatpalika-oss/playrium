@@ -49,7 +49,17 @@ See docs/PLAYRIUM-ORIGINALS-DESIGN-BIBLE.md for the full framework.
 
 ## Deployment
 
-Playrium deploys via GitHub Pages to playrium.fun (custom domain) and venkatpalika-oss.github.io/playrium.
+The `Deploy Playrium to Namecheap` workflow uploads `main` to Namecheap over SFTP. GitHub Pages also has a separate deployment; a successful Pages run does not verify the custom domain's Namecheap release.
+
+The workflow stages public files inside the shared workspace, uploads `.htaccess` explicitly, then checks the public commit marker and homepage over verified HTTPS. Documentation and tests are excluded from the Namecheap upload. Existing remote files are preserved.
+
+Recovery checks before merging deployment changes:
+- Verify SFTP access for the configured hosting account and port. The August 14, 2026 Namecheap run failed with `Permission denied`; code changes do not repair credentials. Update `FTP_PASSWORD` through GitHub's secure settings if required; never paste credentials into issues or chat.
+- Confirm the serving host and certificate coverage for both `playrium.fun` and `www.playrium.fun`. The redirect rules cannot repair a TLS certificate mismatch.
+- Confirm which hosting destination is production and retain a backup of its existing files before deployment.
+- After deployment, require the Namecheap workflow's public release check and a desktop/mobile smoke test; a green Pages run alone is insufficient.
+
+Run `node tests/maintenance.cjs` for the bounded maintenance regression checks.
 
 ## Analytics
 

@@ -20,6 +20,7 @@ var lastFocusedEl = null;
       + '.pr-nav-btn{font-family:var(--font-display,system-ui,sans-serif);background:none;border:none;color:rgba(244,240,230,.72);font-size:.88rem;font-weight:500;cursor:pointer;padding:0;}'
       + '.pr-nav-btn:hover{color:#f4f0e6;}'
       + '.pr-search-overlay{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-start;justify-content:center;background:rgba(5,5,10,.86);opacity:0;pointer-events:none;transition:opacity .3s ease;padding-top:8vh;}'
+      + '.pr-search-overlay[hidden]{display:none;}'
       + '.pr-search-overlay.active{opacity:1;pointer-events:auto;}'
       + '.pr-search-box{width:92%;max-width:560px;background:rgba(20,20,28,.96);border:1px solid rgba(244,240,230,.16);border-radius:1.2rem;padding:1.4rem;box-shadow:0 30px 70px rgba(0,0,0,.5);max-height:70vh;display:flex;flex-direction:column;}'
       + '.pr-search-input{width:100%;font-family:var(--font-display,system-ui,sans-serif);font-size:1.05rem;padding:.9rem 1.1rem;border-radius:.8rem;border:1px solid rgba(244,240,230,.16);background:rgba(255,255,255,.06);color:#f4f0e6;outline:none;box-sizing:border-box;}'
@@ -104,27 +105,30 @@ function exploreHref() { return 'experiences.html'; }
 
   function openSearch() {
 lastFocusedEl = document.activeElement;
+document.getElementById('prSearchOverlay').hidden = false;
 document.getElementById('prSearchOverlay').classList.add('active');
 document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'false');
 var input = document.getElementById('prSearchInput');
 input.value = '';
 document.getElementById('prSearchResults').innerHTML = '';
-setTimeout(function () { input.focus(); }, 50);
+input.focus();
 }
 
 function closeSearch() {
+if (document.getElementById('prSearchOverlay').hidden) return;
 document.getElementById('prSearchOverlay').classList.remove('active');
 document.getElementById('prSearchOverlay').setAttribute('aria-hidden', 'true');
 if (lastFocusedEl && typeof lastFocusedEl.focus === 'function') {
 lastFocusedEl.focus();
 }
 lastFocusedEl = null;
+document.getElementById('prSearchOverlay').hidden = true;
 }
 
 function getSearchFocusable() {
 var input = document.getElementById('prSearchInput');
 var results = Array.prototype.slice.call(document.querySelectorAll('#prSearchResults .pr-search-result-item'));
-return [input].concat(results);
+return [document.getElementById('prSearchClose'), input].concat(results);
 }
 
 function isTypingTarget(el) {
@@ -141,6 +145,7 @@ function goToRandom() {
 }
 
 function wireEvents() {
+  document.getElementById('prSearchClose').addEventListener('click', closeSearch);
   document.getElementById('prSearchInput').addEventListener('input', function () { renderSearchResults(this.value); });
   document.getElementById('prSearchOverlay').addEventListener('click', function (ev) { if (ev.target === this) closeSearch(); });
   document.addEventListener('keydown', function (ev) {
@@ -187,9 +192,10 @@ function render() {
       '<button class="pr-nav-btn" id="prNavRandomBtn" type="button">Random</button>' +
       '</div>' +
       '</nav>' +
-      '<div class="pr-search-overlay" id="prSearchOverlay" aria-hidden="true" role="dialog" aria-label="Search experiences">' +
+      '<div class="pr-search-overlay" id="prSearchOverlay" hidden aria-hidden="true" aria-modal="true" role="dialog" aria-label="Search experiences">' +
       '<div class="pr-search-box">' +
-      '<input class="pr-search-input" id="prSearchInput" type="text" placeholder="Search by title, country, tag, or mood…" autocomplete="off">' +
+      '<button class="pr-nav-btn" id="prSearchClose" type="button" aria-label="Close search">Close ×</button>' +
+      '<input class="pr-search-input" id="prSearchInput" aria-label="Search experiences" type="text" placeholder="Search by title, country, tag, or mood…" autocomplete="off">' +
       '<div class="pr-search-results" id="prSearchResults"></div>' +
       '</div>' +
       '</div>';
