@@ -1,13 +1,13 @@
-PLAYRIUM — COMPLETE 23-EXPERIENCE REVIEW
+PLAYRIUM — COMPLETE 26-EXPERIENCE REVIEW
 
 WINDOWS
 1. Right-click the downloaded ZIP and choose Extract All.
 2. Open the extracted folder. Do not open an HTML file inside the ZIP.
-3. Double-click experiences.html to browse all 23 experiences.
+3. Double-click experiences.html to browse all 26 experiences.
 4. Keep components/ and all other folders beside the HTML files.
 
-This package contains the ten rebuilt games and the thirteen newly styled
-experiences. It is a review build. It does not change the live website.
+Start with puli-meka.html, fukuwarai.html or patintero.html.
+This package contains three new games plus the existing 23 experiences. It is a review build. It does not change the live website.
 
 If a game appears as plain black text on white, its styles/scripts are missing:
 extract the complete archive rather than copying one HTML file.

@@ -6,6 +6,9 @@
  */
 (function () {
   var EXPERIENCES = [
+{"slug": "puli-meka", "title": "Puli Meka", "tagline": "Tigers hunt. Goats outthink.", "href": "puli-meka.html", "country": "India", "flag": "🇮🇳", "accent": "#b9dbc7", "icon": "🐯", "tags": ["strategy", "traditional"], "moods": ["mind"], "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "fukuwarai", "title": "Fukuwarai", "tagline": "A face worth remembering.", "href": "fukuwarai.html", "country": "Japan", "flag": "🇯🇵", "accent": "#b9dbc7", "icon": "🎭", "tags": ["puzzle", "traditional"], "moods": ["mind", "family"], "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "patintero", "title": "Patintero", "tagline": "Read the line. Find your opening.", "href": "patintero.html", "country": "Philippines", "flag": "🇵🇭", "accent": "#b9dbc7", "icon": "🏃", "tags": ["skill", "traditional"], "moods": ["physics", "family"], "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
     {
       "slug": "gully-cricket",
       "title": "Gully Cricket™",

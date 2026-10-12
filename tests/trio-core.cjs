@@ -1,0 +1,8 @@
+const a=require('node:assert/strict'),C=require('../components/trio-core');
+let s=C.newHunt();a.equal(C.moves(s).length,22);a.equal(C.huntMove(s,{from:-1,to:0}),s);s=C.huntMove(s,{from:-1,to:1});a.equal(s.placed,1);a.equal(s.turn,'T');let jump=C.moves(s).find(m=>m.from===0&&m.to===2);a.equal(jump.capture,1);s=C.huntMove(s,jump);a.equal(s.caught,1);a.equal(s.b[1],'');a.equal(s.b[2],'T');
+s={...C.newHunt(),b:Array(25).fill(''),turn:'T',caught:4};s.b[0]='T';s.b[1]='G';a.equal(C.huntMove(s,{from:0,to:2}).winner,'T');
+s={...C.newHunt(),b:Array(25).fill('G'),turn:'G',placed:14};s.b[0]='T';s.b[4]='T';s.b[22]='T';s.b[12]='';a.equal(C.huntMove(s,{from:-1,to:12}).winner,'G');
+for(const hard of [false,true]){s=C.newHunt();while(!s.winner)s=C.huntMove(s,C.ai(s,hard));a.ok(['G','T','draw'].includes(s.winner));a.ok(s.moves<=160);}
+a.equal(C.faceScore([{x:0,y:0}],[{x:0,y:0}]),100);a.equal(C.faceScore([{x:0,y:0}],[{x:500,y:500}]),0);
+s=C.newRun();s.y=40;C.stepRun(s,.01,0,0);a.equal(s.back,true);a.equal(s.score,100);s.y=450;C.stepRun(s,.01,0,0);a.equal(s.status,'cleared');a.ok(s.score>=359);s=C.newRun(3);s.back=true;C.stepRun(s,.01,0,0);a.equal(s.status,'won');s=C.newRun();s.time=.001;C.stepRun(s,.01,0,0);a.equal(s.status,'lost');s=C.newRun();s.x=240;s.y=130;C.stepRun(s,.001,0,0);a.equal(s.lives,2);C.stepRun(s,.001,0,0);a.equal(s.lives,2);a.ok(s.inv>0);
+let x=C.newRun(),y=C.newRun();for(let i=0;i<120;i++)C.stepRun(x,1/120,1,0);for(let i=0;i<60;i++)C.stepRun(y,1/60,1,0);a.ok(Math.abs(x.x-y.x)<1e-8);a.ok(Math.abs(x.time-y.time)<1e-8);console.log('PASS: hunt legal placement, capture, both wins, AI termination; face score; patrol progression, victory, time, collision immunity and timing parity');
