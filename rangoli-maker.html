@@ -115,6 +115,8 @@
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
 <body class="pr-game pr-craft" data-experience="rangoli-maker" style="--game-accent:#ff9eca">
 <header id="site-header"></header>
@@ -209,6 +211,7 @@
   var bgCtx = bgCanvas.getContext('2d');
 
   function resize(){
+    var saved=document.createElement('canvas');saved.width=canvas.width;saved.height=canvas.height;saved.getContext('2d').drawImage(canvas,0,0);
     var r = canvas.getBoundingClientRect();
     W = r.width; H = r.height;
     canvas.width = W*DPR; canvas.height = H*DPR;
@@ -216,6 +219,7 @@
     bgCanvas.width = W*DPR; bgCanvas.height = H*DPR;
     bgCtx.setTransform(DPR,0,0,DPR,0,0);
     center.x = W/2; center.y = H/2;
+    if(saved.width&&saved.height){var factor=Math.min(W*DPR/saved.width,H*DPR/saved.height);var sw=saved.width/DPR*factor,sh=saved.height/DPR*factor;ctx.drawImage(saved,0,0,saved.width,saved.height,(W-sw)/2,(H-sh)/2,sw,sh);}
     drawGuides();
   }
   window.addEventListener('resize', resize);
@@ -229,7 +233,7 @@
   colors.forEach(function(c, i){
     var b = document.createElement('button');
     b.className = 'swatch' + (i===0?' active':'');
-    b.style.background = c;
+    b.style.background = c;b.setAttribute('aria-label','Choose colour '+c);
     b.addEventListener('click', function(){
       activeColor = c;
       Array.prototype.forEach.call(colorRow.children, function(el){ el.classList.remove('active'); });
@@ -272,17 +276,17 @@
   });
 
   function drawGuides(){
-    ctx.save();
-    ctx.strokeStyle = 'rgba(244,196,99,0.18)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, Math.min(W,H)*0.44, 0, Math.PI*2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(center.x, center.y, 4, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(244,196,99,0.4)';
-    ctx.fill();
-    ctx.restore();
+    bgCtx.save();
+    bgCtx.strokeStyle = 'rgba(244,196,99,0.18)';
+    bgCtx.lineWidth = 1;
+    bgCtx.beginPath();
+    bgCtx.arc(center.x, center.y, Math.min(W,H)*0.44, 0, Math.PI*2);
+    bgCtx.stroke();
+    bgCtx.beginPath();
+    bgCtx.arc(center.x, center.y, 4, 0, Math.PI*2);
+    bgCtx.fillStyle = 'rgba(244,196,99,0.4)';
+    bgCtx.fill();
+    bgCtx.restore();
   }
 
   function drawShape(x, y, angle, color, shape){
@@ -355,7 +359,7 @@
 
   var drawing = false, lastStamp = 0;
   canvas.addEventListener('pointerdown', function(e){
-    drawing = true;
+    canvas.setPointerCapture(e.pointerId);drawing = true;
     var r = canvas.getBoundingClientRect();
     stampAt(e.clientX-r.left, e.clientY-r.top);
   });
@@ -368,6 +372,8 @@
     stampAt(e.clientX-r.left, e.clientY-r.top);
   });
   window.addEventListener('pointerup', function(){ drawing = false; });
+canvas.addEventListener('pointercancel',function(){drawing=false;});
+canvas.addEventListener('lostpointercapture',function(){drawing=false;});
 
   /* ---- ambient background: diyas + drifting petals ---- */
   var petals = [];
@@ -435,6 +441,7 @@
     if (W===0) return;
 
     bgCtx.clearRect(0,0,W,H);
+    drawGuides();
 
     drawDiya(38, H-30, now);
     drawDiya(W-38, H-30, now);
@@ -463,5 +470,6 @@
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
 <script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

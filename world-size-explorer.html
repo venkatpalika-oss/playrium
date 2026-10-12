@@ -136,6 +136,8 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
 <body class="pr-game pr-classic" data-experience="world-size-explorer" style="--game-accent:#80d4fa">
 <header id="site-header"></header>
@@ -209,10 +211,10 @@ const resetBtn = document.getElementById('resetBtn');
 
 function resizeCanvases(){
   [globeCanvas, mainCanvas].forEach(c=>{
-    c.width = window.innerWidth*devicePixelRatio;
-    c.height = window.innerHeight*devicePixelRatio;
-    c.style.width = window.innerWidth+'px';
-    c.style.height = window.innerHeight+'px';
+    c.width = PlayriumSurface.width*devicePixelRatio;
+    c.height = PlayriumSurface.height*devicePixelRatio;
+    c.style.width = PlayriumSurface.width+'px';
+    c.style.height = PlayriumSurface.height+'px';
     c.getContext('2d').setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
   });
 }
@@ -403,7 +405,7 @@ function renderShelf(){
     const el = document.createElement('div');
     el.className = 'shelf-item';
     el.innerHTML = `<div class="flag">${e.flag}</div><div class="label">${e.name}</div><div class="area">${formatArea(e.area)}</div>`;
-    el.dataset.id = e.id;
+    el.dataset.id = e.id;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','Compare '+e.name);el.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();placeOnBoard(e,PlayriumSurface.width*.55,PlayriumSurface.height*.45);boardHint.classList.add('hidden');}});
     el.addEventListener('pointerdown', ev=> startDrag(ev, e));
     shelf.appendChild(el);
   });
@@ -462,7 +464,7 @@ function placeOnBoard(entry, x, y){
 function checkDelight(entry){
   if(entry.delight){
     setTimeout(()=>{
-      spawnEmojiPop(entry.__lastX||window.innerWidth/2, entry.__lastY||window.innerHeight/2, entry.delight);
+      spawnEmojiPop(entry.__lastX||PlayriumSurface.width/2, entry.__lastY||PlayriumSurface.height/2, entry.delight);
       if(entry.id==='vatican') showToast("That's... the whole country. 😄");
     }, 250);
   }
@@ -481,15 +483,15 @@ let dragPos = {x:0,y:0};
 function startDrag(e, entry){
   e.preventDefault();
   Sound.lift();
-  entry.__lastX = e.clientX; entry.__lastY = e.clientY;
-  dragging = { entry, tok: { entry, x:e.clientX, y:e.clientY, scale:1 } };
-  dragPos = { x:e.clientX, y:e.clientY };
+  entry.__lastX = PlayriumSurface.point(e).x; entry.__lastY = PlayriumSurface.point(e).y;
+  dragging = { entry, tok: { entry, x:PlayriumSurface.point(e).x, y:PlayriumSurface.point(e).y, scale:1 } };
+  dragPos = { x:PlayriumSurface.point(e).x, y:PlayriumSurface.point(e).y };
   boardHint.classList.add('hidden');
-  const move = ev=>{ dragPos = {x:ev.clientX,y:ev.clientY}; entry.__lastX=ev.clientX; entry.__lastY=ev.clientY; };
+  const move = ev=>{ dragPos = {x:PlayriumSurface.point(ev).x,y:PlayriumSurface.point(ev).y}; entry.__lastX=PlayriumSurface.point(ev).x; entry.__lastY=PlayriumSurface.point(ev).y; };
   const up = ev=>{
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', up);
-    finishDrag(ev.clientX, ev.clientY);
+    finishDrag(PlayriumSurface.point(ev).x, PlayriumSurface.point(ev).y);
   };
   window.addEventListener('pointermove', move);
   window.addEventListener('pointerup', up);
@@ -517,13 +519,13 @@ function hitTestBoard(x,y){
 }
 mainCanvas.addEventListener('pointerdown', e=>{
   if(state!=='main' || dragging) return;
-  const hit = hitTestBoard(e.clientX, e.clientY);
+  const hit = hitTestBoard(PlayriumSurface.point(e).x, PlayriumSurface.point(e).y);
   if(!hit) return;
   selectedTok = hit;
   selectedTok.dragging = true;
   Sound.lift();
   boardHint.classList.add('hidden');
-  const move = ev=>{ selectedTok.x = ev.clientX; selectedTok.y = ev.clientY; };
+  const move = ev=>{ selectedTok.x = PlayriumSurface.point(ev).x; selectedTok.y = PlayriumSurface.point(ev).y; };
   const up = ()=>{
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', up);
@@ -677,7 +679,7 @@ let stars = [];
 for(let i=0;i<50;i++){ stars.push({ x:Math.random(), y:Math.random()*0.4, tw:Math.random()*Math.PI*2 }); }
 
 function drawScene(dt, now){
-  const w = window.innerWidth, h = window.innerHeight;
+  const w = PlayriumSurface.width, h = PlayriumSurface.height;
   const bg = mctx.createLinearGradient(0,0,0,h);
   bg.addColorStop(0,'#050a16'); bg.addColorStop(0.5,'#0d1a33'); bg.addColorStop(1,'#0f2540');
   mctx.fillStyle = bg;
@@ -743,7 +745,7 @@ for(let i=0;i<10;i++){
 let globeHoverTilt = 0;
 
 function drawGlobe(dt, now){
-  const w = window.innerWidth, h = window.innerHeight;
+  const w = PlayriumSurface.width, h = PlayriumSurface.height;
   gctx.clearRect(0,0,w,h);
   gctx.fillStyle = '#050a16';
   gctx.fillRect(0,0,w,h);
@@ -796,8 +798,8 @@ function drawGlobe(dt, now){
 /* hover-lean on the globe before Start (wordless "it noticed you" tell) */
 window.addEventListener('mousemove', e=>{
   if(state!=='globe') return;
-  const cx = window.innerWidth*0.5, cy=window.innerHeight*0.42;
-  const dx = e.clientX-cx;
+  const cx = PlayriumSurface.width*0.5, cy=PlayriumSurface.height*0.42;
+  const dx = PlayriumSurface.point(e).x-cx;
   globeHoverTilt = dx*0.00004;
 });
 
@@ -827,5 +829,6 @@ startBtn.addEventListener('click', ()=>{
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
 <script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

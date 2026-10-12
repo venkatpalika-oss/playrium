@@ -369,6 +369,8 @@ html,body{
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
 <body class="pr-game pr-classic" data-experience="gully-cricket" style="--game-accent:#ffca71">
 <header id="site-header"></header>
@@ -618,12 +620,12 @@ const px = [
 ];
 let targetX = 0, targetY = 0, curX = 0, curY = 0;
 function onPointerMove(x, y){
-  const nx = (x / window.innerWidth - 0.5) * 2;
-  const ny = (y / window.innerHeight - 0.5) * 2;
+  const nx = (x / PlayriumSurface.width - 0.5) * 2;
+  const ny = (y / PlayriumSurface.height - 0.5) * 2;
   targetX = nx; targetY = ny;
 }
-window.addEventListener('mousemove', e => onPointerMove(e.clientX, e.clientY));
-window.addEventListener('touchmove', e => { if(e.touches[0]) onPointerMove(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
+window.addEventListener('mousemove', e => onPointerMove(PlayriumSurface.point(e).x, PlayriumSurface.point(e).y));
+window.addEventListener('touchmove', e => { if(e.touches[0]) onPointerMove(PlayriumSurface.point(e.touches[0]).x, PlayriumSurface.point(e.touches[0]).y); }, {passive:true});
 
 function parallaxTick(){
   curX += (targetX - curX) * 0.06;
@@ -1018,5 +1020,6 @@ replayBtn.addEventListener('click', ()=>{ Sound.click(); startGame(); });
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
 <script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

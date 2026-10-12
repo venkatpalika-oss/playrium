@@ -106,7 +106,7 @@
     return tag === 'input' || tag === 'textarea' || (el && el.isContentEditable);
   }
   document.addEventListener('keydown', function (ev) {
-    if (isTypingTarget(ev.target)) return;
+    if (isTypingTarget(ev.target) || !mount.contains(ev.target)) return;
     if (ev.key === 'ArrowLeft') { location.href = prev.href; }
     else if (ev.key === 'ArrowRight') { location.href = next.href; }
   });

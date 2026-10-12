@@ -138,6 +138,8 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
 <body class="pr-game pr-classic" data-experience="hydraulic-press-lab" style="--game-accent:#b7c4df">
 <header id="site-header"></header>
@@ -208,10 +210,10 @@ const muteBtn = document.getElementById('muteBtn');
 const toast = document.getElementById('toast');
 
 function resize(){
-  canvas.width = window.innerWidth*devicePixelRatio;
-  canvas.height = window.innerHeight*devicePixelRatio;
-  canvas.style.width = window.innerWidth+'px';
-  canvas.style.height = window.innerHeight+'px';
+  canvas.width = PlayriumSurface.width*devicePixelRatio;
+  canvas.height = PlayriumSurface.height*devicePixelRatio;
+  canvas.style.width = PlayriumSurface.width+'px';
+  canvas.style.height = PlayriumSurface.height+'px';
   ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
 }
 resize();
@@ -264,7 +266,7 @@ function renderShelf(){
     const el = document.createElement('div');
     el.className = 'shelf-item';
     el.innerHTML = `<div class="emoji">${o.emoji}</div><div class="label">${o.label}</div>`;
-    el.dataset.id = o.id;
+    el.dataset.id = o.id;el.tabIndex=0;el.setAttribute('role','button');el.setAttribute('aria-label','Place '+o.label);el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();placeObject(o);}});
     el.addEventListener('pointerdown', e=> startDrag(e, o, el));
     shelf.appendChild(el);
   });
@@ -315,9 +317,9 @@ function checkMilestones(obj){
    ============================================================ */
 let padX, padY, padW;
 function layout(){
-  padX = window.innerWidth*0.5;
-  padY = window.innerHeight*0.62;
-  padW = Math.min(window.innerWidth,window.innerHeight)*0.16;
+  padX = PlayriumSurface.width*0.5;
+  padY = PlayriumSurface.height*0.62;
+  padW = Math.min(PlayriumSurface.width,PlayriumSurface.height)*0.16;
 }
 layout();
 window.addEventListener('resize', layout);
@@ -362,8 +364,8 @@ function startDrag(e, def, el){
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerup', up);
     dragGhost.remove(); dragGhost=null;
-    const dist = Math.hypot(ev.clientX-padX, ev.clientY-padY);
-    if(dist < padW*1.8 || ev.clientY > window.innerHeight*0.3){
+    const dist = Math.hypot(PlayriumSurface.point(ev).x-padX, PlayriumSurface.point(ev).y-padY);
+    if(dist < padW*1.8 || PlayriumSurface.point(ev).y > PlayriumSurface.height*0.3){
       placeObject(dragDef);
     }
   };
@@ -380,6 +382,8 @@ pressBtn.addEventListener('pointerdown', ()=>{
 function stopPress(){ pressing=false; pressBtn.classList.remove('pressing'); }
 window.addEventListener('pointerup', stopPress);
 window.addEventListener('pointercancel', stopPress);
+pressBtn.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!e.repeat&&placedObject&&!placedObject.crushed){e.preventDefault();pressing=true;pressBtn.classList.add('pressing');}});
+pressBtn.addEventListener('keyup',stopPress);pressBtn.addEventListener('blur',stopPress);window.addEventListener('blur',stopPress);
 
 slowmoToggle.addEventListener('click', ()=>{
   slowmoManual = !slowmoManual;
@@ -471,7 +475,7 @@ function triggerCrush(){
    ============================================================ */
 let gaugePressure = 0;
 function drawWorkshop(dt){
-  const w = window.innerWidth, h = window.innerHeight;
+  const w = PlayriumSurface.width, h = PlayriumSurface.height;
   const bg = ctx.createLinearGradient(0,0,0,h);
   bg.addColorStop(0,'#221c17'); bg.addColorStop(0.6,'#2b2420'); bg.addColorStop(1,'#181310');
   ctx.fillStyle = bg;
@@ -492,11 +496,11 @@ function drawWorkshop(dt){
 
 function drawPress(dt){
   const colX1 = padX - padW*1.5, colX2 = padX + padW*1.5;
-  const topY = padY - window.innerHeight*0.34;
+  const topY = padY - PlayriumSurface.height*0.34;
   const baseY = padY + padW*0.5;
   const baseTopY = padY; // fixed surface the object rests on — never moves
   const plateThickness = 18;
-  const baseSize = Math.min(window.innerWidth, window.innerHeight)*0.09;
+  const baseSize = Math.min(PlayriumSurface.width, PlayriumSurface.height)*0.09;
 
   // columns
   ctx.fillStyle = '#7a838a';
@@ -582,7 +586,7 @@ function drawGauge(x,y,val){
 
 function drawObject(obj, cx, baseTopY, squashY, squashX){
   const def = obj.def;
-  const baseSize = Math.min(window.innerWidth, window.innerHeight)*0.09;
+  const baseSize = Math.min(PlayriumSurface.width, PlayriumSurface.height)*0.09;
   // anchor the object's BOTTOM to the fixed base plate; it compresses upward from there,
   // so the top surface moves down toward the base as it gets squeezed — never floats free of the plate.
   const bottomY = baseTopY;
@@ -679,5 +683,6 @@ startBtn.addEventListener('click', ()=>{
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
 <script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

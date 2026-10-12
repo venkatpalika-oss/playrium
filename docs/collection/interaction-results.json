@@ -1,0 +1,39 @@
+[
+  {
+    "slug": "cloud-painter",
+    "checks": [
+      "hide/show tools",
+      "PNG download",
+      "arrows stay on page"
+    ]
+  },
+  {
+    "slug": "rangoli-maker",
+    "checks": [
+      "touch stamps",
+      "resize retains artwork",
+      "PNG download"
+    ]
+  },
+  {
+    "slug": "spend-crore",
+    "checks": [
+      "five rapid purchases debit 75 Cr exactly"
+    ]
+  },
+  {
+    "slug": "hydraulic-press-lab",
+    "checks": [
+      "keyboard place",
+      "hold Space crush",
+      "discovery log increments"
+    ]
+  },
+  {
+    "slug": "world-size-explorer",
+    "checks": [
+      "Enter and Space place two countries",
+      "discovery count"
+    ]
+  }
+]

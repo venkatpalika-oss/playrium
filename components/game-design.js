@@ -12,7 +12,7 @@
     'balloon-bazaar': ['Discovery toy', 'A night market full of little surprises.', 'Pop the start balloon, then tap balloons in the scene. Open the almanac to revisit your discoveries.', 'Explore at your own pace. There is no need to race through the surprises.'],
     'spend-crore': ['Money sandbox', 'A very big budget. Your decisions.', 'Start Spending, choose a category, and buy items within your remaining balance.', 'Watch the balance change and switch to the world view to see your purchases.'],
     'hydraulic-press-lab': ['Physics sandbox', 'Choose an object. Discover its breaking point.', 'Enter the lab, pick an object from the shelf, then hold the press control.', 'Try different materials and inspect the crush log. Use slow motion to study the result.'],
-    'world-size-explorer': ['Scale explorer', 'Put the world into perspective.', 'Start Exploring, choose objects from the shelf, and move them onto the comparison board.', 'Compare familiar objects at surprising scales. Reset lets you build a fresh comparison.'],
+    'world-size-explorer': ['Scale explorer', 'Put the world into perspective.', 'Start Exploring, choose countries from the shelf, and move them onto the comparison board.', 'Compare country areas at the same scale. Reset lets you build a fresh comparison.'],
     'moksha-patam': ['Traditional board game', 'Every climb has a story.', 'Select Roll Dice and watch your piece travel across the board.', 'Reach the end through ladders and snakes. Play again to try a different journey.'],
     'pie-break': ['Aim & release', 'Ten slices. Find your perfect throw.', 'Pull back the stone and release to throw it toward the ring.', 'Clear all ten slices in as few throws as possible.'],
     'seven-stones': ['Against the clock', 'Knock it down. Build it back.', 'Throw the ball to scatter the stack. Drag each stone back into the circle.', 'Rebuild all seven stones before the timer runs out.'],
@@ -86,7 +86,7 @@
   document.addEventListener('keydown',e=>{
     if(!['Space','ArrowLeft','ArrowRight'].includes(e.code)) return;
     if(dialog.open || !stage.contains(e.target) || e.target.closest('button,input,select,a,[role="button"]')) e.stopPropagation();
-  },true);
+  });
   stage.addEventListener('click',e=>{
     if(e.target.closest('#startBtn,#playBtn,#againBtn,#replayBtn,#restartBtn,#playMarbleWrap,#playBalloonWrap')) {
       queueMicrotask(()=>stage.focus({preventScroll:true}));
