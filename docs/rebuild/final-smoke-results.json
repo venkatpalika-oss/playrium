@@ -1,0 +1,72 @@
+[
+  {
+    "slug": "daruma-drop",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "goldfish-scoop",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "sensu-spinner",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "koinobori-festival",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "sungka-streak",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "tinikling-tempo",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "parol-glow",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "jeepney-jam",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "matka-mania",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  },
+  {
+    "slug": "gravity-playground",
+    "width": 390,
+    "passed": true,
+    "keyboardNavigationSafe": true,
+    "touchScene": true
+  }
+]

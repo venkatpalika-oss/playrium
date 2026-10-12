@@ -20,7 +20,7 @@ const context={window:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'com
    const ctx=await browser.newContext({viewport,hasTouch:viewport.width<500,isMobile:viewport.width<500,deviceScaleFactor:viewport.width<500?2:1});
    const page=await ctx.newPage();page.setDefaultTimeout(10000);
    await page.route(/https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
-   for(const e of context.window.PLAYRIUM_EXPERIENCES.filter(e=>!process.env.PLAYRIUM_GAMES||process.env.PLAYRIUM_GAMES.split(',').includes(e.slug))){
+   for(const e of context.window.PLAYRIUM_EXPERIENCES.filter(e=>!require('../components/rebuild-core.js').configs[e.slug]).filter(e=>!process.env.PLAYRIUM_GAMES||process.env.PLAYRIUM_GAMES.split(',').includes(e.slug))){
     const errors=[];const handler=error=>errors.push(error.message);page.on('pageerror',handler);
     await page.goto(`http://127.0.0.1:${server.address().port}/${e.href}`,{waitUntil:'domcontentloaded'});
     await page.locator('.pr-game-intro').waitFor();

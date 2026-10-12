@@ -1,3 +1,5 @@
+> Superseded for ten games by [the new gameplay rebuild](../rebuild/README.md). Earlier reports below describe the previous draft, not the current replacement engines.
+
 # Collection interface redesign — review branch
 
 Owner request: redesign all Playrium games because the build quality is unsatisfactory.

@@ -1,3 +1,5 @@
+> Superseded for ten games by [the new gameplay rebuild](../rebuild/README.md). Earlier reports below describe the previous draft, not the current replacement engines.
+
 # Smoothness and timing follow-up
 
 The owner requested smoother gameplay and improved timing. This change focuses on the eight arcade games where the rendering/timing implementation is shared.
