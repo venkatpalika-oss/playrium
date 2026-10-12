@@ -42,6 +42,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#241608;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 <body class="pr-game pr-arcade" data-experience="sensu-spinner" style="--game-accent:#ffbfda">
 <header id="site-header"></header>
@@ -78,6 +79,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#241608;
 </section>
 <script>
 (function(){
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -220,8 +222,8 @@ function updateFan(dt){
 var f = dt/16.6;
 prevPX = fan.x; prevPY = fan.y;
 if(pointerActive){
-fan.x += (pointerX-fan.x)*Math.min(0.35*f,1);
-fan.y += (pointerY-fan.y)*Math.min(0.35*f,1);
+fan.x += (pointerX-fan.x)*PlayriumTiming.blend(0.35,dt);
+fan.y += (pointerY-fan.y)*PlayriumTiming.blend(0.35,dt);
 }
 var dx = fan.x-prevPX, dy = fan.y-prevPY;
 var speed = Math.sqrt(dx*dx+dy*dy)/Math.max(f,0.001);
@@ -302,8 +304,8 @@ var f = dt/16.6;
 var bx = basketX(), by = basketY();
 petals.forEach(function(p){
 if(p.resolved) return;
-if(p.windTimer>0){ p.windTimer -= dt; p.vx *= 0.985; }
-else { p.vx *= 0.96; p.vx += Math.sin(p.y*0.02)*0.01*f; }
+if(p.windTimer>0){ p.windTimer -= dt; p.vx *= Math.pow(0.985,f); }
+else { p.vx *= Math.pow(0.96,f); p.vx += Math.sin(p.y*0.02)*0.01*f; }
 p.vy = Math.min(p.vy+0.002*f, 1.6);
 p.x += p.vx*f;
 p.y += p.vy*f;
@@ -440,6 +442,8 @@ drawFan();
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
 if(lastTime===null) lastTime = ts;
 var delta = ts-lastTime; lastTime = ts;
 if(delta>50) delta=50;

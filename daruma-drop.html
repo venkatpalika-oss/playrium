@@ -42,6 +42,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0f2e;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
   <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 
   <body class="pr-game pr-arcade" data-experience="daruma-drop" style="--game-accent:#ff979e">
@@ -82,6 +83,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0f2e;
   (function(){
   var Engine = Matter.Engine, World = Matter.World, Bodies = Matter.Bodies, Body = Matter.Body, Vertices = Matter.Vertices;
 
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -618,9 +620,9 @@ function updatePhysics(delta){
   }
 }
 
-function updateCameraEffects(){
-    shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
-  zoomPunch *= 0.9; if(zoomPunch<0.005) zoomPunch=0;
+function updateCameraEffects(delta){
+    shakeMag *= Math.pow(0.88, delta/(1000/60)); if(shakeMag<0.02) shakeMag=0;
+  zoomPunch *= Math.pow(0.9, delta/(1000/60)); if(zoomPunch<0.005) zoomPunch=0;
 }
 
 function render(){
@@ -647,12 +649,14 @@ function render(){
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
     if(lastTime===null) lastTime = ts;
   var delta = ts-lastTime; lastTime = ts;
   if(delta>50) delta=50;
   updateParticles(delta);
   if(state==="playing"||state==="settling"){ updatePhysics(delta); }
-  updateCameraEffects();
+  updateCameraEffects(delta);
   render();
   requestAnimationFrame(loop);
 }

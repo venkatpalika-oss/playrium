@@ -26,8 +26,10 @@ const context={window:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'com
     await page.locator('.pr-game-intro').waitFor();
     await page.getByRole('button',{name:'How to play',exact:true}).click();
     assert.equal(await page.locator('.pr-game-help').evaluate(e=>e.open),true);
+    assert.ok(await page.evaluate(()=>!window.PlayriumGameClock||window.PlayriumGameClock.paused),'help must pause the gameplay clock');
     await page.keyboard.press('Escape');assert.equal(await page.locator('.pr-game-help').evaluate(e=>e.open),false);
     assert.equal(await page.getByRole('button',{name:'How to play',exact:true}).evaluate(e=>e===document.activeElement),true);
+    await page.waitForFunction(()=>!window.PlayriumGameClock||!window.PlayriumGameClock.paused,{},{timeout:2000});
     await page.getByRole('button',{name:'Play area ↓',exact:true}).click();
     const stage=page.locator('#hero,#stageWrap');
     await page.screenshot({animations:'disabled',path:`${output}/${e.slug}-${viewport.width}.png`});

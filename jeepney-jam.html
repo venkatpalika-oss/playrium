@@ -42,6 +42,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0a1a18;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 
 <body class="pr-game pr-arcade" data-experience="jeepney-jam" style="--game-accent:#ffa686">
@@ -80,6 +81,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0a1a18;
 <script>
 (function(){
 
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -399,7 +401,7 @@ var speed = speedFor(fares);
 roadOffset += speed*(dt/16.6)*4;
 if(invuln>0) invuln -= dt;
 
-jeepX += (laneX[laneIndex]-jeepX)*0.25;
+jeepX += (laneX[laneIndex]-jeepX)*PlayriumTiming.blend(0.25,dt);
 
 spawnTimer -= dt;
 if(spawnTimer<=0){
@@ -429,11 +431,13 @@ if(e.y>H+80){ entities.splice(i,1); }
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
 if(lastTime===null) lastTime=ts;
 var delta = ts-lastTime; lastTime=ts;
 if(delta>50) delta=50;
 updateParticles(delta);
-shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
+shakeMag *= Math.pow(0.88, delta/(1000/60)); if(shakeMag<0.02) shakeMag=0;
 updatePhysics(delta);
 render();
 requestAnimationFrame(loop);

@@ -49,3 +49,7 @@ Keep this branch unmerged until the owner reviews the new direction. Then inspec
 Screenshots: [Daruma desktop](daruma-desktop.webp), [Cricket mobile](cricket-mobile.webp). Machine-readable startup results: `browser-results.json` and `focused-results.json`.
 
 For a local review, serve the repository with `python -m http.server 8000`, open `http://localhost:8000/experiences.html`, and select a game. Do not upload the review ZIP as a production deployment without reviewing the branch.
+
+## Smoothness follow-up
+
+See [TIMING.md](TIMING.md) for the subsequent eight-game timing changes and their scope. Run `node tests/game-timing.cjs` for the frame-rate, pause and input-window regressions. The follow-up retains the same draft PR and does not authorize deployment.

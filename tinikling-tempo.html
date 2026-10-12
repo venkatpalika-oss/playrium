@@ -42,6 +42,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0d10;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 
 <body class="pr-game pr-arcade" data-experience="tinikling-tempo" style="--game-accent:#e8d68f">
@@ -80,6 +81,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0d10;
 <script>
 (function(){
 
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -232,7 +234,7 @@ ctx.fillRect(0, H*0.66, W, H*0.34);
 }
 
 function poleGap(){
-var now = performance.now();
+var now = gameClock.now();
 var timeToClap = legDuration-(now-legStart);
 var closeThreshold = 260;
 var maxGap = Math.min(W*0.22, 130);
@@ -256,7 +258,7 @@ ctx.restore();
 }
 
 function drawDancer(){
-var now = performance.now();
+var now = gameClock.now();
 var baseY = H*0.62;
 var x = W/2;
 var offsetY = 0;
@@ -340,7 +342,7 @@ function doJump(){
 if(state!=="playing") return;
 if(!jumping){
 jumping = true;
-jumpStart = performance.now();
+jumpStart = gameClock.now();
 tone(600,0.08,"triangle",0.12);
 }
 }
@@ -398,28 +400,31 @@ overlay.classList.remove("hidden");
 
 function updatePhysics(ts){
 if(state!=="playing") return;
-if(jumping && ts-jumpStart>=JUMP_DURATION){ jumping=false; }
-if(!clapProcessed && ts>=legStart+legDuration){
+var clapTime=legStart+legDuration;
+if(!clapProcessed && ts>=clapTime){
 clapProcessed = true;
-if(jumping){ onDodge(); } else { onCaught(); }
-if(state==="playing"){ startCycle(ts); }
+if(jumpStart<=clapTime && clapTime-jumpStart<JUMP_DURATION && jumping){ onDodge(); } else { onCaught(); }
+if(state==="playing"){ startCycle(clapTime); }
 }
+if(jumping && ts-jumpStart>=JUMP_DURATION){ jumping=false; }
 }
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
 if(lastTime===null) lastTime=ts;
 var delta = ts-lastTime; lastTime=ts;
 if(delta>50) delta=50;
 updateParticles(delta);
-shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
+shakeMag *= Math.pow(0.88, delta/(1000/60)); if(shakeMag<0.02) shakeMag=0;
 updatePhysics(ts);
 render();
 requestAnimationFrame(loop);
 }
 
 canvas.addEventListener("pointerdown", function(){ doJump(); });
-window.addEventListener("keydown", function(e){ if(e.code==="Space"){ e.preventDefault(); doJump(); } });
+window.addEventListener("keydown", function(e){ if(e.code==="Space" && !e.repeat){ e.preventDefault(); doJump(); } });
 
 overlay = document.getElementById("overlay");
 overlayText = document.getElementById("overlayText");
@@ -432,14 +437,14 @@ ensureAudio();
 if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
 overlay.classList.add("hidden");
 resetRound();
-startCycle(performance.now());
+startCycle(gameClock.now());
 state = "playing";
 });
 restartBtn.addEventListener("click", function(){
 ensureAudio();
 if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
 resetRound();
-startCycle(performance.now());
+startCycle(gameClock.now());
 state = "playing";
 overlay.classList.add("hidden");
 });

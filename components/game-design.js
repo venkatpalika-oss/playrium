@@ -78,9 +78,9 @@
   const dialogTitle=el('h2','',title); dialogTitle.id='pr-help-title';
   const close=el('button','','Got it'); close.type='button';
   dialog.append(dialogTitle,el('p','',brief[2]),el('p','',brief[3]),close); document.body.append(dialog);
-  help.addEventListener('click',()=>dialog.showModal());
+  help.addEventListener('click',()=>{if(window.PlayriumGameClock)window.PlayriumGameClock.pause('help');dialog.showModal();});
   close.addEventListener('click',()=>dialog.close());
-  dialog.addEventListener('close',()=>help.focus({preventScroll:true}));
+  dialog.addEventListener('close',()=>{if(window.PlayriumGameClock)window.PlayriumGameClock.resume('help');help.focus({preventScroll:true});});
   enter.addEventListener('click',()=>{stage.scrollIntoView({block:'start',behavior:'instant'});stage.focus({preventScroll:true});});
   // A toolbar key must not also swing, jump, or steer the game behind it.
   document.addEventListener('keydown',e=>{

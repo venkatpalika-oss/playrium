@@ -42,6 +42,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0f0a1e;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 
 <body class="pr-game pr-arcade" data-experience="parol-glow" style="--game-accent:#ffe690">
@@ -80,6 +81,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0f0a1e;
 <script>
 (function(){
 
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -164,7 +166,7 @@ for(var i=0;i<slots.length;i++){ if(slots[i].state==="empty") candidates.push(i)
 if(candidates.length===0){ activeIndex=-1; return; }
 activeIndex = candidates[Math.floor(Math.random()*candidates.length)];
 slots[activeIndex].state = "charging";
-chargeStart = performance.now();
+chargeStart = gameClock.now();
 chargeDuration = chargeDurationFor(lit);
 }
 
@@ -273,7 +275,7 @@ function drawSlot(s, idx){
 ctx.save();
 var glow = 0;
 if(s.state==="charging"){
-var now = performance.now();
+var now = gameClock.now();
 glow = Math.min(1,(now-chargeStart)/chargeDuration);
 }
 var radius = 20;
@@ -365,9 +367,9 @@ var s = slots[activeIndex];
 var dx = x-s.x, dy = y-s.y;
 var dist = Math.sqrt(dx*dx+dy*dy);
 if(dist>tapRadius) return;
-var now = performance.now();
+var now = gameClock.now();
 var progress = (now-chargeStart)/chargeDuration;
-if(progress>=READY_FROM){ onLockIn(); } else { onEarlyFail(); }
+if(progress>1){ onTimeout(); } else if(progress>=READY_FROM){ onLockIn(); } else { onEarlyFail(); }
 }
 
 function onLockIn(){
@@ -444,11 +446,13 @@ onTimeout();
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
 if(lastTime===null) lastTime=ts;
 var delta = ts-lastTime; lastTime=ts;
 if(delta>50) delta=50;
 updateParticles(delta);
-shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
+shakeMag *= Math.pow(0.88, delta/(1000/60)); if(shakeMag<0.02) shakeMag=0;
 updatePhysics(ts);
 render();
 requestAnimationFrame(loop);

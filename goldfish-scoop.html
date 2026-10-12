@@ -46,6 +46,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#04141f;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 <body class="pr-game pr-arcade" data-experience="goldfish-scoop" style="--game-accent:#7ae0ec">
 <header id="site-header"></header>
@@ -87,6 +88,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#04141f;
 </section>
 <script>
 (function(){
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -262,8 +264,8 @@ function updatePoi(dt){
 var f = dt/16.6;
 var prevX = poi.x, prevY = poi.y;
 if(pointerActive){
-poi.x += (pointerX-poi.x)*Math.min(0.3*f,1);
-poi.y += (pointerY-poi.y)*Math.min(0.3*f,1);
+poi.x += (pointerX-poi.x)*PlayriumTiming.blend(0.3,dt);
+poi.y += (pointerY-poi.y)*PlayriumTiming.blend(0.3,dt);
 }
 var moveDist = Math.sqrt((poi.x-prevX)*(poi.x-prevX)+(poi.y-prevY)*(poi.y-prevY));
 poi.speed = moveDist / Math.max(f,0.001);
@@ -272,7 +274,7 @@ var dx = poi.x-poolCX, dy = poi.y-poolCY;
 var inWater = Math.sqrt(dx*dx+dy*dy) < poolR;
 
 if(inWater && state==="playing"){
-var wear = 0.012*f + poi.speed*0.012;
+var wear = (0.012 + poi.speed*0.012)*f;
 durability -= wear;
 if(Math.random()<0.05*f) spawnRipple(poi.x,poi.y);
 
@@ -463,6 +465,8 @@ drawPoi();
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
 if(lastTime===null) lastTime = ts;
 var delta = ts-lastTime; lastTime = ts;
 if(delta>50) delta=50;

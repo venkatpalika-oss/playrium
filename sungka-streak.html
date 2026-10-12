@@ -42,6 +42,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#071233;
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
 <link rel="stylesheet" href="components/game-design.css">
+<script src="components/game-clock.js"></script>
 </head>
 
 <body class="pr-game pr-arcade" data-experience="sungka-streak" style="--game-accent:#99bfff">
@@ -80,6 +81,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#071233;
 <script>
 (function(){
 
+var gameClock = window.PlayriumGameClock;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
@@ -359,7 +361,7 @@ ctx.restore();
 function drawRing(){
 if(targetStation!==STORE_INDEX) return;
 var st = stations[STORE_INDEX];
-var now = performance.now();
+var now = gameClock.now();
 var winHalf = windowHalfFor(store);
 var timeToArrival = legDuration-(now-legStart);
 var inWindow = Math.abs(timeToArrival) <= winHalf;
@@ -420,7 +422,7 @@ drawBackground();
 drawBoard();
 drawRing();
 var a = stations[currentStation], b = stations[targetStation];
-var now = performance.now();
+var now = gameClock.now();
 var progress = Math.min(1,(now-legStart)/legDuration);
 var ease = progress<0.5? 2*progress*progress : 1-Math.pow(-2*progress+2,2)/2;
 var hx = a.x+(b.x-a.x)*ease;
@@ -434,7 +436,7 @@ ctx.restore();
 /* ---------- Game loop / logic ---------- */
 function tryTap(){
 if(state!=="playing") return;
-var now = performance.now();
+var now = gameClock.now();
 if(targetStation===STORE_INDEX && !alreadyTapped){
 var timeToArrival = legDuration-(now-legStart);
 var winHalf = windowHalfFor(store);
@@ -500,7 +502,8 @@ overlay.classList.remove("hidden");
 
 function updatePhysics(ts){
 if(state!=="playing") return;
-if(ts-legStart>=legDuration){
+var grace=targetStation===STORE_INDEX ? windowHalfFor(store) : 0;
+if(ts-legStart>=legDuration+grace){
 var arrivedStation = targetStation;
 if(arrivedStation===STORE_INDEX && !alreadyTapped){
 alreadyTapped = true;
@@ -512,24 +515,26 @@ tone(520+arrivedStation*20,0.08,"triangle",0.1);
 }
 currentStation = arrivedStation;
 targetStation = (arrivedStation+1)%STATION_COUNT;
-startLeg(ts);
+startLeg(legStart+legDuration+grace);
 }
 }
 
 var lastTime = null;
 function loop(ts){
+if(gameClock.paused){ lastTime=null; requestAnimationFrame(loop); return; }
+ts=gameClock.tick(ts);
 if(lastTime===null) lastTime=ts;
 var delta = ts-lastTime; lastTime=ts;
 if(delta>50) delta=50;
 updateParticles(delta);
-shakeMag *= 0.88; if(shakeMag<0.02) shakeMag=0;
+shakeMag *= Math.pow(0.88, delta/(1000/60)); if(shakeMag<0.02) shakeMag=0;
 updatePhysics(ts);
 render();
 requestAnimationFrame(loop);
 }
 
 canvas.addEventListener("pointerdown", function(){ tryTap(); });
-window.addEventListener("keydown", function(e){ if(e.code==="Space"){ e.preventDefault(); tryTap(); } });
+window.addEventListener("keydown", function(e){ if(e.code==="Space" && !e.repeat){ e.preventDefault(); tryTap(); } });
 
 overlay = document.getElementById("overlay");
 overlayText = document.getElementById("overlayText");
@@ -542,14 +547,14 @@ ensureAudio();
 if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
 overlay.classList.add("hidden");
 resetRound();
-startLeg(performance.now());
+startLeg(gameClock.now());
 state = "playing";
 });
 restartBtn.addEventListener("click", function(){
 ensureAudio();
 if(audioCtx && audioCtx.state==="suspended") audioCtx.resume();
 resetRound();
-startLeg(performance.now());
+startLeg(gameClock.now());
 state = "playing";
 overlay.classList.add("hidden");
 });

@@ -1,0 +1,137 @@
+[
+  {
+    "slug": "tinikling-tempo",
+    "width": 1365,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 447.5,
+      "right": 917.5,
+      "bottom": 663.8046875,
+      "top": 235.7890625
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "parol-glow",
+    "width": 1365,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 447.5,
+      "right": 917.5,
+      "bottom": 663.8046875,
+      "top": 235.7890625
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "jeepney-jam",
+    "width": 1365,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 447.5,
+      "right": 917.5,
+      "bottom": 676.5546875,
+      "top": 223.0390625
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "tinikling-tempo",
+    "width": 390,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 16,
+      "right": 374,
+      "bottom": 625.859375,
+      "top": 218.734375
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "parol-glow",
+    "width": 390,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 16,
+      "right": 374,
+      "bottom": 625.859375,
+      "top": 218.734375
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "jeepney-jam",
+    "width": 390,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 16,
+      "right": 374,
+      "bottom": 637.0546875,
+      "top": 207.5390625
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "tinikling-tempo",
+    "width": 320,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 16,
+      "right": 304,
+      "bottom": 499.0546875,
+      "top": 69.5390625
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "parol-glow",
+    "width": 320,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 16,
+      "right": 304,
+      "bottom": 499.0546875,
+      "top": 69.5390625
+    },
+    "started": true,
+    "errors": []
+  },
+  {
+    "slug": "jeepney-jam",
+    "width": 320,
+    "retina": true,
+    "overflow": false,
+    "dupes": [],
+    "card": {
+      "left": 16,
+      "right": 304,
+      "bottom": 520,
+      "top": 48.59375
+    },
+    "started": true,
+    "errors": []
+  }
+]
