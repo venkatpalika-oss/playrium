@@ -35,3 +35,17 @@ The browser test requires Playwright and Chromium. Optional environment variable
 ## Review recommendation
 
 Keep this branch unmerged until the owner reviews the new direction. Then inspect one full round in each game on a physical phone and desktop. Assess gameplay depth separately: timing games need meaningful mastery, while creative/relaxation experiences need satisfying responses and discovery rather than arbitrary scores.
+
+## Verification — 12 October 2026
+
+- Existing maintenance suite: PASS (23 destinations, all inline scripts, 366 daily selections, search focus behavior).
+- Existing SEO suite: PASS (30 canonical pages, metadata, sitemap, robots and 404).
+- Browser startup/layout suite: 69/69 page/viewport combinations passed at 1365×900, 390×844 and 320×568. Mobile contexts used DPR 2. All 20 experiences with start controls were started at all three widths; three open-ended Originals start immediately. No page exceptions, duplicate IDs or horizontal overflow were observed; arcade start cards fit inside the viewport.
+- After visual review, corrected Sungka pocket overlap/board clipping, Goldfish durability bar overlap, and the mobile Spending toolbar layout. Also corrected pointer offsets in Kancha/Zen and the keyboard time-of-day control in Zen. A focused 15-case rerun on five affected games passed, using touch taps for mobile start controls.
+- Sungka layout regression test: four widths passed; all eight pockets remain separate and the board stays within the screen.
+- Actual screenshot inspection included desktop start screens, mobile play screens for eight representative games, narrow Daruma start/play screens, and the corrected Sungka board. Automated screenshots for every page do not imply every pixel was manually reviewed.
+- Physical Safari/Chrome on iPhone and physical Android, full victory/loss cycles, audio interruption and long-session progression are NOT VERIFIED in this build.
+
+Screenshots: [Daruma desktop](daruma-desktop.webp), [Cricket mobile](cricket-mobile.webp). Machine-readable startup results: `browser-results.json` and `focused-results.json`.
+
+For a local review, serve the repository with `python -m http.server 8000`, open `http://localhost:8000/experiences.html`, and select a game. Do not upload the review ZIP as a production deployment without reviewing the branch.
