@@ -41,14 +41,15 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0f0a1e;
 #hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
+<link rel="stylesheet" href="components/game-design.css">
 </head>
 
-<body>
+<body class="pr-game pr-arcade" data-experience="parol-glow" style="--game-accent:#ffe690">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
 
 <div id="hero">
-<canvas id="game"></canvas>
+<canvas id="game" tabindex="0" aria-label="Parol Glow game area" aria-describedby="pr-game-controls"></canvas>
 
 <div class="panel" id="hud">
 <div class="stat"><span class="num" id="statLit">0/8</span><span class="label">Lit</span></div>
@@ -72,7 +73,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0f0a1e;
 
 </div>
 <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -82,7 +83,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#0f0a1e;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
-function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; layoutSlots(); }
+function resize(){ W = window.innerWidth; H = window.innerHeight; var dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); layoutSlots(); }
 
 /* ---------- Audio ---------- */
 var audioCtx = null;
@@ -457,7 +458,7 @@ function getPoint(e){
 var rect = canvas.getBoundingClientRect();
 var cx3 = (e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0].clientX));
 var cy3 = (e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0].clientY));
-var scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+var scaleX = W/rect.width, scaleY = H/rect.height;
 return { x:(cx3-rect.left)*scaleX, y:(cy3-rect.top)*scaleY };
 }
 canvas.addEventListener("pointerdown", function(e){ var pt=getPoint(e); tryTapAt(pt.x, pt.y); });
@@ -503,5 +504,6 @@ requestAnimationFrame(loop);
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
 </body>
 </html>

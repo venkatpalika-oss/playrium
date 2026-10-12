@@ -53,8 +53,9 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 @media (prefers-reduced-motion:reduce){ *{transition-duration:.001s !important;} }
 @media (max-width:720px){ .toolDock{max-height:56vh;} .tool-tile{width:38px;height:38px;font-size:1.05rem;} .weatherRow{gap:.3rem;} .weather-btn{width:38px;height:38px;} .skyStrip{max-width:86vw;} }
 </style>
+<link rel="stylesheet" href="components/game-design.css">
 </head>
-<body>
+<body class="pr-game pr-craft" data-experience="cloud-painter" style="--game-accent:#b4dcff">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
  <div id="stageWrap">
@@ -77,7 +78,7 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 <a id="aboutLink" href="index.html">☁ Cloud Painter™ · Back to Playrium</a>
 
 </div> <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -494,5 +495,6 @@ if(document.hidden){ rafPaused=true; } else if(rafPaused){ lastFrame=performance
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
 </body>
 </html>

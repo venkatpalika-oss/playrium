@@ -41,14 +41,15 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0f2e;
 #hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
-  </head>
+  <link rel="stylesheet" href="components/game-design.css">
+</head>
 
-  <body>
+  <body class="pr-game pr-arcade" data-experience="daruma-drop" style="--game-accent:#ff979e">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
 
 <div id="hero">
-  <canvas id="game"></canvas>
+  <canvas id="game" tabindex="0" aria-label="Daruma Drop game area" aria-describedby="pr-game-controls"></canvas>
 
   <div class="panel" id="hud">
     <div class="stat"><span class="num" id="statCombo">0</span><span class="label">Combo</span></div>
@@ -72,11 +73,11 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0f2e;
 
   </div>
 <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script src="components/vendor/matter-0.19.0.min.js"></script>
   <script>
   (function(){
   var Engine = Matter.Engine, World = Matter.World, Bodies = Matter.Bodies, Body = Matter.Body, Vertices = Matter.Vertices;
@@ -84,7 +85,7 @@ html, body { width:100%; min-height:100%; overflow-x:hidden; background:#1a0f2e;
 var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var W, H;
-function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+function resize(){ W = window.innerWidth; H = window.innerHeight; var dpr = Math.min(window.devicePixelRatio || 1, 2); canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
 resize();
 window.addEventListener("resize", resize);
 
@@ -452,7 +453,7 @@ function getPoint(e){
     var rect = canvas.getBoundingClientRect();
   var cx = (e.clientX!==undefined?e.clientX:(e.touches&&e.touches[0].clientX));
   var cy = (e.clientY!==undefined?e.clientY:(e.touches&&e.touches[0].clientY));
-  var scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+  var scaleX = W/rect.width, scaleY = H/rect.height;
   return { x:(cx-rect.left)*scaleX, y:(cy-rect.top)*scaleY };
 }
 function hitTestBlock(x,y){
@@ -696,6 +697,7 @@ requestAnimationFrame(loop);
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
 </body>
   </html>
   
