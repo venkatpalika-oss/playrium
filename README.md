@@ -49,17 +49,15 @@ See docs/PLAYRIUM-ORIGINALS-DESIGN-BIBLE.md for the full framework.
 
 ## Deployment
 
-The `Deploy Playrium to Namecheap` workflow uploads `main` to Namecheap over SFTP. GitHub Pages also has a separate deployment; a successful Pages run does not verify the custom domain's Namecheap release.
+Production is Cloudflare Pages project `playrium`, connected to this repository's `main` branch. Both custom domains are attached; the preferred SEO host is `https://www.playrium.fun`.
 
-The workflow stages public files inside the shared workspace, uploads `.htaccess` explicitly, then checks the public commit marker and homepage over verified HTTPS. Documentation and tests are excluded from the Namecheap upload. Existing remote files are preserved.
+Current Pages settings: framework None, no build command, output directory `.`. Namecheap SFTP deployment has been retired. The manual GitHub workflow checks website availability only; it is not deployment verification.
 
-Recovery checks before merging deployment changes:
-- Verify SFTP access for the configured hosting account and port. The August 14, 2026 Namecheap run failed with `Permission denied`; code changes do not repair credentials. Update `FTP_PASSWORD` through GitHub's secure settings if required; never paste credentials into issues or chat.
-- Confirm the serving host and certificate coverage for both `playrium.fun` and `www.playrium.fun`. The redirect rules cannot repair a TLS certificate mismatch.
-- Confirm which hosting destination is production and retain a backup of its existing files before deployment.
-- After deployment, require the Namecheap workflow's public release check and a desktop/mobile smoke test; a green Pages run alone is insufficient.
+Cloudflare serves flat HTML at extensionless URLs and redirects legacy `.html` paths. Canonical tags, Open Graph URLs, structured data and sitemap must use the extensionless form; the homepage is `/`. The root `404.html` prevents unknown paths from receiving the homepage with HTTP 200. `_headers` keeps Pages preview URLs and repository documentation out of search results. Apache `.htaccess` does not configure Cloudflare Pages.
 
-Run `node tests/maintenance.cjs` for the bounded maintenance regression checks.
+Required dashboard rule: redirect requests with hostname `playrium.fun` to `concat("https://www.playrium.fun", http.request.uri.path)` using HTTP 301 and Preserve query string. Enable HTTPS redirection. Verify the deployed canonical tags, sitemap, robots, legacy URL redirects, 404 response and both hosts after deployment. Submit `https://www.playrium.fun/sitemap.xml` in Search Console only after these checks pass.
+
+Run `node tests/maintenance.cjs` and `node tests/seo.cjs` before merging. Game rebuilds are a separate phase.
 
 ## Analytics
 

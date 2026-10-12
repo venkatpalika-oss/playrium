@@ -1,65 +1,11 @@
-name: Deploy Playrium to Namecheap
-
+name: Verify Cloudflare production
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
 permissions:
   contents: read
-
-concurrency:
-  group: playrium-namecheap-production
-  cancel-in-progress: false
-
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Maintenance checks
-        run: node tests/maintenance.cjs
-
-      - name: Prepare files
-        run: |
-          mkdir -p deploy-dist
-          rsync -a ./ deploy-dist/ --exclude='deploy-dist' --exclude='.git*' --exclude='.github' --exclude='.vscode' --exclude='README.md' --exclude='docs' --exclude='tests'
-          printf '%s\n' "$GITHUB_SHA" > deploy-dist/deploy-version.txt
-          test -s deploy-dist/index.html
-          test -s deploy-dist/.htaccess
-          test -s deploy-dist/components/experiences-data.js
-
-      - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@a5ccb9c6211a94cc59404f0fdb2a9936a6dfee64 # v1.2.6
-        with:
-          server: 'server260.web-hosting.com'
-          port: '21098'
-          username: 'playszzp'
-          password: ${{ secrets.FTP_PASSWORD }}
-          local_path: './deploy-dist/*'
-          remote_path: '/home/playszzp/public_html'
-          sftp_only: true
-          delete_remote_files: false
-
-      # SFTP's * glob omits dotfiles; upload the redirect configuration explicitly.
-      - name: Upload redirect configuration
-        uses: wlixcc/SFTP-Deploy-Action@a5ccb9c6211a94cc59404f0fdb2a9936a6dfee64 # v1.2.6
-        with:
-          server: 'server260.web-hosting.com'
-          port: '21098'
-          username: 'playszzp'
-          password: ${{ secrets.FTP_PASSWORD }}
-          local_path: './deploy-dist/.htaccess'
-          remote_path: '/home/playszzp/public_html/.htaccess'
-          sftp_only: true
-          delete_remote_files: false
-
-      - name: Verify public release
-        run: |
-          curl --fail --silent --show-error --location --max-time 30 "https://www.playrium.fun/deploy-version.txt?commit=$GITHUB_SHA" -o /tmp/playrium-live-version.txt
-          diff deploy-dist/deploy-version.txt /tmp/playrium-live-version.txt
-          curl --fail --silent --show-error --location --max-time 30 "https://www.playrium.fun/index.html?commit=$GITHUB_SHA" -o /tmp/playrium-live-index.html
-          cmp deploy-dist/index.html /tmp/playrium-live-index.html
+      - name: Check website availability
+        run: curl --fail --show-error --location --max-time 30 https://www.playrium.fun/ --output /dev/null
