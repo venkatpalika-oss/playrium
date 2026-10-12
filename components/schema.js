@@ -11,20 +11,24 @@
     return el ? el.getAttribute('content') : null;
   }
 
+  function canonicalURL(href) {
+    return 'https://www.playrium.fun/' + href.replace(/^index\.html/, '').replace(/\.html(?=#|$)/, '');
+  }
+
   function render() {
     var meta = window.PAGE_META || {};
     var exp = meta.slug ? window.PLAYRIUM_getExperience(meta.slug) : null;
     if (!exp) return;
 
-    var url = location.origin + '/' + exp.href;
+    var url = canonicalURL(exp.href);
     var image = getMetaTag('og:image', true) || (location.origin + '/favicon.png');
     var description = getMetaTag('description', false) || exp.tagline;
 
     var breadcrumbItems = [
-      { name: window.PLAYRIUM_HOME.title, item: location.origin + '/' + window.PLAYRIUM_HOME.href }
+      { name: window.PLAYRIUM_HOME.title, item: canonicalURL(window.PLAYRIUM_HOME.href) }
     ];
     var hub = window.PLAYRIUM_getHub(exp.country);
-    if (hub) breadcrumbItems.push({ name: hub.title, item: location.origin + '/' + hub.href });
+    if (hub) breadcrumbItems.push({ name: hub.title, item: canonicalURL(hub.href) });
     breadcrumbItems.push({ name: exp.title, item: url });
 
     var breadcrumbList = {
@@ -43,7 +47,7 @@
       genre: exp.tags,
       isFamilyFriendly: true,
       inLanguage: 'en',
-      isPartOf: { '@type': 'WebSite', name: 'Playrium', url: location.origin + '/' }
+      isPartOf: { '@type': 'WebSite', name: 'Playrium', url: 'https://www.playrium.fun/' }
     };
 
     var graph = { '@context': 'https://schema.org', '@graph': [gameEntity, breadcrumbList] };

@@ -1,31 +1,11 @@
-name: Deploy Playrium to Namecheap
-
+name: Verify Cloudflare production
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
+permissions:
+  contents: read
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Prepare files
-        run: |
-          mkdir -p /tmp/deploy-dist
-          rsync -a ./ /tmp/deploy-dist/ --exclude='.git*' --exclude='.github' --exclude='.vscode' --exclude='README.md'
-
-      - name: SFTP Deploy
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.6
-        with:
-          server: 'server260.web-hosting.com'
-          port: '21098'
-          username: 'playszzp'
-          password: ${{ secrets.FTP_PASSWORD }}
-          local_path: '/tmp/deploy-dist/*'
-          remote_path: '/home/playszzp/public_html'
-          sftp_only: true
-          delete_remote_files: false
+      - name: Check website availability
+        run: curl --fail --show-error --location --max-time 30 https://www.playrium.fun/ --output /dev/null

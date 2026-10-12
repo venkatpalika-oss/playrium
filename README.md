@@ -49,7 +49,15 @@ See docs/PLAYRIUM-ORIGINALS-DESIGN-BIBLE.md for the full framework.
 
 ## Deployment
 
-Playrium deploys via GitHub Pages to playrium.fun (custom domain) and venkatpalika-oss.github.io/playrium.
+Production is Cloudflare Pages project `playrium`, connected to this repository's `main` branch. Both custom domains are attached; the preferred SEO host is `https://www.playrium.fun`.
+
+Current Pages settings: framework None, no build command, output directory `.`. Namecheap SFTP deployment has been retired. The manual GitHub workflow checks website availability only; it is not deployment verification.
+
+Cloudflare serves flat HTML at extensionless URLs and redirects legacy `.html` paths. Canonical tags, Open Graph URLs, structured data and sitemap must use the extensionless form; the homepage is `/`. The root `404.html` prevents unknown paths from receiving the homepage with HTTP 200. `_headers` keeps Pages preview URLs and repository documentation out of search results. Apache `.htaccess` does not configure Cloudflare Pages.
+
+Required dashboard rule: redirect requests with hostname `playrium.fun` to `concat("https://www.playrium.fun", http.request.uri.path)` using HTTP 301 and Preserve query string. Enable HTTPS redirection. Verify the deployed canonical tags, sitemap, robots, legacy URL redirects, 404 response and both hosts after deployment. Submit `https://www.playrium.fun/sitemap.xml` in Search Console only after these checks pass.
+
+Run `node tests/maintenance.cjs` and `node tests/seo.cjs` before merging. Game rebuilds are a separate phase.
 
 ## Analytics
 

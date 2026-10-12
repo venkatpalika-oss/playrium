@@ -1,0 +1,11 @@
+# Keep alternate hosting URLs out of search results.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
+/docs/*
+  X-Robots-Tag: noindex
+/tests/*
+  X-Robots-Tag: noindex
+/README.md
+  X-Robots-Tag: noindex
