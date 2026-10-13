@@ -147,8 +147,11 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 #hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
+<link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
-<body>
+<body class="pr-game pr-classic" data-experience="balloon-bazaar" style="--game-accent:#ff8d9d">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
 
@@ -217,7 +220,7 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 
 </div>
 <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -250,10 +253,10 @@ const lightsLayer = document.getElementById('lightsLayer');
 const fireflyLayer = document.getElementById('fireflyLayer');
 
 function resize(){
-  canvas.width = window.innerWidth * devicePixelRatio;
-  canvas.height = window.innerHeight * devicePixelRatio;
-  canvas.style.width = window.innerWidth+'px';
-  canvas.style.height = window.innerHeight+'px';
+  canvas.width = PlayriumSurface.width * devicePixelRatio;
+  canvas.height = PlayriumSurface.height * devicePixelRatio;
+  canvas.style.width = PlayriumSurface.width+'px';
+  canvas.style.height = PlayriumSurface.height+'px';
   ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
 }
 resize();
@@ -388,17 +391,17 @@ function pickType(excludeMystery){
 
 function spawnBalloon(x){
   const type = pickType();
-  const r = Math.min(window.innerWidth,window.innerHeight) * (0.032+Math.random()*0.012);
-  const startX = x!==undefined ? x : window.innerWidth*(0.12+Math.random()*0.76);
+  const r = Math.min(PlayriumSurface.width,PlayriumSurface.height) * (0.032+Math.random()*0.012);
+  const startX = x!==undefined ? x : PlayriumSurface.width*(0.12+Math.random()*0.76);
   const b = {
     id: nextId++, type, r,
-    x: startX, y: window.innerHeight + r*2,
+    x: startX, y: PlayriumSurface.height + r*2,
     vx: (Math.random()-0.5)*10,
     vy: -20,
-    targetY: window.innerHeight*(0.18+Math.random()*0.42),
+    targetY: PlayriumSurface.height*(0.18+Math.random()*0.42),
     phase: Math.random()*Math.PI*2,
     phaseSpeed: 0.5+Math.random()*0.4,
-    stringLagX: startX, stringLagY: window.innerHeight,
+    stringLagX: startX, stringLagY: PlayriumSurface.height,
     popping:false, popT:0,
     dragging:false,
     hue: Math.random()*360,
@@ -547,7 +550,7 @@ function popBalloon(b, opts){
 function chainTrigger(source, chainKind, depth){
   depth = depth||0;
   if(depth>=1) return; // limit chain depth so cascades stay readable, not infinite
-  const radius = Math.min(window.innerWidth,window.innerHeight)*0.22;
+  const radius = Math.min(PlayriumSurface.width,PlayriumSurface.height)*0.22;
   const targets = balloons.filter(o=> o!==source && !o.popping && Math.hypot(o.x-source.x,o.y-source.y) < radius);
   targets.slice(0,3).forEach((t,i)=>{
     setTimeout(()=>{
@@ -626,7 +629,7 @@ function stepBalloons(dt){
       b.x += b.vx*dt;
       b.y += b.vy*dt;
     }
-    b.x = Math.max(b.r, Math.min(window.innerWidth-b.r, b.x));
+    b.x = Math.max(b.r, Math.min(PlayriumSurface.width-b.r, b.x));
     // string lag (damped spring following knot point)
     const knotX=b.x, knotY=b.y+b.r*0.95;
     b.stringLagX += (knotX-b.stringLagX)*Math.min(1,dt*4);
@@ -649,7 +652,7 @@ function stepBalloons(dt){
 }
 
 function render(){
-  ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.clearRect(0,0,PlayriumSurface.width,PlayriumSurface.height);
   const sorted = balloons.slice().sort((a,b)=>a.y-b.y);
   sorted.forEach(drawBalloon);
   drawParticles();
@@ -689,7 +692,7 @@ drawPlayBalloon();
 function startExperience(){
   ac();
   // the "hello" light shower before dropping into the scene
-  const cx = window.innerWidth*0.5, cy = window.innerHeight*0.42;
+  const cx = PlayriumSurface.width*0.5, cy = PlayriumSurface.height*0.42;
   for(let i=0;i<18;i++){
     const a = Math.random()*Math.PI*2, sp=60+Math.random()*80;
     particles.push({ x:cx,y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-40, life:0.9,maxLife:0.9, color:'#fff3c4', size:2+Math.random()*2, grav:80 });
@@ -712,5 +715,7 @@ playBalloonWrap.addEventListener('click', startExperience);
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

@@ -6,6 +6,19 @@
  */
 (function () {
   var EXPERIENCES = [
+{"slug": "yut-relay", "title": "Yut Relay", "tagline": "Two runners. One clever journey.", "href": "yut-relay.html", "country": "South Korea", "flag": "🇰🇷", "accent": "#b8c8ed", "icon": "🎲", "tags": ["strategy"], "moods": ["mind"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "gonggi-garden", "title": "Gonggi Garden", "tagline": "A little lift. A perfect handful.", "href": "gonggi-garden.html", "country": "South Korea", "flag": "🇰🇷", "accent": "#b8c8ed", "icon": "🪨", "tags": ["puzzle", "skill"], "moods": ["mind"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "tuho-courtyard", "title": "Tuho Courtyard", "tagline": "Read the wind. Find the opening.", "href": "tuho-courtyard.html", "country": "South Korea", "flag": "🇰🇷", "accent": "#b8c8ed", "icon": "🏹", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "ddakji-studio", "title": "Ddakji Studio", "tagline": "Find the corner. Turn the tile.", "href": "ddakji-studio.html", "country": "South Korea", "flag": "🇰🇷", "accent": "#b8c8ed", "icon": "◈", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "jegi-sky", "title": "Jegi Sky", "tagline": "One more kick into the blue.", "href": "jegi-sky.html", "country": "South Korea", "flag": "🇰🇷", "accent": "#b8c8ed", "icon": "🪶", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "peteca-rally", "title": "Peteca Rally", "tagline": "Find the flight. Keep it alive.", "href": "peteca-rally.html", "country": "Brazil", "flag": "🇧🇷", "accent": "#c7dd91", "icon": "🪶", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "button-football", "title": "Button Football", "tagline": "Small discs. Big match moments.", "href": "button-football.html", "country": "Brazil", "flag": "🇧🇷", "accent": "#c7dd91", "icon": "⚽", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "gude-circle", "title": "Gude Circle", "tagline": "Read the angles. Clear the circle.", "href": "gude-circle.html", "country": "Brazil", "flag": "🇧🇷", "accent": "#c7dd91", "icon": "🔵", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "amarelinha-trail", "title": "Amarelinha Trail", "tagline": "Up to the sky. Back to the street.", "href": "amarelinha-trail.html", "country": "Brazil", "flag": "🇧🇷", "accent": "#c7dd91", "icon": "🔢", "tags": ["puzzle", "skill"], "moods": ["mind"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "pipa-breeze", "title": "Pipa Breeze", "tagline": "Follow the breeze. Paint the sky.", "href": "pipa-breeze.html", "country": "Brazil", "flag": "🇧🇷", "accent": "#c7dd91", "icon": "🪁", "tags": ["skill", "physics"], "moods": ["physics", "family"], "addedAt": "2026-10-12T12:10:00Z", "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "puli-meka", "title": "Puli Meka", "tagline": "Tigers hunt. Goats outthink.", "href": "puli-meka.html", "country": "India", "flag": "🇮🇳", "accent": "#b9dbc7", "icon": "🐯", "tags": ["strategy", "traditional"], "moods": ["mind"], "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "fukuwarai", "title": "Fukuwarai", "tagline": "A face worth remembering.", "href": "fukuwarai.html", "country": "Japan", "flag": "🇯🇵", "accent": "#b9dbc7", "icon": "🎭", "tags": ["puzzle", "traditional"], "moods": ["mind", "family"], "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
+{"slug": "patintero", "title": "Patintero", "tagline": "Read the line. Find your opening.", "href": "patintero.html", "country": "Philippines", "flag": "🇵🇭", "accent": "#b9dbc7", "icon": "🏃", "tags": ["skill", "traditional"], "moods": ["physics", "family"], "discovery": {"globe": true, "surprise": true, "featured": true, "dailyChallenge": false}},
     {
       "slug": "gully-cricket",
       "title": "Gully Cricket™",
@@ -308,6 +321,8 @@
     ];
 
  var HUBS = [
+{title:'South Korea Collection',href:'south-korea.html',country:'South Korea',flag:'🇰🇷'},
+{title:'Brazil Collection',href:'brazil.html',country:'Brazil',flag:'🇧🇷'},
    { title: 'India Collection', href: 'india.html', country: 'India', flag: '🇮🇳' },
    { title: 'Japan Collection', href: 'japan.html', country: 'Japan', flag: '🇯🇵' },
    { title: 'Philippines Collection', href: 'philippines.html', country: 'Philippines', flag: '🇵🇭' }

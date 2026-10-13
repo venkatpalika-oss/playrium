@@ -112,8 +112,11 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 #hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
+<link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
-<body>
+<body class="pr-game pr-classic" data-experience="kancha-kings" style="--game-accent:#c5a2ff">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
 
@@ -157,7 +160,7 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 
 </div>
 <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -190,10 +193,10 @@ const replayBtn = document.getElementById('replayBtn');
 const muteBtn = document.getElementById('muteBtn');
 
 function resize(){
-  canvas.width = window.innerWidth * devicePixelRatio;
-  canvas.height = window.innerHeight * devicePixelRatio;
-  canvas.style.width = window.innerWidth + 'px';
-  canvas.style.height = window.innerHeight + 'px';
+  canvas.width = PlayriumSurface.width * devicePixelRatio;
+  canvas.height = PlayriumSurface.height * devicePixelRatio;
+  canvas.style.width = PlayriumSurface.width + 'px';
+  canvas.style.height = PlayriumSurface.height + 'px';
   ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
 }
 resize();
@@ -287,11 +290,11 @@ function hexToRgb(hex){ const v=parseInt(hex.slice(1),16); return {r:(v>>16)&255
    ============================================================ */
 let cx, cy, chalkR, arenaR, baselineR;
 function layoutArena(){
-  cx = window.innerWidth * 0.5;
-  cy = window.innerHeight * 0.46;
-  chalkR = Math.min(window.innerWidth, window.innerHeight) * 0.28;
+  cx = PlayriumSurface.width * 0.5;
+  cy = PlayriumSurface.height * 0.46;
+  chalkR = Math.min(PlayriumSurface.width, PlayriumSurface.height) * 0.28;
   arenaR = chalkR * 1.38;
-  baselineR = Math.min(window.innerWidth, window.innerHeight) / 700 * 14;
+  baselineR = Math.min(PlayriumSurface.width, PlayriumSurface.height) / 700 * 14;
 }
 layoutArena();
 window.addEventListener('resize', layoutArena);
@@ -306,12 +309,12 @@ buildRingJitter();
 
 function drawGround(){
   ctx.fillStyle = '#c79a63';
-  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.fillRect(0,0,PlayriumSurface.width,PlayriumSurface.height);
   const grad = ctx.createRadialGradient(cx,cy,10,cx,cy,arenaR*1.6);
   grad.addColorStop(0,'rgba(255,230,180,0.18)');
   grad.addColorStop(1,'rgba(80,50,20,0.22)');
   ctx.fillStyle = grad;
-  ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+  ctx.fillRect(0,0,PlayriumSurface.width,PlayriumSurface.height);
 }
 
 function drawChalkRing(reveal){
@@ -361,7 +364,7 @@ function setupRing(){
   marbles = [];
   trophyPile = [];
   capRevealed = false;
-  const cluster = Math.min(window.innerWidth, window.innerHeight) * 0.13;
+  const cluster = Math.min(PlayriumSurface.width, PlayriumSurface.height) * 0.13;
   const positions = [];
   for(let i=0;i<7;i++){
     positions.push({
@@ -534,7 +537,7 @@ function animateToTrophy(m){
   const slot = trophyPile.length;
   trophyPile.push(m);
   const targetX = 26 + (slot%8)*26;
-  const targetY = window.innerHeight - 40 - Math.floor(slot/8)*26;
+  const targetY = PlayriumSurface.height - 40 - Math.floor(slot/8)*26;
   m.exitAnim = { t:0, sx:m.x, sy:m.y, tx:targetX, ty:targetY, dur: 0.55 };
 }
 
@@ -566,7 +569,7 @@ function drawParticles(){
    AIM / DRAG INPUT
    ============================================================ */
 let aiming = false, dragStart=null, dragCur=null, pointerHistory=[];
-const MAX_DRAG = () => Math.min(window.innerWidth, window.innerHeight)*0.22;
+const MAX_DRAG = () => Math.min(PlayriumSurface.width, PlayriumSurface.height)*0.22;
 const POWER_SCALE = 8.5;
 
 function shooterIdle(){ return !shotActive && shooter && !shooter.exited; }
@@ -574,15 +577,15 @@ function shooterIdle(){ return !shotActive && shooter && !shooter.exited; }
 canvas.addEventListener('pointerdown', e=>{
   if(state!==STATE.PLAYING || !shooterIdle()) return;
   aiming = true;
-  dragStart = { x:e.clientX, y:e.clientY };
-  dragCur = { x:e.clientX, y:e.clientY };
-  pointerHistory = [{x:e.clientX,y:e.clientY,t:performance.now()}];
+  dragStart = { x:(e.clientX - canvas.getBoundingClientRect().left), y:(e.clientY - canvas.getBoundingClientRect().top) };
+  dragCur = { x:(e.clientX - canvas.getBoundingClientRect().left), y:(e.clientY - canvas.getBoundingClientRect().top) };
+  pointerHistory = [{x:(e.clientX - canvas.getBoundingClientRect().left),y:(e.clientY - canvas.getBoundingClientRect().top),t:performance.now()}];
   prompt.classList.remove('show');
 });
 window.addEventListener('pointermove', e=>{
   if(!aiming) return;
-  dragCur = { x:e.clientX, y:e.clientY };
-  pointerHistory.push({x:e.clientX,y:e.clientY,t:performance.now()});
+  dragCur = { x:(e.clientX - canvas.getBoundingClientRect().left), y:(e.clientY - canvas.getBoundingClientRect().top) };
+  pointerHistory.push({x:(e.clientX - canvas.getBoundingClientRect().left),y:(e.clientY - canvas.getBoundingClientRect().top),t:performance.now()});
   if(pointerHistory.length>8) pointerHistory.shift();
 });
 window.addEventListener('pointerup', e=>{
@@ -693,7 +696,7 @@ function render(dt){
   ctx.save();
   ctx.strokeStyle='rgba(247,241,226,0.35)';
   ctx.setLineDash([4,4]);
-  ctx.strokeRect(8, window.innerHeight-64, 240, 56);
+  ctx.strokeRect(8, PlayriumSurface.height-64, 240, 56);
   ctx.setLineDash([]);
   ctx.restore();
 
@@ -826,13 +829,13 @@ let introDragging = false, introStart = null;
 playMarbleWrap.style.touchAction = 'none';
 playMarbleWrap.addEventListener('pointerdown', e=>{
   introDragging = true;
-  introStart = { x:e.clientX, y:e.clientY };
+  introStart = { x:(e.clientX - canvas.getBoundingClientRect().left), y:(e.clientY - canvas.getBoundingClientRect().top) };
   playMarbleCanvas.style.animation = 'none';
   playMarbleCanvas.style.transition = 'none';
 });
 window.addEventListener('pointermove', e=>{
   if(!introDragging) return;
-  const dx = e.clientX-introStart.x, dy = e.clientY-introStart.y;
+  const dx = (e.clientX - canvas.getBoundingClientRect().left)-introStart.x, dy = (e.clientY - canvas.getBoundingClientRect().top)-introStart.y;
   const dist = Math.hypot(dx,dy);
   const max = 44;
   const clamped = Math.min(dist, max);
@@ -861,5 +864,7 @@ replayBtn.addEventListener('click', ()=>{ Sound.click(); startRound(); });
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

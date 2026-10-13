@@ -151,8 +151,11 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 #hero{position:relative;width:100vw;height:100vh;overflow:hidden;transform:translateZ(0);}
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
+<link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
-<body>
+<body class="pr-game pr-classic" data-experience="spend-crore" style="--game-accent:#f8d97c">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
 
@@ -193,7 +196,7 @@ html,body{ margin:0; padding:0; width:100%; min-height:100%; overflow-x:hidden; 
 
 </div>
 <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -220,10 +223,10 @@ const muteBtn = document.getElementById('muteBtn');
 const toast = document.getElementById('toast');
 
 function resize(){
-  worldCanvas.width = window.innerWidth*devicePixelRatio;
-  worldCanvas.height = window.innerHeight*devicePixelRatio;
-  worldCanvas.style.width = window.innerWidth+'px';
-  worldCanvas.style.height = window.innerHeight+'px';
+  worldCanvas.width = PlayriumSurface.width*devicePixelRatio;
+  worldCanvas.height = PlayriumSurface.height*devicePixelRatio;
+  worldCanvas.style.width = PlayriumSurface.width+'px';
+  worldCanvas.style.height = PlayriumSurface.height+'px';
   wctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
 }
 resize();
@@ -290,16 +293,20 @@ function renderBalanceHero(value){
 }
 renderBalanceHero(TOTAL_CR);
 
+let balanceAnimation=0;
 function animateBalanceTo(target, dur){
   const start = balanceCr;
+  balanceCr=target; // Reserve funds before another click can buy.
+  const animation=++balanceAnimation;
   const t0 = performance.now();
   dur = dur || 700;
   function step(now){
+    if(animation!==balanceAnimation)return;
     const t = Math.min(1, (now-t0)/dur);
     const ease = 1-Math.pow(1-t,3);
     const val = start + (target-start)*ease;
     balanceAmount.textContent = formatCr(val);
-    if(t<1) requestAnimationFrame(step); else { balanceCr = target; balanceAmount.textContent = formatCr(target); }
+    if(t<1) requestAnimationFrame(step); else { balanceAmount.textContent = formatCr(target); }
   }
   requestAnimationFrame(step);
 }
@@ -345,7 +352,7 @@ for(let i=0;i<5;i++){ clouds.push({ x:Math.random()*1400, y:60+Math.random()*90,
 let bird = { x:-100, y:120, active:false };
 let sparkleT = 0;
 
-function groundY(){ return window.innerHeight*0.78; }
+function groundY(){ return PlayriumSurface.height*0.78; }
 
 function slotFor(item){
   const x = nextSlotX + item.slotW/2;
@@ -356,12 +363,12 @@ function slotFor(item){
 function addBuilding(item){
   const x = slotFor(item);
   const baseH = 30 + item.price*0.012;
-  const h = Math.min(baseH, window.innerHeight*0.55);
+  const h = Math.min(baseH, PlayriumSurface.height*0.55);
   buildings.push({ item, x, w:item.slotW, targetH:h, h:0, bobPhase:Math.random()*Math.PI*2 });
 }
 
 function drawWorld(dt, now){
-  const w = window.innerWidth, h = window.innerHeight;
+  const w = PlayriumSurface.width, h = PlayriumSurface.height;
   const gY = groundY();
 
   // sky
@@ -576,8 +583,8 @@ function purchaseItem(item, cardEl, e){
   coin.style.left = rect.left+rect.width/2 + 'px';
   coin.style.top = rect.top + 'px';
   document.body.appendChild(coin);
-  const targetX = Math.min(window.innerWidth-60, nextSlotX);
-  const targetY = groundY()-20;
+  const targetX = Math.min(PlayriumSurface.width-60, nextSlotX)+document.getElementById('hero').getBoundingClientRect().left;
+  const targetY = groundY()-20+document.getElementById('hero').getBoundingClientRect().top;
   const t0 = performance.now();
   function flyStep(now){
     const t = Math.min(1,(now-t0)/550);
@@ -650,5 +657,7 @@ startBtn.addEventListener('click', ()=>{
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

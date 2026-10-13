@@ -33,19 +33,22 @@
   #aboutPanel a{color:#f4f0e6;}
 #pr-explore{position:relative;background:#0a0a0f;padding:2.5rem 0 3.5rem;}
 </style>
+<link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
-<body>
+<body class="pr-game pr-craft" data-experience="zen-ripple" style="--game-accent:#8cdfbd">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
 
 <div id="hero">
 <canvas id="scene" aria-label="Zen Ripple interactive water garden"></canvas>
 <button id="soundBtn" class="ui-btn" aria-label="Toggle sound">🔈</button>
-<div id="timeBtn" class="ui-btn" aria-label="Time of day, hold to nudge">☀️</div>
+<button id="timeBtn" type="button" class="ui-btn" aria-label="Change time of day; hold to advance">☀️</button>
 <div id="aboutPanel">Zen Ripple — a Playrium experience · <a href="index.html">Back to Playrium</a></div>
 </div>
 <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -57,10 +60,10 @@
 /* ================= CANVAS / RESIZE ================= */
 var canvas = document.getElementById('scene');
 var ctx = canvas.getContext('2d');
-var W = window.innerWidth, H = window.innerHeight;
+var W = PlayriumSurface.width, H = PlayriumSurface.height;
 var DPR = Math.min(window.devicePixelRatio || 1, 2);
 function resize(){
-  W = window.innerWidth; H = window.innerHeight;
+  W = PlayriumSurface.width; H = PlayriumSurface.height;
   canvas.width = Math.floor(W*DPR);
   canvas.height = Math.floor(H*DPR);
   canvas.style.width = W+'px';
@@ -440,15 +443,15 @@ function stopRain(){
 }
 
 canvas.addEventListener('pointerdown', function(e){
-  var nx = e.clientX/W, ny = e.clientY/H;
+  var bounds=canvas.getBoundingClientRect(); var nx=(e.clientX-bounds.left)/bounds.width, ny=(e.clientY-bounds.top)/bounds.height;
   onDown(nx, ny);
 });
 canvas.addEventListener('pointermove', function(e){
-  var nx = e.clientX/W, ny = e.clientY/H;
+  var bounds=canvas.getBoundingClientRect(); var nx=(e.clientX-bounds.left)/bounds.width, ny=(e.clientY-bounds.top)/bounds.height;
   onMove(nx, ny);
 });
 window.addEventListener('pointerup', function(e){
-  var nx = e.clientX/W, ny = e.clientY/H;
+  var bounds=canvas.getBoundingClientRect(); var nx=(e.clientX-bounds.left)/bounds.width, ny=(e.clientY-bounds.top)/bounds.height;
   onUp(nx, ny);
   if(rainActive) stopRain();
 });
@@ -462,14 +465,16 @@ soundBtn.addEventListener('click', function(){
   soundBtn.textContent = muted ? '🔇' : '🔈';
   if(masterGain) masterGain.gain.linearRampToValueAtTime(muted?0:0.55, (audioCtx.currentTime||0)+0.4);
 });
-timeBtn.addEventListener('pointerdown', function(){ timeHoldActive = true; timeHoldStart = performance.now(); });
+timeBtn.addEventListener('pointerdown', function(e){ timeBtn.setPointerCapture(e.pointerId); timeHoldActive = true; timeHoldStart = performance.now(); });
+timeBtn.addEventListener('click', function(e){ if(e.detail===0) dayPhase=(dayPhase+0.12)%1; });
+timeBtn.addEventListener('blur', function(){ timeHoldActive=false; });
 timeBtn.addEventListener('pointerup', function(){ timeHoldActive = false; });
 timeBtn.addEventListener('pointercancel', function(){ timeHoldActive = false; });
 
 var skyHoldStart = 0, skyHoldActive = false;
 document.body.addEventListener('pointerdown', function(e){
   if(e.target===soundBtn || e.target===timeBtn) return;
-  if(e.clientY/H < 0.14){ skyHoldActive = true; skyHoldStart = performance.now(); }
+  if(PlayriumSurface.point(e).y/H < 0.14){ skyHoldActive = true; skyHoldStart = performance.now(); }
 });
 document.body.addEventListener('pointerup', function(){
   if(skyHoldActive && performance.now()-skyHoldStart > 700) showAbout();
@@ -870,5 +875,7 @@ document.addEventListener('visibilitychange', function(){
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

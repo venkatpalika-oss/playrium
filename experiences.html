@@ -7,12 +7,12 @@
 <meta name="description" content="Browse the complete Playrium catalogue — every handcrafted interactive experience from every country and collection, searchable and filterable in one place.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Explore All Experiences — Playrium">
-<meta property="og:description" content="Search, filter, and discover every Playrium experience — Originals, India, Japan, Philippines, and Relax & Satisfy picks.">
+<meta property="og:description" content="Search, filter, and discover every Playrium experience — Originals, India, Japan, Philippines, South Korea, Brazil, and relaxing picks.">
 <meta property="og:image" content="https://www.playrium.fun/favicon.png">
 <meta property="og:url" content="https://www.playrium.fun/experiences">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Explore All Experiences — Playrium">
-<meta name="twitter:description" content="Search, filter, and discover every Playrium experience — Originals, India, Japan, Philippines, and Relax & Satisfy picks.">
+<meta name="twitter:description" content="Search, filter, and discover every Playrium experience — Originals, India, Japan, Philippines, South Korea, Brazil, and relaxing picks.">
 <meta name="twitter:image" content="https://www.playrium.fun/favicon.png">
 <link rel="canonical" href="https://www.playrium.fun/experiences">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -137,12 +137,12 @@ transition:transform .25s ease, border-color .25s ease; }
     var relax = EXPERIENCES.filter(function (e) { return window.PLAYRIUM_isRelax(e); });
     // TODO: Replace array-order logic with createdAt metadata
     // once the experience registry supports timestamps.
-    var recentlyAdded = EXPERIENCES.slice(-4).reverse();
+    var recentlyAdded = EXPERIENCES.filter(function(e){return e.addedAt;}).sort(function(a,b){return b.addedAt.localeCompare(a.addedAt);}).slice(0,10);
 
     buildGroup(container, 'group-originals', '✨ Playrium Originals — Featured', originals, 'curated', true);
-    buildGroup(container, 'group-india', '🇮🇳 India', india, 'curated', false);
-    buildGroup(container, 'group-japan', '🇯🇵 Japan', japan, 'curated', false);
-    buildGroup(container, 'group-philippines', '🇵🇭 Philippines', philippines, 'curated', false);
+    (window.PLAYRIUM_HUBS || []).forEach(function(hub){
+      buildGroup(container, 'group-' + hub.country.toLowerCase().replace(/ /g,'-'), hub.flag + ' ' + hub.country, EXPERIENCES.filter(function(e){return e.country === hub.country;}), 'curated', false);
+    });
     buildGroup(container, 'group-relax', '🌿 Relax & Satisfy', relax, 'curated', false);
     buildGroup(container, 'group-recent', '🆕 Recently Added', recentlyAdded, 'curated', false);
     buildGroup(container, 'group-all', '📚 All Experiences', EXPERIENCES, 'all', false);
@@ -160,6 +160,8 @@ transition:transform .25s ease, border-color .25s ease; }
       { id: 'India', label: 'India' },
       { id: 'Japan', label: 'Japan' },
       { id: 'Philippines', label: 'Philippines' },
+      { id: 'South Korea', label: 'South Korea' },
+      { id: 'Brazil', label: 'Brazil' },
       { id: 'relaxing', label: 'Relaxing' },
       { id: 'skill', label: 'Skill' },
       { id: 'physics', label: 'Physics' },
@@ -189,7 +191,7 @@ transition:transform .25s ease, border-color .25s ease; }
     function matchesChip(card, chip) {
       if (chip === 'all') return true;
       if (chip === 'originals') return card.dataset.country === '';
-      if (chip === 'India' || chip === 'Japan' || chip === 'Philippines') return card.dataset.country === chip;
+      if ((window.PLAYRIUM_HUBS || []).some(function(h){return h.country === chip;})) return card.dataset.country === chip;
       var tags = card.dataset.tags || '', moods = card.dataset.moods || '';
       if (chip === 'relaxing') return moods.indexOf('relax') > -1 || moods.indexOf('satisfying') > -1;
       if (chip === 'skill') return tags.indexOf('skill') > -1;

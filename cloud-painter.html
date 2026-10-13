@@ -53,8 +53,11 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 @media (prefers-reduced-motion:reduce){ *{transition-duration:.001s !important;} }
 @media (max-width:720px){ .toolDock{max-height:56vh;} .tool-tile{width:38px;height:38px;font-size:1.05rem;} .weatherRow{gap:.3rem;} .weather-btn{width:38px;height:38px;} .skyStrip{max-width:86vw;} }
 </style>
+<link rel="stylesheet" href="components/game-design.css">
+<link rel="stylesheet" href="components/experience-layout.css">
+<script src="components/experience-surface.js"></script>
 </head>
-<body>
+<body class="pr-game pr-craft" data-experience="cloud-painter" style="--game-accent:#b4dcff">
 <header id="site-header"></header>
 <div id="pr-breadcrumb"></div>
  <div id="stageWrap">
@@ -77,7 +80,7 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 <a id="aboutLink" href="index.html">☁ Cloud Painter™ · Back to Playrium</a>
 
 </div> <section id="pr-explore">
-<div id="pr-breadcrumb"></div>
+
 <div id="pr-did-you-know"></div><div id="pr-related"></div>
 <div id="pr-continue-exploring"></div>
 </section>
@@ -85,8 +88,8 @@ button:focus-visible,.tool-tile:focus-visible,.sky-thumb:focus-visible,.weather-
 (function(){
 'use strict';
 var canvas=document.getElementById('sky'), ctx=canvas.getContext('2d');
-var W=window.innerWidth, H=window.innerHeight, DPR=Math.min(window.devicePixelRatio||1,2);
-function resize(){ W=window.innerWidth; H=window.innerHeight; canvas.width=Math.floor(W*DPR); canvas.height=Math.floor(H*DPR); canvas.style.width=W+'px'; canvas.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
+var W=PlayriumSurface.width, H=PlayriumSurface.height, DPR=Math.min(window.devicePixelRatio||1,2);
+function resize(){ W=PlayriumSurface.width; H=PlayriumSurface.height; canvas.width=Math.floor(W*DPR); canvas.height=Math.floor(H*DPR); canvas.style.width=W+'px'; canvas.style.height=H+'px'; ctx.setTransform(DPR,0,0,DPR,0,0); }
 window.addEventListener('resize', resize); resize();
 
 function clamp(v,a,b){ return v<a?a:(v>b?b:v); }
@@ -405,16 +408,19 @@ else if(selectedTool==='fog'){ weatherState.sunny=false; weatherState.fog=!weath
 else if(selectedTool==='rainbow'){ rainbowArcs.push({x:x,y:y,life:1}); playChime(); }
 else if(selectedTool==='lightning'){ lightningFlash=1; playThunder(); }
 }
-canvas.addEventListener('pointerdown', function(e){ down=true; lastX=e.clientX; lastY=e.clientY; toolTap(e.clientX,e.clientY); resetIdle(); });
-canvas.addEventListener('pointermove', function(e){ if(!down) return; var dx=e.clientX-lastX, dy=e.clientY-lastY; toolPaint(e.clientX,e.clientY,dx,dy); lastX=e.clientX; lastY=e.clientY; });
+canvas.addEventListener('pointerdown', function(e){ canvas.setPointerCapture(e.pointerId); down=true; lastX=PlayriumSurface.point(e).x; lastY=PlayriumSurface.point(e).y; toolTap(PlayriumSurface.point(e).x,PlayriumSurface.point(e).y); resetIdle(); });
+canvas.addEventListener('pointermove', function(e){ if(!down) return; var dx=PlayriumSurface.point(e).x-lastX, dy=PlayriumSurface.point(e).y-lastY; toolPaint(PlayriumSurface.point(e).x,PlayriumSurface.point(e).y,dx,dy); lastX=PlayriumSurface.point(e).x; lastY=PlayriumSurface.point(e).y; });
 window.addEventListener('pointerup', function(){ down=false; });
+canvas.addEventListener('pointercancel',function(){down=false;});
+canvas.addEventListener('lostpointercapture',function(){down=false;});
 
 /* ============ BOTTOM UTIL ============ */
 var uiHidden=false;
-var chromeEls=[document.getElementById('skyStrip'),document.getElementById('toolDock'),document.getElementById('weatherRow'),document.getElementById('bottomUtil')];
+var chromeEls=[document.getElementById('skyStrip'),document.getElementById('toolDock'),document.getElementById('weatherRow')];
 document.getElementById('btnHideUI').addEventListener('click', function(){
 uiHidden=!uiHidden;
 chromeEls.forEach(function(c){ c.style.display=uiHidden?'none':''; });
+this.textContent=uiHidden?'Show tools':'Hide tools';this.setAttribute('aria-pressed',String(uiHidden));
 document.getElementById('aboutLink').style.display=uiHidden?'none':'';
 });
 document.getElementById('btnClearSky').addEventListener('click', function(){ puffs=[]; rainbowArcs=[]; stars=[]; });
@@ -494,5 +500,7 @@ if(document.hidden){ rafPaused=true; } else if(rafPaused){ lastFrame=performance
 <script src="components/navigation.js"></script>
 <script src="components/schema.js"></script>
 <footer id="site-footer"></footer>
+<script src="components/game-design.js"></script>
+<script src="components/experience-layout.js"></script>
 </body>
 </html>

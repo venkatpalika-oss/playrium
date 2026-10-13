@@ -58,4 +58,4 @@ close.listeners.click();
 assert.equal(overlay.hidden,true); assert.equal(document.activeElement,trigger);
 trigger.listeners.click(); keyHandlers.keydown({key:'Escape'});
 assert.equal(overlay.hidden,true); assert.equal(document.activeElement,trigger);
-console.log('PASS: 23 catalogue destinations; static counts; all inline script syntax; 366 daily selections; search open, focus wrap, close, Escape and focus restoration.');
+console.log('PASS: 36 catalogue destinations; static counts; all inline script syntax; 366 daily selections; search open, focus wrap, close, Escape and focus restoration.');

@@ -15,7 +15,7 @@ for (const url of urls) {
   assert(/<title>[^<]+<\/title>/.test(html), file + ': title');
   assert(/name="description" content="[^"]+"/.test(html), file + ': description');
 }
-assert.equal(urls.length, 30);
+assert.equal(urls.length, 45);
 assert(fs.readFileSync('404.html', 'utf8').includes('content="noindex"'));
 assert(fs.readFileSync('robots.txt', 'utf8').includes('Sitemap: https://www.playrium.fun/sitemap.xml'));
-console.log('SEO checks passed: 30 canonical pages, metadata, sitemap, robots and 404.');
+console.log('SEO checks passed: 45 canonical pages, metadata, sitemap, robots and 404.');
